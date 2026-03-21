@@ -764,10 +764,10 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
 
         {/* Heading — full width on mobile, sits above the grid just like RIGHT NOW sits above its dl */}
-        <h2 className="leading-[0.82] tracking-tighter mb-10 md:mb-0 pt-12 md:pt-0">
+        <h2 className="mb-10 md:mb-0 pt-12 md:pt-0">
           <span className="sr-only">Who am I</span>
-          <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: c.text }}>WHO</span>
-          <span className="flex items-baseline gap-[0.12em] text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: '#ff4d00' }}>
+          <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: c.text }}>WHO</span>
+          <span className="flex items-baseline gap-[0.25em] text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: '#ff4d00' }}>
             <span>AM</span>
             <span>I</span>
           </span>
@@ -799,8 +799,8 @@ export default function Home() {
         <h2 className="sr-only">Right Now</h2>
         {/* Identical structure to WHO AM I — full-width heading, content below */}
         <div className="now-item opacity-0 flex flex-col mb-10 md:mb-14" aria-hidden="true">
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>RIGHT</p>
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: '#ff4d00' }}>NOW</p>
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>RIGHT</p>
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>NOW</p>
         </div>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
