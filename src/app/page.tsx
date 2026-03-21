@@ -759,28 +759,29 @@ export default function Home() {
         {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} />)}
       </div>
 
-      {/* ── ABOUT ── FIX: Single h2 with sr-only text; two visual spans */}
+      {/* ── ABOUT ── */}
       <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
-        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-center pt-12 md:pt-0">
-          <div>
-            <h2 className="leading-[0.82] tracking-tighter">
-              <span className="sr-only">Who am I</span>
-              <span className="block text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: c.text }}>WHO</span>
-              <span className="flex items-baseline gap-[0.12em] text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: '#ff4d00' }}>
-                <span>AM</span>
-                <span>I</span>
-              </span>
-            </h2>
-            <ul className="mt-9 flex flex-col gap-3" aria-label="Credentials">
-              {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Prototyping'].map(item => (
-                <li key={item} className="flex items-center gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] flex-shrink-0" aria-hidden="true" />
-                  <span className="text-[11px] font-mono uppercase tracking-[0.22em]" style={{ color: c.textMuted }}>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+
+        {/* Heading — full width on mobile, sits above the grid just like RIGHT NOW sits above its dl */}
+        <h2 className="leading-[0.82] tracking-tighter mb-10 md:mb-0 pt-12 md:pt-0">
+          <span className="sr-only">Who am I</span>
+          <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: c.text }}>WHO</span>
+          <span className="flex items-baseline gap-[0.12em] text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: '#ff4d00' }}>
+            <span>AM</span>
+            <span>I</span>
+          </span>
+        </h2>
+
+        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-start">
+          <ul className="flex flex-col gap-3" aria-label="Credentials">
+            {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Prototyping'].map(item => (
+              <li key={item} className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] flex-shrink-0" aria-hidden="true" />
+                <span className="text-[11px] font-mono uppercase tracking-[0.22em]" style={{ color: c.textMuted }}>{item}</span>
+              </li>
+            ))}
+          </ul>
           <div className="flex flex-col gap-5">
             <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv, a student at Tampere University pursuing a Master's in Human-Technology Interaction.</p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I focus on UX/UI design, blending my B.Tech background in AI and Machine Learning with human-centered design principles.</p>
@@ -792,13 +793,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── RIGHT NOW ── FIX: aria-label added; dl/dt/dd for semantics */}
+      {/* ── RIGHT NOW ── */}
       <section className="now-section relative min-h-[55vh] flex flex-col justify-center px-6 md:px-16 py-24 border-t transition-colors duration-300" style={{ background: c.bg, borderColor: c.border }} aria-label="What Garv is doing right now">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Right Now / P. 008</div>
         <h2 className="sr-only">Right Now</h2>
-        <div className="now-item opacity-0 flex flex-col mb-14" aria-hidden="true">
-          <p className="text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>RIGHT</p>
-          <p className="text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: '#ff4d00' }}>NOW</p>
+        {/* Identical structure to WHO AM I — full-width heading, content below */}
+        <div className="now-item opacity-0 flex flex-col mb-10 md:mb-14" aria-hidden="true">
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>RIGHT</p>
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: '#ff4d00' }}>NOW</p>
         </div>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
