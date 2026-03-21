@@ -122,51 +122,51 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
   pageNum: string, showLabel: boolean, href: string, bgGradient: string,
   videoSrc?: string, surfaceColor: string, borderColor: string
 }) => (
-  <article className="project-card w-screen h-full relative overflow-hidden flex flex-col justify-end p-6 md:p-16 group" aria-label={`Project: ${title}`}>
+  <article className="project-card w-screen h-full relative overflow-hidden flex flex-col justify-end p-8 md:p-16 group" aria-label={`Project: ${title}`}>
     {showLabel && <div className="absolute top-10 left-10 text-[10px] uppercase font-mono italic text-[#ff4d00] tracking-widest z-10" aria-hidden="true">/ STUFF I BUILT / {pageNum}</div>}
     <div className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none z-0 opacity-[0.04]" style={{ color: 'gray', fontVariantNumeric: 'tabular-nums' }} aria-hidden="true">0{index + 1}</div>
 
     {videoSrc ? (
       <>
+        {/* Fix: opacity 0.3→0.52 so video background is clearly visible */}
         <video src={videoSrc} autoPlay loop muted playsInline disablePictureInPicture className="absolute inset-0 w-full h-full object-cover z-0" style={{ opacity: 0.52 }} aria-hidden="true" tabIndex={-1} />
+        {/* Fix: gradient starts at 25% (was 35%) — lets more of the video show through */}
         <div className="absolute inset-0 z-[1]" style={{ background: 'linear-gradient(to top, #050505 25%, rgba(5,5,5,0.65) 55%, rgba(5,5,5,0.18) 100%)' }} aria-hidden="true" />
       </>
     ) : (
       <>
+        {/* Fix: opacity 0.22→0.38 so static gradient bg-image is more present */}
         <div className="absolute inset-0" style={{ background: bgGradient, opacity: 0.38 }} aria-hidden="true" />
         <div className="absolute inset-0" style={{ background: surfaceColor, mixBlendMode: 'multiply' as const }} aria-hidden="true" />
+        {/* Fix: gradient starts at 22% (was 30%) */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 22%, rgba(5,5,5,0.72) 52%, rgba(5,5,5,0.22) 100%)' }} aria-hidden="true" />
       </>
     )}
 
-    {/* Content — single flex column, no absolute button so nothing overlaps on mobile */}
-    <div className="relative z-10 max-w-2xl flex flex-col">
-      <div className="flex items-center gap-4 mb-4" aria-hidden="true">
+    <div className="relative z-10 max-w-2xl">
+      <div className="flex items-center gap-4 mb-5" aria-hidden="true">
         <div className="w-5 h-[1px] bg-[#ff4d00]" />
         <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#ff4d00]">Project 0{index + 1}</span>
       </div>
       <h2 className="text-[7vw] md:text-[5vw] font-black uppercase tracking-tight mb-3 leading-[0.92]" style={{ color: accentColor }}>{title}</h2>
-      <p className="font-mono text-xs md:text-sm mb-4 leading-relaxed" style={{ color: 'rgba(230,226,211,0.88)' }}>{desc}</p>
-
-      {/* Tags + button in a row on mobile so they never stack on top of each other */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <ul className="flex flex-wrap gap-2" aria-label="Project tags">
-          {tags.map(tag => (
-            <li key={tag} className="px-2 py-1 border text-[8px] md:text-[9px] font-bold uppercase font-mono tracking-widest" style={{ borderColor, color: 'rgba(230,226,211,0.65)' }}>{tag}</li>
-          ))}
-        </ul>
-        <Link
-          href={href}
-          className="flex items-center gap-3 z-20 group/link rounded-full self-start sm:self-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] flex-shrink-0"
-          aria-label={`View project: ${title}`}
-        >
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-[#ff4d00] flex items-center justify-center group-hover/link:bg-[#ff4d00] transition-colors duration-200" aria-hidden="true">
-            <span className="text-[#ff4d00] group-hover/link:text-black text-sm transition-colors duration-200" aria-hidden="true">→</span>
-          </div>
-          <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em] whitespace-nowrap">View Project</span>
-        </Link>
-      </div>
+      <p className="font-mono text-xs md:text-sm mb-6 leading-relaxed" style={{ color: 'rgba(230,226,211,0.88)' }}>{desc}</p>
+      <ul className="flex flex-wrap gap-2 mb-10 md:mb-12" aria-label="Project tags">
+        {tags.map(tag => (
+          <li key={tag} className="px-3 py-1 border text-[9px] font-bold uppercase font-mono tracking-widest" style={{ borderColor, color: 'rgba(230,226,211,0.65)' }}>{tag}</li>
+        ))}
+      </ul>
     </div>
+
+    <Link
+      href={href}
+      className="absolute bottom-8 md:bottom-12 right-8 md:right-12 flex items-center gap-3 z-20 group/link rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]"
+      aria-label={`View project: ${title}`}
+    >
+      <div className="w-10 h-10 rounded-full border border-[#ff4d00] flex items-center justify-center group-hover/link:bg-[#ff4d00] transition-colors duration-200" aria-hidden="true">
+        <span className="text-[#ff4d00] group-hover/link:text-black text-sm transition-colors duration-200" aria-hidden="true">→</span>
+      </div>
+      <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em]">View Project</span>
+    </Link>
   </article>
 )
 
@@ -176,10 +176,6 @@ export default function Home() {
   const cursorDot = useRef<HTMLDivElement>(null)
   const cursorRing = useRef<HTMLDivElement>(null)
   const [cursorVisible, setCursorVisible] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
-  }, [])
   const [mobileScrolled, setMobileScrolled] = useState(false)
   const [reduced, setReduced] = useState(false)
   
@@ -271,28 +267,19 @@ export default function Home() {
     gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3 })
     gsap.fromTo('.intro-label',    { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, delay: 1.2, ease: 'power2.out' })
 
-    // Skip heavy scroll-scrub animations on mobile — they cause jank
-    if (!isMobile) {
-      const heroTrigger = { trigger: '.hero-section', start: 'top top', end: 'bottom top', scrub: true }
-      gsap.to('.hero-garv',  { y: -420, ease: 'none', scrollTrigger: heroTrigger })
-      gsap.to('.hero-malik', { y: -240, ease: 'none', scrollTrigger: heroTrigger })
-      const mTl = gsap.timeline({ scrollTrigger: { trigger: '.manifesto-section', pin: true, start: 'top top', end: '+=160%', scrub: 1.2 } })
-      mTl.to('.quote-line', { y: '0%', stagger: 0.4, ease: 'power3.out', duration: 1 }).to('.manifesto-sub', { opacity: 1, y: 0, duration: 0.6 }, '-=0.2')
-      const sTl = gsap.timeline({ scrollTrigger: { trigger: '.split-section', start: 'top 65%', end: 'bottom 85%', scrub: 1 } })
-      sTl.to('.center-line', { height: '100%', ease: 'none', duration: 2 }).to('.split-header', { opacity: 1, y: 0, stagger: 0.15, duration: 1 }, '<0.3').to('.split-item', { opacity: 1, y: 0, stagger: 0.08, duration: 0.8 }, '<0.4')
-      const cards = gsap.utils.toArray<HTMLElement>('.project-card')
-      gsap.to(cards, { xPercent: -100 * (cards.length - 1), ease: 'none', scrollTrigger: { trigger: '.horizontal-section', pin: true, scrub: 1, snap: { snapTo: 1 / (cards.length - 1), duration: 0.5, ease: 'power2.inOut' }, end: () => '+=' + (window.innerWidth * (cards.length - 0.5)) } })
-    } else {
-      // Mobile: simple fade-ins only — no pinning, no scrub, no parallax
-      gsap.set(['.quote-line', '.manifesto-sub'], { clearProps: 'all' })
-      gsap.set(['.split-header', '.split-item'], { clearProps: 'all' })
-      const cards = gsap.utils.toArray<HTMLElement>('.project-card')
-      gsap.to(cards, { xPercent: -100 * (cards.length - 1), ease: 'none', scrollTrigger: { trigger: '.horizontal-section', pin: true, scrub: 1, snap: { snapTo: 1 / (cards.length - 1), duration: 0.4, ease: 'power2.inOut' }, end: () => '+=' + (window.innerWidth * (cards.length - 0.5)) } })
-    }
-
+    // Issue 7 fix: GARV and MALIK animate independently on scroll.
+    const heroTrigger = { trigger: '.hero-section', start: 'top top', end: 'bottom top', scrub: true }
+    gsap.to('.hero-garv',  { y: -420, ease: 'none', scrollTrigger: heroTrigger })
+    gsap.to('.hero-malik', { y: -240, ease: 'none', scrollTrigger: heroTrigger })
+    const mTl = gsap.timeline({ scrollTrigger: { trigger: '.manifesto-section', pin: true, start: 'top top', end: '+=160%', scrub: 1.2 } })
+    mTl.to('.quote-line', { y: '0%', stagger: 0.4, ease: 'power3.out', duration: 1 }).to('.manifesto-sub', { opacity: 1, y: 0, duration: 0.6 }, '-=0.2')
+    const sTl = gsap.timeline({ scrollTrigger: { trigger: '.split-section', start: 'top 65%', end: 'bottom 85%', scrub: 1 } })
+    sTl.to('.center-line', { height: '100%', ease: 'none', duration: 2 }).to('.split-header', { opacity: 1, y: 0, stagger: 0.15, duration: 1 }, '<0.3').to('.split-item', { opacity: 1, y: 0, stagger: 0.08, duration: 0.8 }, '<0.4')
+    const cards = gsap.utils.toArray<HTMLElement>('.project-card')
+    gsap.to(cards, { xPercent: -100 * (cards.length - 1), ease: 'none', scrollTrigger: { trigger: '.horizontal-section', pin: true, scrub: 1, snap: { snapTo: 1 / (cards.length - 1), duration: 0.5, ease: 'power2.inOut' }, end: () => '+=' + (window.innerWidth * (cards.length - 0.5)) } })
     gsap.fromTo('.now-item', { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.now-section', start: 'top 70%' } })
     gsap.fromTo('.footer-email', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: '.footer-section', start: 'top 80%' } })
-  }, { scope: container, dependencies: [isMobile] })
+  }, { scope: container })
 
   const MARQUEE_ITEMS = ['UX/UI Design', 'Interaction Design', 'Figma', 'Design Systems', 'User Research', 'Prototyping', 'Tampere, Finland', 'Open to Work']
   const projects = [
@@ -311,8 +298,8 @@ export default function Home() {
       {/* Hide system cursor only on desktop when not reduced */}
       {!reduced && <style>{`@media (min-width: 768px) { body { cursor: none; } }`}</style>}
 
-      {/* Grain — desktop only for performance, fixed layers cause constant repaints on mobile */}
-      {!isMobile && <div className="fixed inset-0 pointer-events-none z-[9998] transition-opacity duration-300" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat', backgroundSize: '128px 128px', opacity: c.grain }} aria-hidden="true" />}
+      {/* Grain — decorative */}
+      <div className="fixed inset-0 pointer-events-none z-[9998] transition-opacity duration-300" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat', backgroundSize: '128px 128px', opacity: c.grain }} aria-hidden="true" />
 
       {/* Custom cursor — desktop, decorative */}
       <div ref={cursorDot}  className="fixed top-0 left-0 w-1.5 h-1.5 bg-[#ff4d00] rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 hidden md:block" style={{ opacity: cursorVisible ? 1 : 0 }} aria-hidden="true" />
@@ -506,9 +493,9 @@ export default function Home() {
      {/* ── HERO ── */}
       <section id="main-content" className="hero-section relative h-screen flex flex-col justify-end pb-[12vh] md:justify-center md:pb-0 px-6 md:px-16 overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg }} aria-label="Hero Garv Malik, UX UI Designer">
         
-        {/* Topographic Terrain — desktop only. SVG feTurbulence+feDisplacementMap
-             is GPU-intensive and causes severe lag on mobile. */}
-        {!isMobile && (
+        {/* Topographic Terrain — animated contour lines à la the reference image.
+             Pure SVG + CSS: no JS, no external deps, respects prefers-reduced-motion.
+             Two layers: base contours (dim) + highlight paths (accent glow) that drift slowly. */}
         <svg
           className="absolute inset-0 w-full h-full z-0 pointer-events-none"
           style={{ opacity: theme === 'dark' ? 0.55 : 0.45 }}
@@ -518,14 +505,34 @@ export default function Home() {
           aria-hidden="true"
         >
           <defs>
+            {/* Turbulence filter — creates the organic contour warping */}
             <filter id="topo-warp" x="-10%" y="-10%" width="120%" height="120%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.0028 0.0032" numOctaves="5" seed="42" result="noise" />
-              <feDisplacementMap in="SourceGraphic" in2="noise" scale="220" xChannelSelector="R" yChannelSelector="G" />
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.0028 0.0032"
+                numOctaves="5"
+                seed="42"
+                result="noise"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="noise"
+                scale="220"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
             </filter>
+
+            {/* Glow filter for accent highlight contours */}
             <filter id="topo-glow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
             </filter>
+
+            {/* Slow drift animation — paused by reduced-motion via CSS */}
             <style>{`
               @keyframes topo-drift {
                 0%   { transform: translate(0px,   0px)   scale(1.00); }
@@ -545,18 +552,39 @@ export default function Home() {
               }
             `}</style>
           </defs>
-          <g className="topo-base" filter="url(#topo-warp)" stroke={theme === 'dark' ? 'rgba(180,200,220,0.13)' : 'rgba(30,60,100,0.09)'} strokeWidth="1" fill="none">
+
+          {/* ── Base contour layer — fine lines, very subtle ── */}
+          <g
+            className="topo-base"
+            filter="url(#topo-warp)"
+            stroke={theme === 'dark' ? 'rgba(180,200,220,0.13)' : 'rgba(30,60,100,0.09)'}
+            strokeWidth="1"
+            fill="none"
+          >
+            {/* Horizontal bands — spaced 18px apart, warped by filter into organic blobs */}
             {Array.from({ length: 52 }).map((_, i) => (
               <line key={`h-${i}`} x1="-100" y1={i * 18} x2="1600" y2={i * 18} />
             ))}
           </g>
-          <g className="topo-accent" filter="url(#topo-warp)" fill="none">
+
+          {/* ── Accent contour layer — bright highlight paths (like the cyan lines in the ref) ── */}
+          <g
+            className="topo-accent"
+            filter="url(#topo-warp)"
+            fill="none"
+          >
+            {/* Every ~8th contour gets the accent color and glow — mimics the bold cyan lines */}
             {[36, 90, 162, 234, 306, 378, 450, 522, 594, 666, 738, 810, 882].map((y, i) => (
-              <line key={`a-${i}`} x1="-100" y1={y} x2="1600" y2={y} stroke={theme === 'dark' ? 'rgba(100,210,200,0.38)' : 'rgba(0,120,160,0.28)'} strokeWidth="1.4" filter="url(#topo-glow)" />
+              <line
+                key={`a-${i}`}
+                x1="-100" y1={y} x2="1600" y2={y}
+                stroke={theme === 'dark' ? 'rgba(100,210,200,0.38)' : 'rgba(0,120,160,0.28)'}
+                strokeWidth="1.4"
+                filter="url(#topo-glow)"
+              />
             ))}
           </g>
         </svg>
-        )}
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
         <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Home / P. 001</div>
@@ -679,8 +707,8 @@ export default function Home() {
           <div>
             <h2 className="leading-[0.82] tracking-tighter">
               <span className="sr-only">Who am I</span>
-              <span className="block text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: c.text }}>WHO</span>
-              <span className="flex items-baseline gap-[0.12em] text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: '#ff4d00' }}>
+              <span className="block text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: c.text }}>WHO</span>
+              <span className="flex items-baseline gap-[0.12em] text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: '#ff4d00' }}>
                 <span>AM</span>
                 <span>I</span>
               </span>
@@ -710,8 +738,8 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Right Now / P. 008</div>
         <h2 className="sr-only">Right Now</h2>
         <div className="now-item opacity-0 flex flex-col mb-14" aria-hidden="true">
-          <p className="text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>RIGHT</p>
-          <p className="text-[16vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: '#ff4d00' }}>NOW</p>
+          <p className="text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>RIGHT</p>
+          <p className="text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: '#ff4d00' }}>NOW</p>
         </div>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
