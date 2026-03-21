@@ -705,12 +705,10 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-center pt-12 md:pt-0">
           <div>
-            <h2 className="leading-[0.85] tracking-tighter">
+            <h2 className="leading-[0.82] tracking-tighter">
               <span className="sr-only">Who am I</span>
-              <span className="block text-[10vw] md:text-[11vw] font-black uppercase" aria-hidden="true" style={{ color: c.text }}>WHO</span>
-              {/* Fix: "AM I" space gap — render as inline-flex with controlled gap instead of
-                  a raw string where the space inflates to a full word-space at large vw sizes */}
-              <span className="flex items-baseline gap-[0.12em] text-[10vw] md:text-[11vw] font-black uppercase leading-[0.85]" aria-hidden="true" style={{ color: '#ff4d00' }}>
+              <span className="block text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: c.text }}>WHO</span>
+              <span className="flex items-baseline gap-[0.12em] text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" aria-hidden="true" style={{ color: '#ff4d00' }}>
                 <span>AM</span>
                 <span>I</span>
               </span>
@@ -739,9 +737,9 @@ export default function Home() {
       <section className="now-section relative min-h-[55vh] flex flex-col justify-center px-6 md:px-16 py-24 border-t transition-colors duration-300" style={{ background: c.bg, borderColor: c.border }} aria-label="What Garv is doing right now">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Right Now / P. 008</div>
         <h2 className="sr-only">Right Now</h2>
-        <div className="now-item opacity-0 flex flex-col md:flex-row md:items-end gap-4 md:gap-6 mb-14" aria-hidden="true">
-          <p className="text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>Right</p>
-          <p className="text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter text-[#ff4d00]">Now</p>
+        <div className="now-item opacity-0 flex flex-col mb-14" aria-hidden="true">
+          <p className="text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: c.text }}>RIGHT</p>
+          <p className="text-[10vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-tighter" style={{ color: '#ff4d00' }}>NOW</p>
         </div>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
