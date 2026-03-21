@@ -42,13 +42,21 @@ export default function MyTownPage() {
     })
   }, { scope: container })
 
+  // ── MyTown brand tokens — exact palette ──
+  const brand = {
+    primary:   '#FF844B',   // MyTown primary orange
+    secondary: '#55A6EC',   // MyTown secondary blue
+    tertiary:  '#28285F',   // MyTown tertiary navy
+    bg:        '#0d1318',   // deep navy-black
+    glow:      'rgba(255,132,75,0.15)',
+  }
+
   return (
     <main
       ref={container}
-      className={`min-h-screen overflow-x-hidden selection:bg-[#ff4d00] selection:text-black ${tr}`}
-      style={{ background: c.bg, color: c.text }}
-    >
-      <SkipLink />
+      className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
+      style={{ background: c.bg, color: c.text, ['--sel-bg' as string]: brand.primary }}
+    >\n      <SkipLink />
       <Grain opacity={c.grain} />
       <SiteNav c={c} />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
@@ -56,26 +64,44 @@ export default function MyTownPage() {
       {/* ── HERO ── */}
       <section
         id="main-content"
-        className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b ${tr}`}
-        style={{ borderColor: c.border }}
+        className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b overflow-hidden ${tr}`}
+        style={{ borderColor: c.border, background: brand.bg }}
         aria-label="MyTown — project hero"
       >
-        <div className="project-fade-in mb-8">
+        {/* Brand glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 20% 60%, ${brand.glow} 0%, transparent 65%)` }} aria-hidden="true" />
+
+        <div className="project-fade-in mb-8 relative z-10">
           <BackButton c={c} />
         </div>
-        <div className="overflow-hidden mb-1" aria-label="MyTown">
+
+        {/* MyTown inline SVG logo */}
+        <div className="project-fade-in mb-8 relative z-10" aria-label="MyTown logo">
+          <svg width="120" height="80" viewBox="0 0 260 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            {/* Buildings */}
+            <polyline points="20,130 20,80 55,45 90,80 90,130" stroke={brand.primary} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <polyline points="90,130 90,55 130,15 170,55 170,130" stroke={brand.primary} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <polyline points="170,130 170,75 205,50 240,75 240,130" stroke={brand.primary} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            {/* Arrow up center */}
+            <line x1="130" y1="15" x2="130" y2="90" stroke={brand.primary} strokeWidth="6" strokeLinecap="round"/>
+            <polyline points="115,32 130,15 145,32" stroke={brand.primary} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </svg>
+          <p className="text-[10px] uppercase font-mono tracking-[0.4em] mt-1" style={{ color: brand.secondary }}>MYTOWN</p>
+        </div>
+
+        <div className="overflow-hidden mb-1 relative z-10" aria-label="MyTown">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'MYTOWN'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: c.text }}>
+              <span key={i} className="inline-block text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.secondary }}>
                 {char}
               </span>
             ))}
           </div>
         </div>
-        <div className="overflow-hidden mb-8" aria-label="Relocation">
+        <div className="overflow-hidden mb-8 relative z-10" aria-label="Relocation">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'RELOCATION'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[8vw] font-black uppercase leading-[0.9] tracking-tighter text-[#ff4d00]">
+              <span key={i} className="inline-block text-[8vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: brand.primary }}>
                 {char}
               </span>
             ))}
@@ -127,7 +153,7 @@ export default function MyTownPage() {
                 'Design system and high-fidelity prototype',
               ].map(item => (
                 <li key={item} className="flex items-start gap-3 text-xs font-mono" style={{ color: c.textMuted }}>
-                  <span className="text-[#ff4d00] mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
+                  <span className="text-[#FF844B] mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
                   {item}
                 </li>
               ))}
@@ -169,7 +195,7 @@ export default function MyTownPage() {
 
           {/* Persona */}
           <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-6">Persona — Sheldon</p>
+            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-6">Persona — Sheldon</p>
             <PersonaGrid
               c={c}
               columns={[
@@ -214,7 +240,7 @@ export default function MyTownPage() {
               { phase: 'Long-Term',      emotion: 'Empowered / Confident', note: 'Hard to maintain engagement, seasonal challenges' },
             ].map(stage => (
               <Card key={stage.phase} c={c} accentBorder="#ff4d00">
-                <p className="text-[9px] uppercase font-mono tracking-widest text-[#ff4d00] mb-2">{stage.phase}</p>
+                <p className="text-[9px] uppercase font-mono tracking-widest text-[#FF844B] mb-2">{stage.phase}</p>
                 <p className="text-xs font-mono mb-2" style={{ color: c.textMuted }}>{stage.emotion}</p>
                 <p className="text-[10px] font-mono italic" style={{ color: c.textFaint }}>{stage.note}</p>
               </Card>
@@ -241,7 +267,7 @@ export default function MyTownPage() {
 
           {/* Four pillars */}
           <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-5">The Four Pillars of MyTown</p>
+            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-5">The Four Pillars of MyTown</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4" role="list">
               {[
                 { name: 'The Roadmaps',  desc: 'Step-by-step task guides: Arrival → DVV → Bank' },
@@ -250,7 +276,7 @@ export default function MyTownPage() {
                 { name: 'Support Hub',   desc: 'Mentor chat, AI FAQ, emergency info' },
               ].map(p => (
                 <div key={p.name} role="listitem" className="text-center p-3 border" style={{ borderColor: c.border }}>
-                  <p className="text-[10px] uppercase font-mono tracking-widest text-[#ff4d00] mb-2">{p.name}</p>
+                  <p className="text-[10px] uppercase font-mono tracking-widest text-[#FF844B] mb-2">{p.name}</p>
                   <p className="text-[10px] font-mono leading-relaxed" style={{ color: c.textFaint }}>{p.desc}</p>
                 </div>
               ))}
@@ -263,7 +289,7 @@ export default function MyTownPage() {
           <SectionHeading num="04" title="Design System" c={c} />
           <div className="grid md:grid-cols-3 gap-5">
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Color Tokens</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-4">Color Tokens</p>
               <div className="grid grid-cols-3 gap-2 mb-4" role="img" aria-label="MyTown palette: orange primary, blue secondary, purple tertiary">
                 {[
                   { bg: '#FF844B', label: 'Primary' },
@@ -281,14 +307,14 @@ export default function MyTownPage() {
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Typography</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-4">Typography</p>
               <p className="text-lg font-bold mb-1" style={{ color: c.text }}>Nunito</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
                 Chosen for readability and friendly tone. Clear scale: Display, H1–H4, Body L/M/S, Button, Caption. Tokens connected to components.
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Components</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-4">Components</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
                 Buttons, inputs, switches, checkboxes, radio buttons — reusable with predefined states: default, focused, pressed, disabled, error. Icons follow Material Design Icons.
               </p>

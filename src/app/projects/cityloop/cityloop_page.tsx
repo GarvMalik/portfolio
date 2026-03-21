@@ -42,10 +42,19 @@ export default function CityLoopPage() {
     })
   }, { scope: container })
 
+  // ── CityLoop brand tokens — exact palette ──
+  const brand = {
+    primary:   '#D95F30',   // CityLoop primary orange
+    secondary: '#D7DFD8',   // CityLoop secondary sage
+    dark:      '#A14421',   // CityLoop dark shade
+    bg:        '#0e0b09',   // warm near-black
+    glow:      'rgba(217,95,48,0.18)',
+  }
+
   return (
     <main
       ref={container}
-      className={`min-h-screen overflow-x-hidden selection:bg-[#ff4d00] selection:text-black ${tr}`}
+      className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
       style={{ background: c.bg, color: c.text }}
     >
       <SkipLink />
@@ -56,25 +65,37 @@ export default function CityLoopPage() {
       {/* ── HERO ── */}
       <section
         id="main-content"
-        className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b ${tr}`}
-        style={{ borderColor: c.border }}
+        className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b overflow-hidden ${tr}`}
+        style={{ borderColor: c.border, background: brand.bg }}
         aria-label="CityLoop — project hero"
       >
-        <div className="project-fade-in mb-8">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 70% 40%, ${brand.glow} 0%, transparent 65%)` }} aria-hidden="true" />
+
+        <div className="project-fade-in mb-8 relative z-10">
           <BackButton c={c} />
         </div>
 
-        {/* Large title */}
-        <div className="overflow-hidden mb-2" aria-label="CityLoop">
+        {/* CityLoop logo mark */}
+        <div className="project-fade-in mb-6 relative z-10" aria-label="CityLoop logo">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="24" cy="24" r="22" stroke={brand.primary} strokeWidth="3" fill="none"/>
+            <circle cx="24" cy="24" r="10" stroke={brand.primary} strokeWidth="3" fill="none"/>
+            <circle cx="24" cy="8"  r="4" fill={brand.primary}/>
+            <path d="M32,16 A12,12 0 0,1 40,24" stroke={brand.primary} strokeWidth="3" strokeLinecap="round" fill="none"/>
+          </svg>
+          <p className="text-[10px] uppercase font-mono tracking-[0.5em] mt-2" style={{ color: brand.primary }}>CITYLOOP</p>
+        </div>
+
+        <div className="overflow-hidden mb-2 relative z-10" aria-label="CityLoop">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'CITYLOOP'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[13vw] md:text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: c.accentGreen }}>
+              <span key={i} className="inline-block text-[13vw] md:text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.primary }}>
                 {char}
               </span>
             ))}
           </div>
         </div>
-        <div className="overflow-hidden mb-8" aria-label="Discovery">
+        <div className="overflow-hidden mb-8 relative z-10" aria-label="Discovery">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'DISCOVERY'.split('').map((char, i) => (
               <span key={i} className="inline-block text-[13vw] md:text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: c.text }}>
@@ -127,7 +148,7 @@ export default function CityLoopPage() {
               <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mb-5" style={{ color: c.text }}>
                 Discovering what to do in a city feels more complicated than it should.
               </p>
-              <blockquote className="border-l-2 border-[#ff4d00] pl-4 mt-6">
+              <blockquote className="border-l-2 border-[#D95F30] pl-4 mt-6">
                 <p className="font-mono text-sm italic" style={{ color: c.textMuted }}>
                   "Users spend more time deciding than actually experiencing the city."
                 </p>
@@ -182,7 +203,7 @@ export default function CityLoopPage() {
           </div>
           <Card c={c}>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              <span style={{ color: c.accentGreen }}>Dark-first visual direction: </span>
+              <span style={{ color: '#D95F30' }}>Dark-first visual direction: </span>
               As a conscious design choice, a darker interface was used to create a distinct look and mood — the dark background reduces visual noise and helps event imagery stand out, especially in evening or low-light use.
             </p>
           </Card>
@@ -208,7 +229,7 @@ export default function CityLoopPage() {
           <SectionHeading num="05" title="Design System" c={c} />
           <div className="grid md:grid-cols-3 gap-5">
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Color System</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#D95F30] mb-4">Color System</p>
               <div className="flex gap-2 mb-4" role="img" aria-label="CityLoop palette: light grey, burnt orange, near-black">
                 <div className="w-10 h-10 rounded border" style={{ background: '#D7DFD8', borderColor: c.border }} title="#D7DFD8" />
                 <div className="w-10 h-10 rounded border" style={{ background: '#D95F30', borderColor: c.border }} title="#D95F30" />
@@ -219,13 +240,13 @@ export default function CityLoopPage() {
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Typography</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#D95F30] mb-4">Typography</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
                 Clear typographic hierarchy for quick scanning and calm reading. Headings guide attention to featured content; body text remains neutral and legible for descriptions and metadata.
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Spacing System</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#D95F30] mb-4">Spacing System</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
                 8-point–based spacing for consistent rhythm and alignment. Defined rules for cards, sections, and safe areas — reducing clutter and keeping dense content navigable.
               </p>
@@ -238,7 +259,7 @@ export default function CityLoopPage() {
           <SectionHeading num="06" title="Final Solution" c={c} />
           <div className="grid md:grid-cols-2 gap-10">
             <div>
-              <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mb-5" style={{ color: c.accentGreen }}>
+              <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mb-5" style={{ color: '#D95F30' }}>
                 One calm interface for the whole city.
               </p>
               <p className="font-mono text-sm leading-relaxed mb-4" style={{ color: c.textMuted }}>
@@ -263,7 +284,7 @@ export default function CityLoopPage() {
                 >
                   <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ background: c.accentGreen }} aria-hidden="true" />
                   <div>
-                    <p className="text-[9px] uppercase font-mono tracking-widest mb-1" style={{ color: c.accentGreen }}>{s.screen}</p>
+                    <p className="text-[9px] uppercase font-mono tracking-widest mb-1" style={{ color: '#D95F30' }}>{s.screen}</p>
                     <p className="text-xs font-mono" style={{ color: c.textMuted }}>{s.desc}</p>
                   </div>
                 </div>

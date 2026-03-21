@@ -365,9 +365,33 @@ export default function Home() {
 
   const MARQUEE_ITEMS = ['UX/UI Design', 'Interaction Design', 'Figma', 'Design Systems', 'User Research', 'Prototyping', 'Tampere, Finland', 'Open to Work']
   const projects = [
-    { title: 'CityLoop Discovery', desc: 'Lifestyle discovery app helping users find places and events based on mood and weather in Tampere.', tags: ['UX/UI Design', 'Figma', 'UX Research', 'Prototyping'], accentColor: '#42d392', pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop', bgGradient: 'radial-gradient(ellipse at 30% 60%, #1a4a35 0%, #0d2a20 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #0d3025 0%, transparent 60%)', videoSrc: '/cityloop-bg.mp4' },
-    { title: 'MyTown Relocation', desc: 'Service concept centralizing guidance and peer support for international students moving to Finland.', tags: ['Product Design', 'Service Concept', 'Figma', 'Research'], accentColor: '#e6e2d3', pageNum: 'P. 005', showLabel: false, href: '/projects/mytown', bgGradient: 'radial-gradient(ellipse at 20% 70%, #2a2520 0%, #1a1810 40%, transparent 70%), radial-gradient(ellipse at 75% 25%, #201e18 0%, transparent 60%)', videoSrc: '/mytown-bg.mp4' },
-    { title: 'PlayPal Community', desc: 'Concept designed to help people find sports partners, organize games, and book venues effortlessly.', tags: ['Design System', 'Interaction', 'Figma', 'Motion'], accentColor: '#ff4d00', pageNum: 'P. 006', showLabel: false, href: '/projects/playpal', bgGradient: 'radial-gradient(ellipse at 25% 65%, #3a1800 0%, #200e00 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #2a1200 0%, transparent 60%)', videoSrc: '/playpal-bg.mp4' },
+    {
+      title: 'CityLoop Discovery',
+      desc: 'Lifestyle discovery app helping users find places and events based on mood and weather in Tampere.',
+      tags: ['UX/UI Design', 'Figma', 'UX Research', 'Prototyping'],
+      accentColor: '#D95F30',   // CityLoop terracotta
+      pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
+      bgGradient: 'radial-gradient(ellipse at 30% 60%, #3d1a0e 0%, #1a0a05 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #2a1208 0%, transparent 60%)',
+      videoSrc: '/cityloop-bg.mp4',
+    },
+    {
+      title: 'MyTown Relocation',
+      desc: 'Service concept centralizing guidance and peer support for international students moving to Finland.',
+      tags: ['Product Design', 'Service Concept', 'Figma', 'Research'],
+      accentColor: '#FF844B',   // MyTown orange
+      pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
+      bgGradient: 'radial-gradient(ellipse at 20% 70%, #2a1e18 0%, #1a1208 40%, transparent 70%), radial-gradient(ellipse at 75% 25%, #1e2535 0%, transparent 60%)',
+      videoSrc: '/mytown-bg.mp4',
+    },
+    {
+      title: 'PlayPal Community',
+      desc: 'Concept designed to help people find sports partners, organize games, and book venues effortlessly.',
+      tags: ['Design System', 'Interaction', 'Figma', 'Motion'],
+      accentColor: '#2978FF',   // PlayPal blue
+      pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
+      bgGradient: 'radial-gradient(ellipse at 25% 65%, #0a1530 0%, #050c1e 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #0d1828 0%, transparent 60%)',
+      videoSrc: '/playpal-bg.mp4',
+    },
   ]
 
   return (
@@ -760,11 +784,11 @@ export default function Home() {
       </div>
 
       {/* ── ABOUT ── */}
-      <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
+      <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
 
-        {/* Heading — full width on mobile, sits above the grid just like RIGHT NOW sits above its dl */}
-        <h2 className="mb-10 md:mb-0 pt-12 md:pt-0">
+        {/* Heading — full width, structurally identical to RIGHT NOW */}
+        <h2 className="pt-12 md:pt-0 mb-8 md:mb-12">
           <span className="sr-only">Who am I</span>
           <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: c.text }}>WHO</span>
           <span className="flex items-baseline gap-[0.25em] text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: '#ff4d00' }}>
@@ -774,7 +798,7 @@ export default function Home() {
         </h2>
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-start">
-          <ul className="flex flex-col gap-3" aria-label="Credentials">
+          <ul className="flex flex-col gap-4" aria-label="Credentials">
             {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Prototyping'].map(item => (
               <li key={item} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] flex-shrink-0" aria-hidden="true" />

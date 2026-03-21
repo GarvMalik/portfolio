@@ -42,10 +42,19 @@ export default function PlayPalPage() {
     })
   }, { scope: container })
 
+  // ── PlayPal brand tokens — exact palette ──
+  const brand = {
+    primary:   '#2978FF',   // PlayPal primary blue
+    secondary: '#FFC107',   // PlayPal secondary yellow
+    dark:      '#0151D9',   // PlayPal dark blue
+    bg:        '#080c14',   // deep blue-black
+    glow:      'rgba(41,120,255,0.20)',
+  }
+
   return (
     <main
       ref={container}
-      className={`min-h-screen overflow-x-hidden selection:bg-[#ff4d00] selection:text-black ${tr}`}
+      className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
       style={{ background: c.bg, color: c.text }}
     >
       <SkipLink />
@@ -56,26 +65,49 @@ export default function PlayPalPage() {
       {/* ── HERO ── */}
       <section
         id="main-content"
-        className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b ${tr}`}
-        style={{ borderColor: c.border }}
+        className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b overflow-hidden ${tr}`}
+        style={{ borderColor: c.border, background: brand.bg }}
         aria-label="PlayPal — project hero"
       >
-        <div className="project-fade-in mb-8">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 30% 60%, ${brand.glow} 0%, transparent 65%)` }} aria-hidden="true" />
+
+        <div className="project-fade-in mb-8 relative z-10">
           <BackButton c={c} />
         </div>
-        <div className="overflow-hidden mb-1" aria-label="PlayPal">
+
+        {/* PlayPal basketball logo */}
+        <div className="project-fade-in mb-6 relative z-10" aria-label="PlayPal logo">
+          <svg width="48" height="52" viewBox="0 0 48 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            {/* Basketball circle */}
+            <circle cx="24" cy="22" r="18" stroke={brand.primary} strokeWidth="3" fill="none"/>
+            {/* Vertical line */}
+            <line x1="24" y1="4" x2="24" y2="40" stroke={brand.primary} strokeWidth="2.5"/>
+            {/* Horizontal line */}
+            <line x1="6" y1="22" x2="42" y2="22" stroke={brand.primary} strokeWidth="2.5"/>
+            {/* Arc left */}
+            <path d="M24,4 Q10,14 10,22 Q10,30 24,40" stroke={brand.primary} strokeWidth="2.5" fill="none"/>
+            {/* Arc right */}
+            <path d="M24,4 Q38,14 38,22 Q38,30 24,40" stroke={brand.primary} strokeWidth="2.5" fill="none"/>
+            {/* Yellow underline */}
+            <line x1="2" y1="48" x2="46" y2="48" stroke={brand.secondary} strokeWidth="3" strokeLinecap="round"/>
+            <line x1="6" y1="44" x2="42" y2="44" stroke={brand.secondary} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+          </svg>
+          <p className="text-[10px] uppercase font-mono tracking-[0.5em] mt-2" style={{ color: brand.primary }}>PLAYPAL</p>
+        </div>
+
+        <div className="overflow-hidden mb-1 relative z-10" aria-label="PlayPal">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'PLAYPAL'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[14vw] font-black uppercase leading-[0.85] tracking-tighter text-[#ff4d00]">
+              <span key={i} className="inline-block text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.primary }}>
                 {char}
               </span>
             ))}
           </div>
         </div>
-        <div className="overflow-hidden mb-8" aria-label="Community">
+        <div className="overflow-hidden mb-8 relative z-10" aria-label="Community">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'COMMUNITY'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[8vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: c.text }}>
+              <span key={i} className="inline-block text-[8vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: brand.secondary }}>
                 {char}
               </span>
             ))}
@@ -127,7 +159,7 @@ export default function PlayPalPage() {
                 'Participated in user interviews, transcription, and collaborative analysis',
               ].map(item => (
                 <li key={item} className="flex items-start gap-3 text-xs font-mono" style={{ color: c.textMuted }}>
-                  <span className="text-[#ff4d00] mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
+                  <span className="text-[#2978FF] mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
                   {item}
                 </li>
               ))}
@@ -143,7 +175,7 @@ export default function PlayPalPage() {
               <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mb-5" style={{ color: c.text }}>
                 People stop playing sports not because they lack motivation — because coordination is too hard.
               </p>
-              <blockquote className="border-l-2 border-[#ff4d00] pl-4">
+              <blockquote className="border-l-2 border-[#2978FF] pl-4">
                 <p className="font-mono text-sm italic" style={{ color: c.textMuted }}>
                   "The key challenge: enabling people to move easily from wanting to play to actually having a game."
                 </p>
@@ -174,7 +206,7 @@ export default function PlayPalPage() {
               { label: 'Logistics matter', insight: 'Distance, venue availability, and timing strongly influence participation.' },
             ].map(item => (
               <Card key={item.label} c={c} accentBorder="#ff4d00">
-                <p className="text-[9px] uppercase font-mono tracking-widest text-[#ff4d00] mb-2">{item.label}</p>
+                <p className="text-[9px] uppercase font-mono tracking-widest text-[#2978FF] mb-2">{item.label}</p>
                 <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>{item.insight}</p>
               </Card>
             ))}
@@ -182,7 +214,7 @@ export default function PlayPalPage() {
 
           {/* Target users */}
           <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-5">Target Users</p>
+            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-5">Target Users</p>
             <div className="grid md:grid-cols-3 gap-6" role="list">
               {[
                 { name: 'Tim, 19',     desc: 'Highly active player who trains almost daily but wastes time finding games or suitable opponents.' },
@@ -208,14 +240,14 @@ export default function PlayPalPage() {
               { title: 'Increase confidence',        desc: 'Provide clear information about players, venues, distance, and availability to help users commit.' },
             ].map(g => (
               <Card key={g.title} c={c}>
-                <div className="w-5 h-[1px] bg-[#ff4d00] mb-4" aria-hidden="true" />
+                <div className="w-5 h-[1px] bg-[#2978FF] mb-4" aria-hidden="true" />
                 <h3 className="text-sm font-black uppercase tracking-tight mb-2" style={{ color: c.text }}>{g.title}</h3>
                 <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>{g.desc}</p>
               </Card>
             ))}
           </div>
           <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-3">Service Concept</p>
+            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-3">Service Concept</p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
               PlayPal is a central coordination service that brings together player discovery, game organization, and venue booking in one place. Users can join existing games or create their own — with clear information about skill level, location, timing, and participation status. The concept prioritizes clarity over complexity and spontaneity over long-term planning.
             </p>
@@ -227,7 +259,7 @@ export default function PlayPalPage() {
           <SectionHeading num="04" title="Design System & UI Decisions" c={c} />
           <div className="grid md:grid-cols-3 gap-5">
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Color Palette</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Color Palette</p>
               <div className="grid grid-cols-3 gap-2 mb-4" role="img" aria-label="PlayPal palette: blue primary, yellow secondary, dark text">
                 {[
                   { bg: '#2978FF', label: 'Primary' },
@@ -245,14 +277,14 @@ export default function PlayPalPage() {
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Typography</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Typography</p>
               <p className="text-lg font-bold mb-1" style={{ color: c.text }}>Zalando Sans</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
                 Bold, SemiBold, Medium, Regular — prioritizing readability and hierarchy. Supports quick scanning and reduces cognitive load.
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-4">Navigation Design</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Navigation Design</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
                 Core actions — Home, Play, Create, Book, Profile — accessible through predictable patterns and clear labels. Repeated layouts across flows help users feel oriented when switching between tasks.
               </p>
@@ -298,7 +330,7 @@ export default function PlayPalPage() {
                   className="flex items-start gap-3 text-xs font-mono border p-3"
                   style={{ borderColor: c.border, color: c.textMuted, background: c.cardBg }}
                 >
-                  <span className="text-[#ff4d00] mt-0.5 flex-shrink-0" aria-hidden="true">→</span>
+                  <span className="text-[#2978FF] mt-0.5 flex-shrink-0" aria-hidden="true">→</span>
                   {item}
                 </li>
               ))}
