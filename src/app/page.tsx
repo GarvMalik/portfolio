@@ -139,8 +139,8 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
       </>
     )}
 
-    {/* Content — single flex column, no absolute button so nothing overlaps on mobile */}
-    <div className="relative z-10 max-w-2xl flex flex-col">
+    {/* Content — left-aligned text block, max half width on desktop so button has room */}
+    <div className="relative z-10 max-w-xl flex flex-col">
       <div className="flex items-center gap-4 mb-4" aria-hidden="true">
         <div className="w-5 h-[1px] bg-[#ff4d00]" />
         <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#ff4d00]">Project 0{index + 1}</span>
@@ -148,25 +148,38 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
       <h2 className="text-[7vw] md:text-[5vw] font-black uppercase tracking-tight mb-3 leading-[0.92]" style={{ color: accentColor }}>{title}</h2>
       <p className="font-mono text-xs md:text-sm mb-4 leading-relaxed" style={{ color: 'rgba(230,226,211,0.88)' }}>{desc}</p>
 
-      {/* Tags + button in a row on mobile so they never stack on top of each other */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      {/* Tags — mobile only inline with button below; desktop just tags, button is absolute */}
+      <div className="flex flex-col gap-4">
         <ul className="flex flex-wrap gap-2" aria-label="Project tags">
           {tags.map(tag => (
             <li key={tag} className="px-2 py-1 border text-[8px] md:text-[9px] font-bold uppercase font-mono tracking-widest" style={{ borderColor, color: 'rgba(230,226,211,0.65)' }}>{tag}</li>
           ))}
         </ul>
+        {/* Mobile-only inline button — hidden on desktop */}
         <Link
           href={href}
-          className="flex items-center gap-3 z-20 group/link rounded-full self-start sm:self-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] flex-shrink-0"
+          className="md:hidden flex items-center gap-3 z-20 group/link rounded-full self-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]"
           aria-label={`View project: ${title}`}
         >
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-[#ff4d00] flex items-center justify-center group-hover/link:bg-[#ff4d00] transition-colors duration-200" aria-hidden="true">
+          <div className="w-9 h-9 rounded-full border border-[#ff4d00] flex items-center justify-center group-hover/link:bg-[#ff4d00] transition-colors duration-200" aria-hidden="true">
             <span className="text-[#ff4d00] group-hover/link:text-black text-sm transition-colors duration-200" aria-hidden="true">→</span>
           </div>
           <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em] whitespace-nowrap">View Project</span>
         </Link>
       </div>
     </div>
+
+    {/* Desktop-only button — absolute bottom-right, exactly like the original design */}
+    <Link
+      href={href}
+      className="hidden md:flex absolute bottom-12 right-12 items-center gap-3 z-20 group/link rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]"
+      aria-label={`View project: ${title}`}
+    >
+      <div className="w-10 h-10 rounded-full border border-[#ff4d00] flex items-center justify-center group-hover/link:bg-[#ff4d00] transition-colors duration-200" aria-hidden="true">
+        <span className="text-[#ff4d00] group-hover/link:text-black text-sm transition-colors duration-200" aria-hidden="true">→</span>
+      </div>
+      <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em]">View Project</span>
+    </Link>
   </article>
 )
 
