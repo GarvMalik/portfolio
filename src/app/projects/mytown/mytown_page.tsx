@@ -55,8 +55,9 @@ export default function MyTownPage() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
-      style={{ background: c.bg, color: c.text, ['--sel-bg' as string]: brand.primary }}
-    >\n      <SkipLink />
+      style={{ background: c.bg, color: c.text }}
+    >
+      <SkipLink />
       <Grain opacity={c.grain} />
       <SiteNav c={c} />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />

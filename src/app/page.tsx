@@ -383,7 +383,7 @@ export default function Home() {
       desc: 'Lifestyle discovery app helping users find places and events based on mood and weather in Tampere.',
       tags: ['UX/UI Design', 'Figma', 'UX Research', 'Prototyping'],
       accentColor: '#D95F30',   // CityLoop terracotta
-      pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
+      pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop_page',
       bgGradient: 'radial-gradient(ellipse at 30% 60%, #3d1a0e 0%, #1a0a05 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #2a1208 0%, transparent 60%)',
       videoSrc: '/cityloop-bg.mp4',
     },
@@ -392,7 +392,7 @@ export default function Home() {
       desc: 'Service concept centralizing guidance and peer support for international students moving to Finland.',
       tags: ['Product Design', 'Service Concept', 'Figma', 'Research'],
       accentColor: '#FF844B',   // MyTown orange
-      pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
+      pageNum: 'P. 005', showLabel: false, href: '/projects/mytown_page',
       bgGradient: 'radial-gradient(ellipse at 20% 70%, #2a1e18 0%, #1a1208 40%, transparent 70%), radial-gradient(ellipse at 75% 25%, #1e2535 0%, transparent 60%)',
       videoSrc: '/mytown-bg.mp4',
     },
@@ -401,7 +401,7 @@ export default function Home() {
       desc: 'Concept designed to help people find sports partners, organize games, and book venues effortlessly.',
       tags: ['Design System', 'Interaction', 'Figma', 'Motion'],
       accentColor: '#2978FF',   // PlayPal blue
-      pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
+      pageNum: 'P. 006', showLabel: false, href: '/projects/playpal_page',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #0a1530 0%, #050c1e 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #0d1828 0%, transparent 60%)',
       videoSrc: '/playpal-bg.mp4',
     },
@@ -800,14 +800,11 @@ export default function Home() {
       <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
 
-        {/* Heading — full width, structurally identical to RIGHT NOW */}
+        {/* Heading — mirrors RIGHT NOW exactly: two plain block lines, no flex, no gap tricks */}
         <h2 className="pt-12 md:pt-0 mb-8 md:mb-12">
           <span className="sr-only">Who am I</span>
           <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: c.text }}>WHO</span>
-          <span className="flex items-baseline gap-[0.25em] text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: '#ff4d00' }}>
-            <span>AM</span>
-            <span>I</span>
-          </span>
+          <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: '#ff4d00' }}>AM&nbsp;I</span>
         </h2>
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-start">
