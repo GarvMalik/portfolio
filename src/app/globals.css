@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 @import "tailwindcss";
 
 /* === BASE ================================================================= */
-/* WCAG 1.4.4: Do not set px root font-size — respects user browser preferences */
 html {
   scroll-behavior: smooth;
 }
@@ -12,29 +10,20 @@ body {
   color: #e6e2d3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* FIX: Removed external texture URL (CSP/offline risk, contrast issue).
-     SVG grain overlay in page.tsx handles the texture instead. */
 }
 
-/* === TYPOGRAPHY ============================================================
- * FIX (Nielsen #4 Consistency): Previous rule `span, p, div { font-family }`
- * was too broad — it overrode interactive elements and broke inheritance.
- * Now scoped to semantic prose elements only.
- */
+/* === TYPOGRAPHY ============================================================ */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas), sans-serif;
   font-weight: 400;
   line-height: 1;
 }
 
 body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-family: var(--font-jetbrains), 'Courier New', monospace;
 }
 
-/* === FOCUS (WCAG 2.4.7 / 2.4.11) =========================================
- * Global focus-visible fallback for any element not explicitly styled.
- * :focus-visible avoids rings on mouse click while showing them for keyboard.
- */
+/* === FOCUS (WCAG 2.4.7 / 2.4.11) ========================================= */
 :focus-visible {
   outline: 2px solid #ff4d00;
   outline-offset: 3px;
@@ -47,13 +36,10 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
 /* === SELECTION ============================================================= */
 ::selection {
   background-color: #ff4d00;
-  color: #000000; /* 5.5:1 contrast ratio — WCAG AA */
+  color: #000000;
 }
 
-/* === REDUCED MOTION (WCAG 2.3.3) ==========================================
- * Disables CSS animations/transitions for users with that OS preference.
- * GSAP checks this separately in JavaScript.
- */
+/* === REDUCED MOTION (WCAG 2.3.3) ========================================== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
