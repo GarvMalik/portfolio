@@ -1,26 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* === BASE ================================================================= */
+/* WCAG 1.4.4: Do not set px root font-size — respects user browser preferences */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0a0a0a;
+  color: #e6e2d3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* FIX: Removed external texture URL (CSP/offline risk, contrast issue).
+     SVG grain overlay in page.tsx handles the texture instead. */
 }
+
+/* === TYPOGRAPHY ============================================================
+ * FIX (Nielsen #4 Consistency): Previous rule `span, p, div { font-family }`
+ * was too broad — it overrode interactive elements and broke inheritance.
+ * Now scoped to semantic prose elements only.
+ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  line-height: 1;
+}
+
+body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* === FOCUS (WCAG 2.4.7 / 2.4.11) =========================================
+ * Global focus-visible fallback for any element not explicitly styled.
+ * :focus-visible avoids rings on mouse click while showing them for keyboard.
+ */
+:focus-visible {
+  outline: 2px solid #ff4d00;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* === SELECTION ============================================================= */
+::selection {
+  background-color: #ff4d00;
+  color: #000000; /* 5.5:1 contrast ratio — WCAG AA */
+}
+
+/* === REDUCED MOTION (WCAG 2.3.3) ==========================================
+ * Disables CSS animations/transitions for users with that OS preference.
+ * GSAP checks this separately in JavaScript.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* === SCROLLBAR (cosmetic only) ============================================= */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 77, 0, 0.4); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #ff4d00; }
