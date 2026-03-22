@@ -861,7 +861,7 @@ export default function Home() {
           </ul>
           <div className="flex flex-col gap-5">
             <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv, a student at Tampere University pursuing a Master's in Human-Technology Interaction.</p>
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I focus on UX/UI design, blending my B.Tech background in AI and Machine Learning with human-centered design principles.</p>
+            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I enjoy designing thoughtful digital experiences that feel calm, intuitive, and accessible. My work is rooted in research, where I explore user needs through interviews, testing, and iterative design. I’ve built projects ranging from lifestyle discovery apps to student support services, always focusing on clarity and real-world impact. I care deeply about how technology fits into everyday life, and I aim to create solutions that are not just functional, but genuinely meaningful for the people who use them.</p>
 
             <blockquote className="border-l-2 border-[#ff4d00] pl-4">
               <p className="font-mono text-sm italic" style={{ color: c.text }}>Building, learning, and sharing the process.</p>
