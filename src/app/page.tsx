@@ -383,7 +383,7 @@ export default function Home() {
       desc: 'Lifestyle discovery app helping users find places and events based on mood and weather in Tampere.',
       tags: ['UX/UI Design', 'Figma', 'UX Research', 'Prototyping'],
       accentColor: '#D95F30',   // CityLoop terracotta
-      pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop_page',
+      pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
       bgGradient: 'radial-gradient(ellipse at 30% 60%, #3d1a0e 0%, #1a0a05 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #2a1208 0%, transparent 60%)',
       videoSrc: '/cityloop-bg.mp4',
     },
@@ -392,7 +392,7 @@ export default function Home() {
       desc: 'Service concept centralizing guidance and peer support for international students moving to Finland.',
       tags: ['Product Design', 'Service Concept', 'Figma', 'Research'],
       accentColor: '#FF844B',   // MyTown orange
-      pageNum: 'P. 005', showLabel: false, href: '/projects/mytown_page',
+      pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
       bgGradient: 'radial-gradient(ellipse at 20% 70%, #2a1e18 0%, #1a1208 40%, transparent 70%), radial-gradient(ellipse at 75% 25%, #1e2535 0%, transparent 60%)',
       videoSrc: '/mytown-bg.mp4',
     },
@@ -401,7 +401,7 @@ export default function Home() {
       desc: 'Concept designed to help people find sports partners, organize games, and book venues effortlessly.',
       tags: ['Design System', 'Interaction', 'Figma', 'Motion'],
       accentColor: '#2978FF',   // PlayPal blue
-      pageNum: 'P. 006', showLabel: false, href: '/projects/playpal_page',
+      pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #0a1530 0%, #050c1e 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #0d1828 0%, transparent 60%)',
       videoSrc: '/playpal-bg.mp4',
     },
