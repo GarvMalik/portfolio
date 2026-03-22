@@ -892,10 +892,10 @@ export default function Home() {
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Pink Floyed\nGorillaz' },
+            { label: 'Listening', value: 'Pink Floyed\nGorillaz\nDon Toliver' },
             { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
             { label: 'Building',  value: 'Talos - AI Medical Screen' },
-            { label: 'Wearing',   value: "D&G Pour Homme\nLight Blue Intense" },
+            { label: 'Wearing',   value: "YSL Y" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
               <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>
