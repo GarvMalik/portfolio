@@ -802,7 +802,7 @@ export default function Home() {
 
         {/* WHO AM I — exact same JSX as RIGHT NOW below */}
         <div className="flex flex-col mb-8 md:mb-12 pt-12 md:pt-0">
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.22em]" style={{ color: c.text }}>WHO</p>
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>WHO</p>
           <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>AM&nbsp;I</p>
         </div>
         <span className="sr-only">Who am I</span>
