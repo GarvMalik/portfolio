@@ -15,13 +15,7 @@ const Marquee = ({ items, speed = 40, reverse = false, textColor }: {
 }) => {
   const trackRef = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
   useEffect(() => {
     const track = trackRef.current
     if (!track || reduced) return
@@ -69,13 +63,7 @@ const ListRow = ({ label, value, borderColor, textColor, labelColor }: {
 const HoverWaveText = ({ text, color }: { text: string, color: string }) => {
   const ref = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
   return (
     <div
       ref={ref}
@@ -203,15 +191,12 @@ export default function Home() {
   const [cursorVisible, setCursorVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
-    // Set on mount and update on resize so it stays accurate after orientation change
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check, { passive: true })
-    return () => window.removeEventListener('resize', check)
+    setIsMobile(window.innerWidth < 768)
   }, [])
   const [mobileScrolled, setMobileScrolled] = useState(false)
   const [reduced, setReduced] = useState(false)
   
+  // Navigation State from page (2).tsx
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('main-content')
   
@@ -235,22 +220,19 @@ export default function Home() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  // Mobile scroll listener — only needed on mobile for the floating name strip
+  // Mobile scroll listener
   useEffect(() => {
-    if (!isMobile) return
     const h = () => setMobileScrolled(window.scrollY > 60)
     window.addEventListener('scroll', h, { passive: true })
     return () => window.removeEventListener('scroll', h)
-  }, [isMobile])
+  }, [])
 
   // Scrollspy — highlights the active nav link based on visible section
   useEffect(() => {
     const ids = ['main-content', 'manifesto', 'about-skills', 'projects', 'about', 'contact']
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id) }),
-      // threshold 0.1 instead of 0.25 — the horizontal-section is 300vw wide so
-      // 25% visible threshold was never reached on that section, breaking nav highlight
-      { threshold: 0.1 }
+      { threshold: 0.25 }
     )
     ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el) })
     return () => observer.disconnect()
@@ -290,11 +272,7 @@ export default function Home() {
         el.removeEventListener('mouseleave', onLeave)
       })
     }
-  // cursorVisible intentionally excluded from deps — we only want to register
-  // hover listeners once on mount (and re-register if reduced changes).
-  // setCursorVisible is stable and doesn't need to be in deps.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced])
+  }, [cursorVisible, reduced])
 
   // Lightweight CSS parallax for hero on mobile — avoids GSAP scrub entirely
   useEffect(() => {
@@ -677,33 +655,48 @@ export default function Home() {
             </g>
           </svg>
         ) : (
-          /* Mobile: pure CSS radial contour rings — zero filter cost, no animation, still textural */
-          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" style={{ opacity: theme === 'dark' ? 0.18 : 0.12 }} aria-hidden="true">
-            {[
-              { top: '15%', left: '10%',  w: 340, h: 220 },
-              { top: '45%', left: '55%',  w: 280, h: 180 },
-              { top: '70%', left: '5%',   w: 200, h: 140 },
-              { top: '20%', left: '65%',  w: 180, h: 260 },
-              { top: '60%', left: '35%',  w: 320, h: 200 },
-            ].map((ring, ri) => (
-              <div key={ri} className="absolute" style={{ top: ring.top, left: ring.left }}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="absolute rounded-[60%_40%_55%_45%/45%_55%_40%_60%] border"
-                    style={{
-                      width:  ring.w + i * 28,
-                      height: ring.h + i * 18,
-                      top:    -(i * 9),
-                      left:   -(i * 14),
-                      borderColor: i % 3 === 0
-                        ? (theme === 'dark' ? 'rgba(100,210,200,0.55)' : 'rgba(0,120,160,0.4)')
-                        : (theme === 'dark' ? 'rgba(180,200,220,0.25)' : 'rgba(30,60,100,0.18)'),
-                      borderWidth: i % 3 === 0 ? '1.5px' : '1px',
-                    }}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
+          /* Mobile terrain — static SVG topographic contour map, no filters, no animation.
+             More lines, tighter spacing, higher opacity than before to match desktop richness. */
+          <svg
+            className="absolute inset-0 w-full h-full z-0 pointer-events-none"
+            style={{ opacity: theme === 'dark' ? 0.55 : 0.40 }}
+            viewBox="0 0 390 844"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
+          >
+            <defs>
+              {/* Gentle warp — lighter than desktop, GPU-safe on mobile */}
+              <filter id="m-warp" x="-15%" y="-15%" width="130%" height="130%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.006 0.005" numOctaves="3" seed="17" result="n" />
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="90" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <filter id="m-glow">
+                <feGaussianBlur stdDeviation="1.8" result="b" />
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            {/* Base contour lines — warped horizontal bands */}
+            <g filter="url(#m-warp)" stroke={theme === 'dark' ? 'rgba(180,210,220,0.18)' : 'rgba(30,60,100,0.12)'} strokeWidth="0.8" fill="none">
+              {Array.from({ length: 60 }).map((_, i) => (
+                <line key={i} x1="-60" y1={i * 15} x2="450" y2={i * 15} />
+              ))}
+            </g>
+
+            {/* Accent highlight contours — teal/cyan, glowing */}
+            <g filter="url(#m-warp)" fill="none">
+              {[45, 105, 180, 255, 330, 405, 480, 555, 630, 705, 780].map((y, i) => (
+                <line
+                  key={i}
+                  x1="-60" y1={y} x2="450" y2={y}
+                  stroke={theme === 'dark' ? 'rgba(100,210,200,0.50)' : 'rgba(0,120,160,0.35)'}
+                  strokeWidth="1.2"
+                  filter="url(#m-glow)"
+                />
+              ))}
+            </g>
+          </svg>
         )}
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
@@ -816,14 +809,94 @@ export default function Home() {
       </div>
 
       {/* ── PROJECTS ── */}
-      {/* Desktop: horizontal scroll pinned by GSAP. Mobile: vertical stack, native scroll, no GSAP */}
       {isMobile ? (
         <div id="projects" className="flex flex-col scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects">
           {projects.map((p, i) => (
             <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border }}>
-              {/* Mobile: always use static gradient — video autoplay causes severe lag on mobile */}
-              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.6 }} aria-hidden="true" />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.7) 55%, rgba(5,5,5,0.2) 100%)' }} aria-hidden="true" />
+
+              {/* Base brand gradient */}
+              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.7 }} aria-hidden="true" />
+
+              {/* Per-project decorative SVG pattern — unique to each brand */}
+              {i === 0 && (
+                // CityLoop — circular loop/radar motif matching the app's loop icon
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.18 }}>
+                  <defs>
+                    <filter id="cl-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  {/* Concentric circles — cityloop loop motif */}
+                  {[40, 90, 140, 195, 255, 320, 390].map((r, ri) => (
+                    <circle key={ri} cx="310" cy="160" r={r} fill="none"
+                      stroke={ri % 2 === 0 ? '#D95F30' : '#D7DFD8'}
+                      strokeWidth={ri % 2 === 0 ? '1.5' : '0.8'}
+                      filter={ri % 2 === 0 ? 'url(#cl-glow)' : undefined}
+                    />
+                  ))}
+                  {/* Dot on 'i' */}
+                  <circle cx="310" cy="160" r="6" fill="#D95F30" filter="url(#cl-glow)" />
+                  {/* Radar sweep line */}
+                  <line x1="310" y1="160" x2="310" y2="-230" stroke="#D95F30" strokeWidth="1" opacity="0.4" />
+                  <line x1="310" y1="160" x2="620" y2="420" stroke="#D7DFD8" strokeWidth="0.7" opacity="0.3" />
+                </svg>
+              )}
+
+              {i === 1 && (
+                // MyTown — city skyline silhouette matching the logo buildings
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.22 }}>
+                  <defs>
+                    <filter id="mt-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  {/* Grid lines — city map feel */}
+                  {[0,1,2,3,4,5,6].map(col => (
+                    <line key={`v${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#FF844B" strokeWidth="0.5" opacity="0.3" />
+                  ))}
+                  {[0,1,2,3,4,5,6,7,8,9,10].map(row => (
+                    <line key={`h${row}`} x1="0" y1={row * 70} x2="390" y2={row * 70} stroke="#55A6EC" strokeWidth="0.5" opacity="0.3" />
+                  ))}
+                  {/* Building silhouettes bottom-right */}
+                  <rect x="240" y="380" width="30" height="200" fill="#FF844B" opacity="0.15" />
+                  <rect x="278" y="310" width="40" height="270" fill="#FF844B" opacity="0.20" rx="1" />
+                  <rect x="326" y="350" width="28" height="230" fill="#FF844B" opacity="0.12" />
+                  <rect x="362" y="420" width="28" height="160" fill="#55A6EC" opacity="0.12" />
+                  {/* Arrow pointing up — from logo */}
+                  <polyline points="298,310 298,260 288,275 298,258 308,275 298,260" stroke="#FF844B" strokeWidth="2" fill="none" filter="url(#mt-glow)" />
+                </svg>
+              )}
+
+              {i === 2 && (
+                // PlayPal — basketball court lines + dot grid
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.20 }}>
+                  <defs>
+                    <filter id="pp-glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  {/* Court outline */}
+                  <rect x="30" y="80" width="330" height="540" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.5" rx="4" />
+                  {/* Centre line */}
+                  <line x1="30" y1="350" x2="360" y2="350" stroke="#2978FF" strokeWidth="1" opacity="0.4" />
+                  {/* Centre circle */}
+                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="1.2" opacity="0.5" filter="url(#pp-glow)" />
+                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.7" filter="url(#pp-glow)" />
+                  {/* Three-point arcs */}
+                  <path d="M 60 80 A 135 135 0 0 1 330 80" fill="none" stroke="#FFC107" strokeWidth="1.2" opacity="0.35" />
+                  <path d="M 60 620 A 135 135 0 0 0 330 620" fill="none" stroke="#FFC107" strokeWidth="1.2" opacity="0.35" />
+                  {/* Key boxes */}
+                  <rect x="130" y="80" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1" opacity="0.35" />
+                  <rect x="130" y="480" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1" opacity="0.35" />
+                  {/* Basketball icon */}
+                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.6" filter="url(#pp-glow)" />
+                  <line x1="195" y1="135" x2="195" y2="225" stroke="#2978FF" strokeWidth="1.5" opacity="0.5" />
+                  <line x1="150" y1="180" x2="240" y2="180" stroke="#2978FF" strokeWidth="1.5" opacity="0.5" />
+                  <path d="M 165 140 Q 195 160 165 220" fill="none" stroke="#FFC107" strokeWidth="1.5" opacity="0.5" />
+                  <path d="M 225 140 Q 195 160 225 220" fill="none" stroke="#FFC107" strokeWidth="1.5" opacity="0.5" />
+                  {/* Yellow underline stripes */}
+                  <line x1="30" y1="640" x2="360" y2="640" stroke="#FFC107" strokeWidth="3" opacity="0.5" />
+                  <line x1="30" y1="648" x2="360" y2="648" stroke="#FFC107" strokeWidth="1.5" opacity="0.3" />
+                </svg>
+              )}
+
+              {/* Dark gradient overlay — content stays readable */}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 32%, rgba(5,5,5,0.75) 58%, rgba(5,5,5,0.25) 100%)' }} aria-hidden="true" />
+
               {/* Content */}
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-3">
