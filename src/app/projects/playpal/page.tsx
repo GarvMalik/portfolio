@@ -1,5 +1,6 @@
 "use client"
 import { useRef } from 'react'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -19,6 +20,14 @@ export default function PlayPalPage() {
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
+
+  const brand = {
+    primary:  '#2978FF',
+    secondary:'#FFC107',
+    dark:     '#0151D9',
+    bg:       '#080c14',
+    glow:     'rgba(41,120,255,0.20)',
+  }
 
   useGSAP(() => {
     if (reduced) {
@@ -42,15 +51,6 @@ export default function PlayPalPage() {
     })
   }, { scope: container })
 
-  // ── PlayPal brand tokens — exact palette ──
-  const brand = {
-    primary:   '#2978FF',   // PlayPal primary blue
-    secondary: '#FFC107',   // PlayPal secondary yellow
-    dark:      '#0151D9',   // PlayPal dark blue
-    bg:        '#080c14',   // deep blue-black
-    glow:      'rgba(41,120,255,0.20)',
-  }
-
   return (
     <main
       ref={container}
@@ -59,7 +59,7 @@ export default function PlayPalPage() {
     >
       <SkipLink />
       <Grain opacity={c.grain} />
-      <SiteNav c={c} />
+      <SiteNav c={c} projectName="PlayPal" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 
       {/* ── HERO ── */}
@@ -75,48 +75,37 @@ export default function PlayPalPage() {
           <BackButton c={c} />
         </div>
 
-        {/* PlayPal basketball logo */}
-        <div className="project-fade-in mb-6 relative z-10" aria-label="PlayPal logo">
-          <svg width="48" height="52" viewBox="0 0 48 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            {/* Basketball circle */}
-            <circle cx="24" cy="22" r="18" stroke={brand.primary} strokeWidth="3" fill="none"/>
-            {/* Vertical line */}
-            <line x1="24" y1="4" x2="24" y2="40" stroke={brand.primary} strokeWidth="2.5"/>
-            {/* Horizontal line */}
-            <line x1="6" y1="22" x2="42" y2="22" stroke={brand.primary} strokeWidth="2.5"/>
-            {/* Arc left */}
-            <path d="M24,4 Q10,14 10,22 Q10,30 24,40" stroke={brand.primary} strokeWidth="2.5" fill="none"/>
-            {/* Arc right */}
-            <path d="M24,4 Q38,14 38,22 Q38,30 24,40" stroke={brand.primary} strokeWidth="2.5" fill="none"/>
-            {/* Yellow underline */}
-            <line x1="2" y1="48" x2="46" y2="48" stroke={brand.secondary} strokeWidth="3" strokeLinecap="round"/>
-            <line x1="6" y1="44" x2="42" y2="44" stroke={brand.secondary} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
-          </svg>
-          <p className="text-[10px] uppercase font-mono tracking-[0.5em] mt-2" style={{ color: brand.primary }}>PLAYPAL</p>
+        {/* Real PlayPal logo */}
+        <div className="project-fade-in mb-6 relative z-10">
+          <Image
+            src="/playpal-logo.png"
+            alt="PlayPal"
+            width={120}
+            height={120}
+            className="h-20 w-auto"
+            style={{ filter: theme === 'dark' ? 'brightness(1)' : 'none' }}
+          />
         </div>
 
-        <div className="overflow-hidden mb-1 relative z-10" aria-label="PlayPal">
+        <div className="overflow-hidden mb-2 relative z-10">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'PLAYPAL'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.primary }}>
-                {char}
-              </span>
+              <span key={i} className="inline-block text-[14vw] md:text-[11vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.primary }}>{char}</span>
             ))}
           </div>
         </div>
-        <div className="overflow-hidden mb-8 relative z-10" aria-label="Community">
+        <div className="overflow-hidden mb-8 relative z-10">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'COMMUNITY'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[8vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: brand.secondary }}>
-                {char}
-              </span>
+              <span key={i} className="inline-block text-[7vw] md:text-[5.5vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: brand.secondary }}>{char}</span>
             ))}
           </div>
         </div>
-        <p className="project-fade-in font-mono text-sm max-w-xl leading-relaxed mb-6" style={{ color: c.textMuted }}>
+
+        <p className="project-fade-in font-mono text-sm max-w-xl leading-relaxed mb-6 relative z-10" style={{ color: c.textMuted }}>
           A service and mobile app concept designed to help people find sports partners, organize games, and book nearby venues — with less social and logistical effort.
         </p>
-        <div className="project-fade-in flex flex-wrap gap-2" role="list" aria-label="Project tags">
+        <div className="project-fade-in flex flex-wrap gap-2 relative z-10">
           {['Design System', 'Interaction Design', 'Figma', 'Service Design', 'UX Research'].map(tag => (
             <Tag key={tag} label={tag} c={c} />
           ))}
@@ -124,16 +113,12 @@ export default function PlayPalPage() {
       </section>
 
       {/* ── META ── */}
-      <section
-        className={`grid grid-cols-2 md:grid-cols-4 border-b ${tr}`}
-        style={{ borderColor: c.border }}
-        aria-label="Project metadata"
-      >
+      <section className={`grid grid-cols-2 md:grid-cols-4 border-b ${tr}`} style={{ borderColor: c.border }}>
         {[
-          { label: 'Timeline', value: 'Aug 2025 – Oct 2025' },
-          { label: 'Tools',    value: 'Figma, Mural, Canva' },
-          { label: 'Type',     value: 'Group Project' },
-          { label: 'Links',    value: 'Behance ↗' },
+          { label: 'Role',     value: 'UI/UX Designer'   },
+          { label: 'Timeline', value: 'Oct – Dec 2025'   },
+          { label: 'Tools',    value: 'Figma'            },
+          { label: 'Type',     value: 'Academic Project' },
         ].map((s, i) => (
           <div key={s.label} className={`px-6 md:px-12 ${tr} ${i < 3 ? 'border-r' : ''}`} style={{ borderColor: c.border }}>
             <Stat label={s.label} value={s.value} c={c} />
@@ -143,213 +128,181 @@ export default function PlayPalPage() {
 
       <div className="px-6 md:px-16 py-20 max-w-7xl mx-auto space-y-28">
 
-        {/* 00 What I Worked On */}
-        <div className="section-block" aria-labelledby="s-role">
-          <SectionHeading num="00" title="What I Worked On" c={c} />
-          <div className="grid md:grid-cols-2 gap-10">
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              I contributed across research, synthesis, and design phases. My main focus was on translating user insights into a clear service structure and usable interface.
-            </p>
-            <ul className="space-y-2" aria-label="Contributions">
-              {[
-                'Defined the conceptual model and sitemap for the service',
-                'Designed wireframes and combined individual drafts into a cohesive structure',
-                'Created high-fidelity screens — particularly the Play Game and Book Game flows',
-                'Supported the design system to ensure consistency across screens',
-                'Participated in user interviews, transcription, and collaborative analysis',
-              ].map(item => (
-                <li key={item} className="flex items-start gap-3 text-xs font-mono" style={{ color: c.textMuted }}>
-                  <span className="text-[#2978FF] mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+        {/* ── APP SCREENS ── */}
+        <div className="section-block">
+          <SectionHeading num="00" title="App Screens" c={c} />
+          <p className="font-mono text-sm leading-relaxed max-w-2xl mb-10" style={{ color: c.textMuted }}>
+            Two core flows — the Home screen with upcoming events, find players, and find venue; and the Create Game flow with sport selection, skill level, venue booking, and player management.
+          </p>
+          <div className="flex flex-col gap-8">
+            {/* Home screens — full width */}
+            <div>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>
+                Home · Play · Book — Three Tab Views
+              </p>
+              <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                <Image
+                  src="/home-screen.png"
+                  alt="PlayPal Home, Play and Book screens"
+                  width={1200}
+                  height={700}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+            {/* Create game screens — full width */}
+            <div>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>
+                Create Game Flow
+              </p>
+              <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                <Image
+                  src="/create-game.png"
+                  alt="PlayPal Create Game flow"
+                  width={1200}
+                  height={700}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 01 Problem */}
-        <div className="section-block" aria-labelledby="s-problem">
+        {/* ── PROBLEM ── */}
+        <div className="section-block">
           <SectionHeading num="01" title="The Problem" c={c} />
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mb-5" style={{ color: c.text }}>
-                People stop playing sports not because they lack motivation — because coordination is too hard.
+                Finding someone to play sports with is harder than it should be.
               </p>
-              <blockquote className="border-l-2 border-[#2978FF] pl-4">
+              <blockquote className="border-l-2 pl-4 mt-6" style={{ borderColor: brand.primary }}>
                 <p className="font-mono text-sm italic" style={{ color: c.textMuted }}>
-                  "The key challenge: enabling people to move easily from wanting to play to actually having a game."
+                  "People give up on physical activity not because they lack motivation — but because they lack a partner."
                 </p>
               </blockquote>
             </div>
             <div className="space-y-4">
               <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-                Many people enjoy playing sports but struggle to do so regularly because organising group activities takes effort. Finding suitable partners, aligning schedules, booking venues, and considering travel distance often turns a simple plan into a frustrating task.
+                Casual sports players in cities rely on WhatsApp groups, social media posts, or pure luck to find partners. There's no dedicated, low-friction way to find people at the right skill level, at the right time, near the right venue.
               </p>
               <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-                Existing solutions are fragmented across messaging apps, social media groups, and separate booking systems. The challenge was enabling people to move smoothly from intention to action, without social pressure or logistical friction.
+                Booking venues is a separate, often frustrating process — handled through phone calls or third-party platforms with no connection to the game or the players involved.
               </p>
             </div>
           </div>
         </div>
 
-        {/* 02 Research */}
-        <div className="section-block" aria-labelledby="s-research">
+        {/* ── RESEARCH ── */}
+        <div className="section-block">
           <SectionHeading num="02" title="Research & Key Insights" c={c} />
           <p className="font-mono text-sm leading-relaxed max-w-2xl mb-8" style={{ color: c.textMuted }}>
-            Semi-structured interviews with people who regularly play sports such as badminton, football, or gym-based activities. Interviews focused on how participants find players, organise games, choose venues, and what prevents them from playing. Analysed collaboratively using affinity mapping.
+            Research focused on understanding how casual sports players currently organise games — the friction points, the workarounds, and what they actually need.
           </p>
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="grid md:grid-cols-2 gap-4">
             {[
-              { label: 'Primary barrier', insight: 'Coordination is the main barrier — not lack of interest or motivation.' },
-              { label: 'Fragmented tools', insight: 'People rely on multiple disconnected tools to organize a single game.' },
-              { label: 'Social friction',  insight: 'Social discomfort and uncertainty often stop people from reaching out.' },
-              { label: 'Logistics matter', insight: 'Distance, venue availability, and timing strongly influence participation.' },
-            ].map(item => (
-              <Card key={item.label} c={c} accentBorder="#ff4d00">
-                <p className="text-[9px] uppercase font-mono tracking-widest text-[#2978FF] mb-2">{item.label}</p>
-                <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>{item.insight}</p>
+              'Players spend more time coordinating than playing — messaging across multiple platforms to confirm attendance.',
+              'Skill level mismatch is a major frustration — playing with people who are too advanced or too casual kills enjoyment.',
+              'Venue discovery is disconnected — users book courts on separate apps with no link to who they\'re playing with.',
+              'Social barrier — asking strangers to play feels awkward without a structured, purpose-built platform.',
+            ].map((text, i) => (
+              <Card key={i} c={c} accentBorder={brand.primary}>
+                <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>{text}</p>
               </Card>
             ))}
           </div>
-
-          {/* Target users */}
-          <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-5">Target Users</p>
-            <div className="grid md:grid-cols-3 gap-6" role="list">
-              {[
-                { name: 'Tim, 19',     desc: 'Highly active player who trains almost daily but wastes time finding games or suitable opponents.' },
-                { name: 'Atharva, 25', desc: 'University student who loves badminton but struggles to find partners due to his introverted nature.' },
-                { name: 'Liza, 35',    desc: 'Teacher who recently moved to a new city. Enjoys swimming and badminton but finds it hard to coordinate or discover safe, nearby venues.' },
-              ].map(p => (
-                <div key={p.name} role="listitem" className="border p-4" style={{ borderColor: c.border }}>
-                  <p className="text-[10px] uppercase font-mono tracking-widest mb-2" style={{ color: c.text }}>{p.name}</p>
-                  <p className="text-xs font-mono leading-relaxed" style={{ color: c.textMuted }}>{p.desc}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
         </div>
 
-        {/* 03 Design Goals */}
-        <div className="section-block" aria-labelledby="s-goals">
-          <SectionHeading num="03" title="Design Goals & Service Concept" c={c} />
-          <div className="grid md:grid-cols-3 gap-5 mb-6">
+        {/* ── DESIGN GOALS ── */}
+        <div className="section-block">
+          <SectionHeading num="03" title="Design Goals" c={c} />
+          <div className="grid md:grid-cols-3 gap-5">
             {[
-              { title: 'Reduce coordination effort', desc: 'Minimize the effort required to organize and join sports activities, especially in the early stages.' },
-              { title: 'Support comfort levels',     desc: 'Work for hesitant players who prefer low-pressure participation and active users who value efficiency.' },
-              { title: 'Increase confidence',        desc: 'Provide clear information about players, venues, distance, and availability to help users commit.' },
+              { title: 'Reduce coordination friction', desc: 'Let users create or join a game in under a minute — sport, time, location, skill level, done.' },
+              { title: 'Match by skill level',         desc: 'Noobie, Proficient, Master — clear tiers so games feel balanced and enjoyable for everyone.' },
+              { title: 'Unify venue booking',          desc: 'Browse, compare, and book venues directly inside the game creation flow — no separate app needed.' },
             ].map(g => (
-              <Card key={g.title} c={c}>
-                <div className="w-5 h-[1px] bg-[#2978FF] mb-4" aria-hidden="true" />
+              <Card key={g.title} c={c} accentBorder={brand.primary}>
+                <div className="w-5 h-[1px] mb-4" style={{ background: brand.primary }} aria-hidden="true" />
                 <h3 className="text-sm font-black uppercase tracking-tight mb-2" style={{ color: c.text }}>{g.title}</h3>
                 <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>{g.desc}</p>
               </Card>
             ))}
           </div>
-          <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-3">Service Concept</p>
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              PlayPal is a central coordination service that brings together player discovery, game organization, and venue booking in one place. Users can join existing games or create their own — with clear information about skill level, location, timing, and participation status. The concept prioritizes clarity over complexity and spontaneity over long-term planning.
-            </p>
-          </Card>
         </div>
 
-        {/* 04 Design System */}
-        <div className="section-block" aria-labelledby="s-system">
-          <SectionHeading num="04" title="Design System & UI Decisions" c={c} />
-          <div className="grid md:grid-cols-3 gap-5">
-            <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Color Palette</p>
-              <div className="grid grid-cols-3 gap-2 mb-4" role="img" aria-label="PlayPal palette: blue primary, yellow secondary, dark text">
-                {[
-                  { bg: '#2978FF', label: 'Primary' },
-                  { bg: '#FFC107', label: 'Secondary' },
-                  { bg: '#333333', label: 'Text' },
-                ].map(col => (
-                  <div key={col.label} className="flex flex-col items-center gap-1">
-                    <div className="w-8 h-8 rounded border" style={{ background: col.bg, borderColor: c.border }} title={col.bg} />
-                    <p className="text-[8px] font-mono" style={{ color: c.textFaint }}>{col.label}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Restrained palette maintains clarity and reduces visual noise — supporting a low-pressure, approachable experience.
-              </p>
-            </Card>
-            <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Typography</p>
-              <p className="text-lg font-bold mb-1" style={{ color: c.text }}>Zalando Sans</p>
-              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Bold, SemiBold, Medium, Regular — prioritizing readability and hierarchy. Supports quick scanning and reduces cognitive load.
-              </p>
-            </Card>
-            <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Navigation Design</p>
-              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Core actions — Home, Play, Create, Book, Profile — accessible through predictable patterns and clear labels. Repeated layouts across flows help users feel oriented when switching between tasks.
-              </p>
-            </Card>
-          </div>
-        </div>
-
-        {/* 05 Prototype */}
-        <div className="section-block" aria-labelledby="s-prototype">
-          <SectionHeading num="05" title="Prototype Highlights" c={c} />
-          <div className="space-y-6">
+        {/* ── DESIGN PROCESS ── */}
+        <div className="section-block">
+          <SectionHeading num="04" title="Design Process" c={c} />
+          <div className="space-y-8">
             {[
-              { flow: 'Finding Games & Booking Venues', desc: 'The discovery flow helps users quickly assess whether a game or venue fits their preferences. Filters for sport type, date, and location narrow options without excessive interaction. Key details — distance, time, skill level, remaining spots — are surfaced early. Venue booking is integrated directly into the experience.' },
-              { flow: 'Creating and Managing a Game',   desc: 'The Create Game flow guides users through essential decisions: sport type, location, time, access level (public or invite only), and skill range. This helps reduce uncertainty for both organizer and invited players, increasing confidence before committing.' },
-              { flow: 'Player Discovery',               desc: 'Users can sort, filter, and search for players directly. Profiles show sport preferences, skill level, and location — making it easier to find compatible partners without the social friction of cold outreach through messaging apps.' },
-            ].map(f => (
-              <ProcessStep key={f.flow} step={f.flow} body={f.desc} c={c} />
+              { step: '01 — Mapping the Core Flows', body: 'Three main flows were identified: finding players and joining an existing game, creating a new game with full settings, and discovering and booking venues. Each flow was mapped before any visual design began.' },
+              { step: '02 — Design System First',    body: 'A component library was built before screens — button variants, input states, card types, tab navigation, and icon sets. This ensured consistency across all screens from the first high-fidelity frame.' },
+              { step: '03 — Interaction Design',     body: 'Key micro-interactions were designed: sport filter chips, date carousel, skill level selection, game access toggle (Public vs Invite Only), and the player management screen with add/remove controls.' },
+              { step: '04 — Iteration',              body: 'The create game flow went through multiple iterations — early versions had too many steps. The final version combines sport, area, date, time, access, and skill level on a single scrollable screen with a clear CTA.' },
+            ].map(p => (
+              <ProcessStep key={p.step} step={p.step} body={p.body} c={c} accentBorder={brand.primary} />
             ))}
           </div>
         </div>
 
-        {/* 06 Evaluation */}
-        <div className="section-block" aria-labelledby="s-eval">
-          <SectionHeading num="06" title="Evaluation & Iteration" c={c} />
-          <div className="grid md:grid-cols-2 gap-10">
-            <div className="space-y-4">
-              <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-                The prototype was evaluated through informal walkthroughs, peer feedback sessions, and group discussions. Evaluations focused on clarity of flows, consistency across screens, and whether the interface supported the intended low-friction coordination experience.
-              </p>
-              <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-                Key scenarios tested: creating a game, browsing available games, and booking a venue — identifying where users might hesitate, feel uncertain, or require additional confirmation.
-              </p>
-            </div>
-            <ul className="space-y-3" aria-label="Iteration outcomes">
-              {[
-                'Refined structure and ordering of inputs in Create Game flow to reduce cognitive load',
-                'Adjusted labels and grouping to make essential information more visible earlier',
-                'Improved visibility of location, time, and skill level information in browsing flows',
-                'Small adjustments to spacing and hierarchy to support scannability',
-              ].map(item => (
-                <li
-                  key={item}
-                  className="flex items-start gap-3 text-xs font-mono border p-3"
-                  style={{ borderColor: c.border, color: c.textMuted, background: c.cardBg }}
-                >
-                  <span className="text-[#2978FF] mt-0.5 flex-shrink-0" aria-hidden="true">→</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+        {/* ── KEY FEATURES ── */}
+        <div className="section-block">
+          <SectionHeading num="05" title="Key Features" c={c} />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { name: 'Find Players',   desc: 'Browse open games by sport, date, and skill level — join with one tap.' },
+              { name: 'Create Game',    desc: 'Set sport, time, area, access type, skill level, and instructions in one flow.' },
+              { name: 'Book Venue',     desc: 'Discover, compare, and book courts directly — price, rating, and amenities shown.' },
+              { name: 'Manage Players', desc: 'Add players, set invite-only access, share game link, manage attendance.' },
+            ].map(f => (
+              <Card key={f.name} c={c} accentBorder={brand.primary}>
+                <p className="text-[10px] uppercase font-mono tracking-widest mb-2" style={{ color: brand.primary }}>{f.name}</p>
+                <p className="text-[10px] font-mono leading-relaxed" style={{ color: c.textMuted }}>{f.desc}</p>
+              </Card>
+            ))}
           </div>
         </div>
 
-        {/* 07 Reflection */}
-        <div className="section-block border-t pt-14" style={{ borderColor: c.border }} aria-labelledby="s-reflection">
+        {/* ── DESIGN SYSTEM ── */}
+        <div className="section-block">
+          <SectionHeading num="06" title="Design System" c={c} />
+          <div className="grid md:grid-cols-3 gap-5">
+            <Card c={c}>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Color Palette</p>
+              <div className="flex gap-2 mb-4">
+                {['#2978FF','#FFC107','#0151D9','#0E67FF','#5392FF'].map(col => (
+                  <div key={col} className="w-8 h-8 rounded border" style={{ background: col, borderColor: c.border }} title={col} />
+                ))}
+              </div>
+              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
+                Royal blue primary (#2978FF). Yellow accent (#FFC107). Dark blue shade (#0151D9).
+              </p>
+            </Card>
+            <Card c={c}>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Typography</p>
+              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
+                Bold headings for section titles and CTAs. Clean body text for event details. Monospace labels for metadata — distance, price, rating.
+              </p>
+            </Card>
+            <Card c={c}>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Components</p>
+              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
+                Sport filter chips, date carousel, skill level selectors, game cards, venue cards with booking CTA, bottom tab navigation with active states.
+              </p>
+            </Card>
+          </div>
+        </div>
+
+        {/* ── REFLECTION ── */}
+        <div className="section-block border-t pt-14" style={{ borderColor: c.border }}>
           <SectionHeading num="07" title="Reflection" c={c} />
           <div className="max-w-2xl space-y-4">
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              This project helped me better understand how service design extends beyond interface design. While the final output included a mobile prototype, much of the value came from understanding the coordination challenges that exist before users ever interact with a screen.
+              PlayPal pushed me to think about social friction in product design — not just usability, but the psychological barrier of reaching out to strangers. The design had to make that feel natural and low-stakes.
             </p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              Working with real user insights reinforced the importance of focusing on when friction occurs, not just where. The project shifted my thinking away from feature-driven design toward designing for confidence, clarity, and reduced effort.
-            </p>
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              Collaborating in a group setting highlighted the importance of shared understanding and alignment. Translating research insights into a coherent service concept required constant discussion, iteration, and compromise — especially when balancing different user needs and comfort levels.
+              Building the design system before the screens was a deliberate choice and the right one — it meant every screen felt consistent from the first draft, and iteration was faster because components just snapped together.
             </p>
           </div>
         </div>
