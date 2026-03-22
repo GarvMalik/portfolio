@@ -349,19 +349,21 @@ export default function Home() {
       )
     }
 
-    // ── Horizontal cards — pin+scrub on both, essential for swipe mechanic ──
-    const cards = gsap.utils.toArray<HTMLElement>('.project-card')
-    gsap.to(cards, {
-      xPercent: -100 * (cards.length - 1),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.horizontal-section',
-        pin: true,
-        scrub: isMobile ? 0.5 : 1,  // lower scrub value = more responsive on mobile
-        snap: { snapTo: 1 / (cards.length - 1), duration: { min: 0.2, max: 0.4 }, ease: 'power2.inOut' },
-        end: () => '+=' + (window.innerWidth * (cards.length - 0.5)),
-      }
-    })
+    // ── Horizontal cards — desktop only, mobile uses vertical stack ──
+    if (!isMobile) {
+      const cards = gsap.utils.toArray<HTMLElement>('.project-card')
+      gsap.to(cards, {
+        xPercent: -100 * (cards.length - 1),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.horizontal-section',
+          pin: true,
+          scrub: 1,
+          snap: { snapTo: 1 / (cards.length - 1), duration: { min: 0.2, max: 0.4 }, ease: 'power2.inOut' },
+          end: () => '+=' + (window.innerWidth * (cards.length - 0.5)),
+        }
+      })
+    }
 
     // ── Shared trigger-based animations — same on all devices ──
     gsap.fromTo('.now-item',
@@ -792,9 +794,51 @@ export default function Home() {
       </div>
 
       {/* ── PROJECTS ── */}
-      <div id="projects" className="horizontal-section flex w-[300vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
-        {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} />)}
-      </div>
+      {/* Desktop: horizontal scroll pinned by GSAP. Mobile: vertical stack, native scroll, no GSAP */}
+      {isMobile ? (
+        <div id="projects" className="flex flex-col scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects">
+          {projects.map((p, i) => (
+            <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border }}>
+              {/* Background */}
+              {p.videoSrc ? (
+                <>
+                  <video src={p.videoSrc} autoPlay loop muted playsInline disablePictureInPicture className="absolute inset-0 w-full h-full object-cover z-0" style={{ opacity: 0.45 }} aria-hidden="true" tabIndex={-1} />
+                  <div className="absolute inset-0 z-[1]" style={{ background: 'linear-gradient(to top, #050505 30%, rgba(5,5,5,0.6) 60%, rgba(5,5,5,0.15) 100%)' }} aria-hidden="true" />
+                </>
+              ) : (
+                <>
+                  <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.5 }} aria-hidden="true" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.7) 55%, rgba(5,5,5,0.2) 100%)' }} aria-hidden="true" />
+                </>
+              )}
+              {/* Content */}
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-4 h-[1px] bg-[#ff4d00]" />
+                  <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#ff4d00]">Project 0{i + 1}</span>
+                </div>
+                <h2 className="text-[10vw] font-black uppercase tracking-tight mb-2 leading-[0.92]" style={{ color: p.accentColor }}>{p.title}</h2>
+                <p className="font-mono text-xs mb-4 leading-relaxed" style={{ color: 'rgba(230,226,211,0.85)' }}>{p.desc}</p>
+                <ul className="flex flex-wrap gap-2 mb-5">
+                  {p.tags.map(tag => (
+                    <li key={tag} className="px-2 py-1 border text-[8px] font-bold uppercase font-mono tracking-widest" style={{ borderColor: c.border, color: 'rgba(230,226,211,0.6)' }}>{tag}</li>
+                  ))}
+                </ul>
+                <Link href={p.href} className="inline-flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]" aria-label={`View project: ${p.title}`}>
+                  <div className="w-9 h-9 rounded-full border border-[#ff4d00] flex items-center justify-center">
+                    <span className="text-[#ff4d00] text-sm">→</span>
+                  </div>
+                  <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em]">View Project</span>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div id="projects" className="horizontal-section flex w-[300vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
+          {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} />)}
+        </div>
+      )}
 
       {/* ── ABOUT ── */}
       <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
