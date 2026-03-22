@@ -12,8 +12,14 @@ import {
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
-const reduced = typeof window !== 'undefined'
-  && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+// Brand tokens — defined outside component to avoid recreation on every render
+const PLAYPAL_BRAND = {
+  primary:  '#2978FF',
+  secondary:'#FFC107',
+  dark:     '#0151D9',
+  bg:       '#080c14',
+  glow:     'rgba(41,120,255,0.20)',
+}
 
 export default function PlayPalPage() {
   const container = useRef<HTMLDivElement>(null)
@@ -21,15 +27,11 @@ export default function PlayPalPage() {
   const c = T[theme]
   const tr = 'transition-colors duration-300'
 
-  const brand = {
-    primary:  '#2978FF',
-    secondary:'#FFC107',
-    dark:     '#0151D9',
-    bg:       '#080c14',
-    glow:     'rgba(41,120,255,0.20)',
-  }
+  const brand = PLAYPAL_BRAND
 
   useGSAP(() => {
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
       gsap.set(['.project-hero-title span', '.project-fade-in', '.section-block'], { clearProps: 'all' })
       return

@@ -15,7 +15,13 @@ const Marquee = ({ items, speed = 40, reverse = false, textColor }: {
 }) => {
   const trackRef = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(false)
-  useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
   useEffect(() => {
     const track = trackRef.current
     if (!track || reduced) return
@@ -63,7 +69,13 @@ const ListRow = ({ label, value, borderColor, textColor, labelColor }: {
 const HoverWaveText = ({ text, color }: { text: string, color: string }) => {
   const ref = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(false)
-  useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
   return (
     <div
       ref={ref}
@@ -191,12 +203,15 @@ export default function Home() {
   const [cursorVisible, setCursorVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
+    // Set on mount and update on resize so it stays accurate after orientation change
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check, { passive: true })
+    return () => window.removeEventListener('resize', check)
   }, [])
   const [mobileScrolled, setMobileScrolled] = useState(false)
   const [reduced, setReduced] = useState(false)
   
-  // Navigation State from page (2).tsx
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('main-content')
   
@@ -220,19 +235,22 @@ export default function Home() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  // Mobile scroll listener
+  // Mobile scroll listener — only needed on mobile for the floating name strip
   useEffect(() => {
+    if (!isMobile) return
     const h = () => setMobileScrolled(window.scrollY > 60)
     window.addEventListener('scroll', h, { passive: true })
     return () => window.removeEventListener('scroll', h)
-  }, [])
+  }, [isMobile])
 
   // Scrollspy — highlights the active nav link based on visible section
   useEffect(() => {
     const ids = ['main-content', 'manifesto', 'about-skills', 'projects', 'about', 'contact']
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id) }),
-      { threshold: 0.25 }
+      // threshold 0.1 instead of 0.25 — the horizontal-section is 300vw wide so
+      // 25% visible threshold was never reached on that section, breaking nav highlight
+      { threshold: 0.1 }
     )
     ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el) })
     return () => observer.disconnect()
@@ -272,7 +290,11 @@ export default function Home() {
         el.removeEventListener('mouseleave', onLeave)
       })
     }
-  }, [cursorVisible, reduced])
+  // cursorVisible intentionally excluded from deps — we only want to register
+  // hover listeners once on mount (and re-register if reduced changes).
+  // setCursorVisible is stable and doesn't need to be in deps.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduced])
 
   // Lightweight CSS parallax for hero on mobile — avoids GSAP scrub entirely
   useEffect(() => {

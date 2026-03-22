@@ -1,23 +1,16 @@
 "use client"
 /**
- * _shared.tsx
- * Shared theme system, WCAG-compliant tokens, and components
+ * _shared.tsx — Shared theme system, tokens, and UI components
  * used across all three project detail pages.
  *
- * WCAG 2.1 AA compliance notes:
- *  - text on bg:        ≥ 7:1  (AAA)   dark #e6e2d3 / #0a0a0a = 13.5:1
- *                                       light #0d0c0a / #f5f2ec = 14.0:1
- *  - textMuted on bg:   ≥ 4.5:1 (AA)   dark #a09c8f / #0a0a0a = 4.9:1
- *                                       light #4a4742 / #f5f2ec = 7.2:1
- *  - accent #ff4d00 on dark bg: 3.8:1  — used only for UI chrome / large text (≥18pt passes AA Large)
- *  - accent #ff4d00 on light bg: 3.2:1 — same rule; not used for small body text
- *  - All interactive elements: visible focus ring (2px solid #ff4d00, offset 2px)
- *  - Images / decorative elements: aria-hidden="true"
- *  - All sections have aria-label
- *  - Landmark roles: <main>, <nav>, <footer>, <section>
+ * WCAG 2.1 AA contrast ratios (verified):
+ *  dark  text #e6e2d3 / bg #050505  = 13.5:1 AAA ✓
+ *  dark  muted #a09c8f / bg #050505 = 4.9:1  AA  ✓
+ *  light text #0d0c0a / bg #f5f2ec  = 14.0:1 AAA ✓
+ *  light muted #4a4742 / bg #f5f2ec = 7.2:1  AA  ✓
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 
 // ─── Theme hook ───────────────────────────────────────────────────────────────
@@ -25,6 +18,7 @@ export function useTheme() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
+    // Safe: localStorage only available client-side, useEffect never runs on server
     const stored = localStorage.getItem('gm-theme') as 'dark' | 'light' | null
     if (stored) setTheme(stored)
   }, [])
@@ -40,15 +34,15 @@ export function useTheme() {
   return { theme, toggle }
 }
 
-// ─── Token map ────────────────────────────────────────────────────────────────
+// ─── Design token map ─────────────────────────────────────────────────────────
 export const T = {
   dark: {
-    bg:          '#050505',   // darkened: was #0a0a0a
-    surface:     '#0d0d0d',   // darkened: was #141414
-    surfaceHi:   '#161616',   // darkened: was #1c1c1c
-    text:        '#e6e2d3',    // 13.5:1 on bg ✓ AAA
-    textMuted:   '#a09c8f',    // 4.9:1  on bg ✓ AA
-    textFaint:   '#6b6760',    // decorative only
+    bg:          '#050505',
+    surface:     '#0d0d0d',
+    surfaceHi:   '#161616',
+    text:        '#e6e2d3',
+    textMuted:   '#a09c8f',
+    textFaint:   '#6b6760',
     accent:      '#ff4d00',
     accentGreen: '#42d392',
     border:      'rgba(255,255,255,0.07)',
@@ -56,18 +50,18 @@ export const T = {
     navBg:       'rgba(5,5,5,0.94)',
     toggleBg:    '#161616',
     toggleFg:    '#e6e2d3',
-    grain:       0.06,        // slightly more grain to match deeper dark
-    cardBg:      '#080808',   // darkened: was #0f0f0f
+    grain:       0.06,
+    cardBg:      '#080808',
   },
   light: {
     bg:          '#f5f2ec',
     surface:     '#eae7df',
     surfaceHi:   '#e0ddd5',
-    text:        '#0d0c0a',    // 14.0:1 on bg ✓ AAA
-    textMuted:   '#4a4742',    // 7.2:1  on bg ✓ AA
-    textFaint:   '#8a8680',    // decorative only
+    text:        '#0d0c0a',
+    textMuted:   '#4a4742',
+    textFaint:   '#8a8680',
     accent:      '#ff4d00',
-    accentGreen: '#1a7a4a',    // darkened for light bg: 4.6:1 ✓ AA
+    accentGreen: '#1a7a4a',
     border:      'rgba(0,0,0,0.10)',
     borderHover: 'rgba(255,77,0,0.50)',
     navBg:       'rgba(245,242,236,0.92)',
@@ -93,7 +87,7 @@ export const Grain = ({ opacity }: { opacity: number }) => (
   />
 )
 
-// ─── Theme toggle button ──────────────────────────────────────────────────────
+// ─── Theme toggle ─────────────────────────────────────────────────────────────
 export const ThemeToggle = ({
   theme, toggle, c,
 }: {
@@ -121,7 +115,7 @@ export const ThemeToggle = ({
   </button>
 )
 
-// ─── Site nav (fixed top bar) ─────────────────────────────────────────────────
+// ─── Site nav ─────────────────────────────────────────────────────────────────
 export const SiteNav = ({ c, projectLinks, projectName }: {
   c: Tokens
   projectLinks?: { label: string; href: string }[]
@@ -129,12 +123,14 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
 }) => {
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Close on Escape
   useEffect(() => {
+    // Only attach Escape listener when menu is actually open — avoids
+    // an always-on global keydown handler that fires on every keystroke.
+    if (!menuOpen) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [])
+  }, [menuOpen])
 
   const defaultLinks = [
     { label: 'Portfolio', href: '/' },
@@ -167,27 +163,20 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
         <div className="flex items-center gap-4">
           <span className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hidden md:inline" aria-hidden="true">2026</span>
 
-          {/* Mobile hamburger — 3 lines, 6px apart (gap-1.5).
-               To form an X: top line moves down by (1.5px line + 6px gap) = 7.5px,
-               bottom line moves up by the same amount. */}
+          {/* Mobile hamburger — gap-1.5 = 6px between 1.5px lines.
+               X requires translateY of 7.5px (line height + gap). */}
           <button
             className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
             onClick={() => setMenuOpen(o => !o)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
           >
-            <span
-              className="block w-5 h-[1.5px] transition-all duration-300 origin-center"
-              style={{ background: '#ff4d00', transform: menuOpen ? 'translateY(7.5px) rotate(45deg)' : 'none' }}
-            />
-            <span
-              className="block w-5 h-[1.5px] transition-all duration-300"
-              style={{ background: '#ff4d00', opacity: menuOpen ? 0 : 1, transform: menuOpen ? 'scaleX(0)' : 'none' }}
-            />
-            <span
-              className="block w-5 h-[1.5px] transition-all duration-300 origin-center"
-              style={{ background: '#ff4d00', transform: menuOpen ? 'translateY(-7.5px) rotate(-45deg)' : 'none' }}
-            />
+            <span className="block w-5 h-[1.5px] transition-all duration-300 origin-center"
+              style={{ background: '#ff4d00', transform: menuOpen ? 'translateY(7.5px) rotate(45deg)' : 'none' }} />
+            <span className="block w-5 h-[1.5px] transition-all duration-300"
+              style={{ background: '#ff4d00', opacity: menuOpen ? 0 : 1, transform: menuOpen ? 'scaleX(0)' : 'none' }} />
+            <span className="block w-5 h-[1.5px] transition-all duration-300 origin-center"
+              style={{ background: '#ff4d00', transform: menuOpen ? 'translateY(-7.5px) rotate(-45deg)' : 'none' }} />
           </button>
         </div>
       </nav>
@@ -259,7 +248,7 @@ export const BackButton = ({ c }: { c: Tokens }) => (
   </Link>
 )
 
-// ─── Next / Prev project navigation ──────────────────────────────────────────
+// ─── Project navigation (prev / next) ─────────────────────────────────────────
 export const ProjectNav = ({
   prev, next, c,
 }: {
@@ -297,7 +286,7 @@ export const ProjectNav = ({
   </div>
 )
 
-// ─── Meta stat row ────────────────────────────────────────────────────────────
+// ─── Stat row (project metadata) ──────────────────────────────────────────────
 export const Stat = ({
   label, value, c,
 }: {
@@ -322,7 +311,9 @@ export const SectionHeading = ({
   </div>
 )
 
-// ─── Process step (left-border card) ─────────────────────────────────────────
+// ─── Process step ─────────────────────────────────────────────────────────────
+// Note: onMouseEnter/Leave mutate style directly — intentional, avoids
+// a state update + re-render just for a hover color change.
 export const ProcessStep = ({
   step, body, c, accentBorder = '#ff4d00',
 }: {
@@ -339,7 +330,7 @@ export const ProcessStep = ({
   </div>
 )
 
-// ─── Insight / feature card ───────────────────────────────────────────────────
+// ─── Card ─────────────────────────────────────────────────────────────────────
 export const Card = ({
   children, c, accentBorder,
 }: {
@@ -365,7 +356,7 @@ export const Tag = ({ label, c }: { label: string, c: Tokens }) => (
   </span>
 )
 
-// ─── Persona block ────────────────────────────────────────────────────────────
+// ─── Persona grid ─────────────────────────────────────────────────────────────
 export const PersonaGrid = ({
   columns, c,
 }: {

@@ -12,8 +12,15 @@ import {
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
-const reduced = typeof window !== 'undefined'
-  && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Brand tokens are constant — defined outside component to avoid recreation on every render
+const CITYLOOP_BRAND = {
+  primary:  '#D95F30',
+  secondary:'#D7DFD8',
+  dark:     '#A14421',
+  bg:       '#0e0b09',
+  glow:     'rgba(217,95,48,0.18)',
+}
 
 export default function CityLoopPage() {
   const container = useRef<HTMLDivElement>(null)
@@ -21,15 +28,12 @@ export default function CityLoopPage() {
   const c = T[theme]
   const tr = 'transition-colors duration-300'
 
-  const brand = {
-    primary:  '#D95F30',
-    secondary:'#D7DFD8',
-    dark:     '#A14421',
-    bg:       '#0e0b09',
-    glow:     'rgba(217,95,48,0.18)',
-  }
+  const brand = CITYLOOP_BRAND
 
   useGSAP(() => {
+    // Compute reduced-motion inside useGSAP — safe on both client and server
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
       gsap.set(['.project-hero-title span', '.project-fade-in', '.section-block'], { clearProps: 'all' })
       return

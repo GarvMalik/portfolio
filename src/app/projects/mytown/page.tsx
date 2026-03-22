@@ -12,8 +12,14 @@ import {
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
-const reduced = typeof window !== 'undefined'
-  && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+// Brand tokens — defined outside component to avoid recreation on every render
+const MYTOWN_BRAND = {
+  primary:   '#FF844B',
+  secondary: '#55A6EC',
+  tertiary:  '#28285F',
+  bg:        '#0d1318',
+  glow:      'rgba(255,132,75,0.15)',
+}
 
 export default function MyTownPage() {
   const container = useRef<HTMLDivElement>(null)
@@ -21,15 +27,11 @@ export default function MyTownPage() {
   const c = T[theme]
   const tr = 'transition-colors duration-300'
 
-  const brand = {
-    primary:   '#FF844B',
-    secondary: '#55A6EC',
-    tertiary:  '#28285F',
-    bg:        '#0d1318',
-    glow:      'rgba(255,132,75,0.15)',
-  }
+  const brand = MYTOWN_BRAND
 
   useGSAP(() => {
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
       gsap.set(['.project-hero-title span', '.project-fade-in', '.section-block'], { clearProps: 'all' })
       return
