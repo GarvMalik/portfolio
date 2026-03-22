@@ -801,10 +801,10 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
 
         {/* WHO AM I — exact same JSX as RIGHT NOW below */}
-        <div className="flex flex-col mb-8 md:mb-12 pt-12 md:pt-0">
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>WHO</p>
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>AM&nbsp;I</p>
-        </div>
+       <h2 className="flex flex-col mb-8 md:mb-12 pt-12 md:pt-0">
+  <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>WHO</p>
+  <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>AM I</p>
+</h2>
         <span className="sr-only">Who am I</span>
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-start">
@@ -832,10 +832,10 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Right Now / P. 008</div>
         <h2 className="sr-only">Right Now</h2>
         {/* Identical structure to WHO AM I — full-width heading, content below */}
-        <div className="now-item opacity-0 flex flex-col mb-10 md:mb-14" aria-hidden="true">
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>RIGHT</p>
-          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>NOW</p>
-        </div>
+       <h2 className="now-item opacity-0 flex flex-col mb-10 md:mb-14">
+  <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>RIGHT</p>
+  <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>NOW</p>
+</h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
             { label: 'Listening', value: 'Kind of Blue\nMiles Davis' },
