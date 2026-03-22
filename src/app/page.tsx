@@ -862,7 +862,7 @@ export default function Home() {
           <div className="flex flex-col gap-5">
             <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv, a student at Tampere University pursuing a Master's in Human-Technology Interaction.</p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I focus on UX/UI design, blending my B.Tech background in AI and Machine Learning with human-centered design principles.</p>
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I run a YouTube channel called "UXverse by Garv" where I explore the psychology behind digital experiences.</p>
+
             <blockquote className="border-l-2 border-[#ff4d00] pl-4">
               <p className="font-mono text-sm italic" style={{ color: c.text }}>Building, learning, and sharing the process.</p>
             </blockquote>
@@ -879,10 +879,10 @@ export default function Home() {
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Kind of Blue\nMiles Davis' },
-            { label: 'Reading',   value: "Giovanni's Room\nBaldwin" },
-            { label: 'Building',  value: 'PlayPal\nCommunity' },
-            { label: 'Wearing',   value: "Vintage Levi's\n501s" },
+            { label: 'Listening', value: 'Pink Floyed\nGorillaz' },
+            { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
+            { label: 'Building',  value: 'Talos - AI Medical Screen' },
+            { label: 'Wearing',   value: "D&G\nLight Blue Intense" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
               <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>
