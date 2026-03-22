@@ -800,12 +800,12 @@ export default function Home() {
       <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
 
-        {/* Heading — mirrors RIGHT NOW exactly: two plain block lines, no flex, no gap tricks */}
-        <h2 className="pt-12 md:pt-0 mb-8 md:mb-12">
-          <span className="sr-only">Who am I</span>
-          <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: c.text }}>WHO</span>
-          <span className="block text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" aria-hidden="true" style={{ color: '#ff4d00' }}>AM&nbsp;I</span>
-        </h2>
+        {/* WHO AM I — exact same JSX as RIGHT NOW below */}
+        <div className="flex flex-col mb-8 md:mb-12 pt-12 md:pt-0">
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text }}>WHO</p>
+          <p className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00' }}>AM&nbsp;I</p>
+        </div>
+        <span className="sr-only">Who am I</span>
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-start">
           <ul className="flex flex-col gap-4" aria-label="Credentials">
