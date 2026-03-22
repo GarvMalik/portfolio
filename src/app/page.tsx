@@ -799,18 +799,9 @@ export default function Home() {
         <div id="projects" className="flex flex-col scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects">
           {projects.map((p, i) => (
             <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border }}>
-              {/* Background */}
-              {p.videoSrc ? (
-                <>
-                  <video src={p.videoSrc} autoPlay loop muted playsInline disablePictureInPicture className="absolute inset-0 w-full h-full object-cover z-0" style={{ opacity: 0.45 }} aria-hidden="true" tabIndex={-1} />
-                  <div className="absolute inset-0 z-[1]" style={{ background: 'linear-gradient(to top, #050505 30%, rgba(5,5,5,0.6) 60%, rgba(5,5,5,0.15) 100%)' }} aria-hidden="true" />
-                </>
-              ) : (
-                <>
-                  <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.5 }} aria-hidden="true" />
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.7) 55%, rgba(5,5,5,0.2) 100%)' }} aria-hidden="true" />
-                </>
-              )}
+              {/* Mobile: always use static gradient — video autoplay causes severe lag on mobile */}
+              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.6 }} aria-hidden="true" />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.7) 55%, rgba(5,5,5,0.2) 100%)' }} aria-hidden="true" />
               {/* Content */}
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-3">
@@ -850,7 +841,7 @@ export default function Home() {
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00', fontFamily: "'Bebas Neue', sans-serif" }}>AM I</span>
         </h2>
 
-        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-start">
+        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-center">
           <ul className="flex flex-col gap-4" aria-label="Credentials">
             {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Prototyping'].map(item => (
               <li key={item} className="flex items-center gap-3">
