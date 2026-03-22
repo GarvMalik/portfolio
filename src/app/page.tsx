@@ -814,88 +814,77 @@ export default function Home() {
           {projects.map((p, i) => (
             <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border }}>
 
-              {/* Base brand gradient */}
-              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.7 }} aria-hidden="true" />
+              {/* Base brand gradient — stronger */}
+              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: theme === 'dark' ? 0.9 : 0.6 }} aria-hidden="true" />
 
               {/* Per-project decorative SVG pattern — unique to each brand */}
               {i === 0 && (
-                // CityLoop — circular loop/radar motif matching the app's loop icon
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.18 }}>
+                // CityLoop — concentric circles / radar motif
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
                   <defs>
-                    <filter id="cl-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <filter id="cl-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                   </defs>
-                  {/* Concentric circles — cityloop loop motif */}
                   {[40, 90, 140, 195, 255, 320, 390].map((r, ri) => (
                     <circle key={ri} cx="310" cy="160" r={r} fill="none"
                       stroke={ri % 2 === 0 ? '#D95F30' : '#D7DFD8'}
-                      strokeWidth={ri % 2 === 0 ? '1.5' : '0.8'}
+                      strokeWidth={ri % 2 === 0 ? '2' : '1'}
                       filter={ri % 2 === 0 ? 'url(#cl-glow)' : undefined}
                     />
                   ))}
-                  {/* Dot on 'i' */}
-                  <circle cx="310" cy="160" r="6" fill="#D95F30" filter="url(#cl-glow)" />
-                  {/* Radar sweep line */}
-                  <line x1="310" y1="160" x2="310" y2="-230" stroke="#D95F30" strokeWidth="1" opacity="0.4" />
-                  <line x1="310" y1="160" x2="620" y2="420" stroke="#D7DFD8" strokeWidth="0.7" opacity="0.3" />
+                  <circle cx="310" cy="160" r="8" fill="#D95F30" filter="url(#cl-glow)" />
+                  <line x1="310" y1="160" x2="310" y2="-230" stroke="#D95F30" strokeWidth="1.5" opacity="0.6" />
+                  <line x1="310" y1="160" x2="650" y2="450" stroke="#D7DFD8" strokeWidth="1" opacity="0.4" />
                 </svg>
               )}
 
               {i === 1 && (
-                // MyTown — city skyline silhouette matching the logo buildings
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.22 }}>
+                // MyTown — city grid + building silhouettes
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
                   <defs>
                     <filter id="mt-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                   </defs>
-                  {/* Grid lines — city map feel */}
                   {[0,1,2,3,4,5,6].map(col => (
-                    <line key={`v${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#FF844B" strokeWidth="0.5" opacity="0.3" />
+                    <line key={`v${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#FF844B" strokeWidth="0.8" opacity="0.5" />
                   ))}
                   {[0,1,2,3,4,5,6,7,8,9,10].map(row => (
-                    <line key={`h${row}`} x1="0" y1={row * 70} x2="390" y2={row * 70} stroke="#55A6EC" strokeWidth="0.5" opacity="0.3" />
+                    <line key={`h${row}`} x1="0" y1={row * 70} x2="390" y2={row * 70} stroke="#55A6EC" strokeWidth="0.8" opacity="0.5" />
                   ))}
-                  {/* Building silhouettes bottom-right */}
-                  <rect x="240" y="380" width="30" height="200" fill="#FF844B" opacity="0.15" />
-                  <rect x="278" y="310" width="40" height="270" fill="#FF844B" opacity="0.20" rx="1" />
-                  <rect x="326" y="350" width="28" height="230" fill="#FF844B" opacity="0.12" />
-                  <rect x="362" y="420" width="28" height="160" fill="#55A6EC" opacity="0.12" />
-                  {/* Arrow pointing up — from logo */}
-                  <polyline points="298,310 298,260 288,275 298,258 308,275 298,260" stroke="#FF844B" strokeWidth="2" fill="none" filter="url(#mt-glow)" />
+                  <rect x="240" y="380" width="30" height="200" fill="#FF844B" opacity="0.30" />
+                  <rect x="278" y="310" width="40" height="270" fill="#FF844B" opacity="0.40" rx="1" />
+                  <rect x="326" y="350" width="28" height="230" fill="#FF844B" opacity="0.25" />
+                  <rect x="362" y="420" width="28" height="160" fill="#55A6EC" opacity="0.25" />
+                  <polyline points="298,310 298,255 285,272 298,252 311,272 298,255" stroke="#FF844B" strokeWidth="2.5" fill="none" filter="url(#mt-glow)" />
                 </svg>
               )}
 
               {i === 2 && (
-                // PlayPal — basketball court lines + dot grid
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.20 }}>
+                // PlayPal — basketball court
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
                   <defs>
-                    <filter id="pp-glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <filter id="pp-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                   </defs>
-                  {/* Court outline */}
-                  <rect x="30" y="80" width="330" height="540" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.5" rx="4" />
-                  {/* Centre line */}
-                  <line x1="30" y1="350" x2="360" y2="350" stroke="#2978FF" strokeWidth="1" opacity="0.4" />
-                  {/* Centre circle */}
-                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="1.2" opacity="0.5" filter="url(#pp-glow)" />
-                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.7" filter="url(#pp-glow)" />
-                  {/* Three-point arcs */}
-                  <path d="M 60 80 A 135 135 0 0 1 330 80" fill="none" stroke="#FFC107" strokeWidth="1.2" opacity="0.35" />
-                  <path d="M 60 620 A 135 135 0 0 0 330 620" fill="none" stroke="#FFC107" strokeWidth="1.2" opacity="0.35" />
-                  {/* Key boxes */}
-                  <rect x="130" y="80" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1" opacity="0.35" />
-                  <rect x="130" y="480" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1" opacity="0.35" />
-                  {/* Basketball icon */}
-                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.6" filter="url(#pp-glow)" />
-                  <line x1="195" y1="135" x2="195" y2="225" stroke="#2978FF" strokeWidth="1.5" opacity="0.5" />
-                  <line x1="150" y1="180" x2="240" y2="180" stroke="#2978FF" strokeWidth="1.5" opacity="0.5" />
-                  <path d="M 165 140 Q 195 160 165 220" fill="none" stroke="#FFC107" strokeWidth="1.5" opacity="0.5" />
-                  <path d="M 225 140 Q 195 160 225 220" fill="none" stroke="#FFC107" strokeWidth="1.5" opacity="0.5" />
-                  {/* Yellow underline stripes */}
-                  <line x1="30" y1="640" x2="360" y2="640" stroke="#FFC107" strokeWidth="3" opacity="0.5" />
-                  <line x1="30" y1="648" x2="360" y2="648" stroke="#FFC107" strokeWidth="1.5" opacity="0.3" />
+                  <rect x="30" y="80" width="330" height="540" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" rx="4" />
+                  <line x1="30" y1="350" x2="360" y2="350" stroke="#2978FF" strokeWidth="1.5" opacity="0.6" />
+                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" filter="url(#pp-glow)" />
+                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.9" filter="url(#pp-glow)" />
+                  <path d="M 60 80 A 135 135 0 0 1 330 80" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
+                  <path d="M 60 620 A 135 135 0 0 0 330 620" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
+                  <rect x="130" y="80" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
+                  <rect x="130" y="480" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
+                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.8" filter="url(#pp-glow)" />
+                  <line x1="195" y1="135" x2="195" y2="225" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
+                  <line x1="150" y1="180" x2="240" y2="180" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
+                  <path d="M 165 140 Q 195 162 165 220" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.7" />
+                  <path d="M 225 140 Q 195 162 225 220" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.7" />
+                  <line x1="30" y1="638" x2="360" y2="638" stroke="#FFC107" strokeWidth="4" opacity="0.7" />
                 </svg>
               )}
 
-              {/* Dark gradient overlay — content stays readable */}
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 32%, rgba(5,5,5,0.75) 58%, rgba(5,5,5,0.25) 100%)' }} aria-hidden="true" />
+              {/* Dark overlay — lighter so patterns show through, still keeps text readable */}
+              <div className="absolute inset-0" style={{ background: theme === 'dark'
+                ? 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.55) 55%, rgba(5,5,5,0.10) 100%)'
+                : 'linear-gradient(to top, rgba(20,10,5,0.92) 28%, rgba(20,10,5,0.65) 55%, rgba(20,10,5,0.15) 100%)'
+              }} aria-hidden="true" />
 
               {/* Content */}
               <div className="relative z-10">
@@ -965,10 +954,10 @@ export default function Home() {
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Pink Floyed\nGorillaz' },
+            { label: 'Listening', value: 'Pink Floyed\nGorillaz\n Tame Impala' },
             { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
             { label: 'Building',  value: 'Talos - AI Medical Screen' },
-            { label: 'Wearing',   value: "D&G Pour Homme\nLight Blue Intense" },
+            { label: 'Wearing',   value: "YSL Y" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
               <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>
