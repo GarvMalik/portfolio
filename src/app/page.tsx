@@ -882,7 +882,7 @@ export default function Home() {
             { label: 'Listening', value: 'Pink Floyed\nGorillaz' },
             { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
             { label: 'Building',  value: 'Talos - AI Medical Screen' },
-            { label: 'Wearing',   value: "D&G\nLight Blue Intense" },
+            { label: 'Wearing',   value: "D&G Pour Homme\nLight Blue Intense" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
               <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>
