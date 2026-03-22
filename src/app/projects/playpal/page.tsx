@@ -269,26 +269,34 @@ export default function PlayPalPage() {
           <SectionHeading num="06" title="Design System" c={c} />
           <div className="grid md:grid-cols-3 gap-5">
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Color Palette</p>
-              <div className="flex gap-2 mb-4">
-                {['#2978FF','#FFC107','#0151D9','#0E67FF','#5392FF'].map(col => (
-                  <div key={col} className="w-8 h-8 rounded border" style={{ background: col, borderColor: c.border }} title={col} />
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Color Palette</p>
+              <div className="grid grid-cols-3 gap-2 mb-4" role="img" aria-label="PlayPal palette: blue primary, yellow secondary, dark text">
+                {[
+                  { bg: '#2978FF', label: 'Primary' },
+                  { bg: '#FFC107', label: 'Secondary' },
+                  { bg: '#333333', label: 'Text' },
+                ].map(col => (
+                  <div key={col.label} className="flex flex-col items-center gap-1">
+                    <div className="w-8 h-8 rounded border" style={{ background: col.bg, borderColor: c.border }} title={col.bg} />
+                    <p className="text-[8px] font-mono" style={{ color: c.textFaint }}>{col.label}</p>
+                  </div>
                 ))}
               </div>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Royal blue primary (#2978FF). Yellow accent (#FFC107). Dark blue shade (#0151D9).
+                Restrained palette maintains clarity and reduces visual noise — supporting a low-pressure, approachable experience.
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Typography</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Typography</p>
+              <p className="text-lg font-bold mb-1" style={{ color: c.text }}>Zalando Sans</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Bold headings for section titles and CTAs. Clean body text for event details. Monospace labels for metadata — distance, price, rating.
+                Bold, SemiBold, Medium, Regular — prioritizing readability and hierarchy. Supports quick scanning and reduces cognitive load.
               </p>
             </Card>
             <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Components</p>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#2978FF] mb-4">Navigation Design</p>
               <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Sport filter chips, date carousel, skill level selectors, game cards, venue cards with booking CTA, bottom tab navigation with active states.
+                Core actions — Home, Play, Create, Book, Profile — accessible through predictable patterns and clear labels. Repeated layouts across flows help users feel oriented when switching between tasks.
               </p>
             </Card>
           </div>
