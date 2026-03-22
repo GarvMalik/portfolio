@@ -1,5 +1,6 @@
 "use client"
 import { useRef } from 'react'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -19,6 +20,14 @@ export default function MyTownPage() {
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
+
+  const brand = {
+    primary:   '#FF844B',
+    secondary: '#55A6EC',
+    tertiary:  '#28285F',
+    bg:        '#0d1318',
+    glow:      'rgba(255,132,75,0.15)',
+  }
 
   useGSAP(() => {
     if (reduced) {
@@ -42,15 +51,6 @@ export default function MyTownPage() {
     })
   }, { scope: container })
 
-  // ── MyTown brand tokens — exact palette ──
-  const brand = {
-    primary:   '#FF844B',   // MyTown primary orange
-    secondary: '#55A6EC',   // MyTown secondary blue
-    tertiary:  '#28285F',   // MyTown tertiary navy
-    bg:        '#0d1318',   // deep navy-black
-    glow:      'rgba(255,132,75,0.15)',
-  }
-
   return (
     <main
       ref={container}
@@ -59,7 +59,7 @@ export default function MyTownPage() {
     >
       <SkipLink />
       <Grain opacity={c.grain} />
-      <SiteNav c={c} />
+      <SiteNav c={c} projectName="MyTown" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 
       {/* ── HERO ── */}
@@ -69,65 +69,55 @@ export default function MyTownPage() {
         style={{ borderColor: c.border, background: theme === 'dark' ? brand.bg : c.bg }}
         aria-label="MyTown — project hero"
       >
-        {/* Brand glow */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 20% 60%, ${brand.glow} 0%, transparent 65%)` }} aria-hidden="true" />
 
         <div className="project-fade-in mb-8 relative z-10">
           <BackButton c={c} />
         </div>
 
-        {/* MyTown inline SVG logo */}
-        <div className="project-fade-in mb-8 relative z-10" aria-label="MyTown logo">
-          <svg width="120" height="80" viewBox="0 0 260 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            {/* Buildings */}
-            <polyline points="20,130 20,80 55,45 90,80 90,130" stroke={brand.primary} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            <polyline points="90,130 90,55 130,15 170,55 170,130" stroke={brand.primary} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            <polyline points="170,130 170,75 205,50 240,75 240,130" stroke={brand.primary} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            {/* Arrow up center */}
-            <line x1="130" y1="15" x2="130" y2="90" stroke={brand.primary} strokeWidth="6" strokeLinecap="round"/>
-            <polyline points="115,32 130,15 145,32" stroke={brand.primary} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          </svg>
-          <p className="text-[10px] uppercase font-mono tracking-[0.4em] mt-1" style={{ color: brand.secondary }}>MYTOWN</p>
+        {/* Real MyTown logo */}
+        <div className="project-fade-in mb-6 relative z-10">
+          <Image
+            src="/mytown-logo.png"
+            alt="MyTown"
+            width={160}
+            height={100}
+            className="h-16 w-auto"
+            style={{ filter: theme === 'dark' ? 'brightness(1)' : 'none' }}
+          />
         </div>
 
-        <div className="overflow-hidden mb-1 relative z-10" aria-label="MyTown">
+        <div className="overflow-hidden mb-2 relative z-10">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'MYTOWN'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[14vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.secondary }}>
-                {char}
-              </span>
+              <span key={i} className="inline-block text-[14vw] md:text-[11vw] font-black uppercase leading-[0.85] tracking-tighter" style={{ color: brand.secondary }}>{char}</span>
             ))}
           </div>
         </div>
-        <div className="overflow-hidden mb-8 relative z-10" aria-label="Relocation">
+        <div className="overflow-hidden mb-8 relative z-10">
           <div className="project-hero-title flex flex-wrap" aria-hidden="true">
             {'RELOCATION'.split('').map((char, i) => (
-              <span key={i} className="inline-block text-[8vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: brand.primary }}>
-                {char}
-              </span>
+              <span key={i} className="inline-block text-[7vw] md:text-[5.5vw] font-black uppercase leading-[0.9] tracking-tighter" style={{ color: brand.primary }}>{char}</span>
             ))}
           </div>
         </div>
-        <p className="project-fade-in font-mono text-sm max-w-xl leading-relaxed mb-6" style={{ color: c.textMuted }}>
+
+        <p className="project-fade-in font-mono text-sm max-w-xl leading-relaxed mb-6 relative z-10" style={{ color: c.textMuted }}>
           A service concept and mobile app designed to support international students during their first weeks in Finland — centralizing practical guidance, local discovery, and peer support.
         </p>
-        <div className="project-fade-in flex flex-wrap gap-2" role="list" aria-label="Project tags">
-          {['Product Design', 'Service Concept', 'Figma', 'UX Research', 'Co-creation Workshop'].map(tag => (
+        <div className="project-fade-in flex flex-wrap gap-2 relative z-10">
+          {['Product Design', 'Service Concept', 'Figma', 'UX Research', 'Co-creation'].map(tag => (
             <Tag key={tag} label={tag} c={c} />
           ))}
         </div>
       </section>
 
       {/* ── META ── */}
-      <section
-        className={`grid grid-cols-2 md:grid-cols-4 border-b ${tr}`}
-        style={{ borderColor: c.border }}
-        aria-label="Project metadata"
-      >
+      <section className={`grid grid-cols-2 md:grid-cols-4 border-b ${tr}`} style={{ borderColor: c.border }}>
         {[
           { label: 'Role',     value: 'UI/UX Designer, Product Designer' },
-          { label: 'Timeline', value: 'Oct 2025 – Dec 2025' },
-          { label: 'Tools',    value: 'Figma, Microsoft Whiteboard' },
+          { label: 'Timeline', value: 'Oct – Dec 2025' },
+          { label: 'Tools',    value: 'Figma, Whiteboard' },
           { label: 'Type',     value: 'Group Project' },
         ].map((s, i) => (
           <div key={s.label} className={`px-6 md:px-12 ${tr} ${i < 3 ? 'border-r' : ''}`} style={{ borderColor: c.border }}>
@@ -138,225 +128,167 @@ export default function MyTownPage() {
 
       <div className="px-6 md:px-16 py-20 max-w-7xl mx-auto space-y-28">
 
-        {/* 00 What I Worked On */}
-        <div className="section-block" aria-labelledby="s-role">
-          <SectionHeading num="00" title="What I Worked On" c={c} />
-          <div className="grid md:grid-cols-2 gap-10">
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              This was a collaborative group project with shared responsibilities. I co-hosted the user workshop, analysed interview data, and contributed to affinity mapping and synthesis. I helped define the service concept, sitemap, and design direction, and contributed to the design system and high-fidelity prototype.
-            </p>
-            <ul className="space-y-2" aria-label="Contributions">
-              {[
-                'Co-hosted the user co-creation workshop',
-                'Interview data analysis and affinity mapping',
-                'User journey map and persona creation',
-                'Service concept and sitemap definition',
-                'Design system and high-fidelity prototype',
-              ].map(item => (
-                <li key={item} className="flex items-start gap-3 text-xs font-mono" style={{ color: c.textMuted }}>
-                  <span className="text-[#FF844B] mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+        {/* ── APP SCREENS ── */}
+        <div className="section-block">
+          <SectionHeading num="00" title="App Screens" c={c} />
+          <p className="font-mono text-sm leading-relaxed max-w-2xl mb-10" style={{ color: c.textMuted }}>
+            Three core flows — the Home checklist for first-week tasks, the Events discovery screen, and the Support Hub with guides and FAQs — each designed to reduce friction during the settling-in process.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { src: '/home.png',        label: 'Home — First Week Checklist' },
+              { src: '/events.png',      label: 'Events Discovery' },
+              { src: '/support-hub.png', label: 'Support Hub & FAQs' },
+            ].map(({ src, label }) => (
+              <div key={src} className="flex flex-col gap-3">
+                <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                  <Image src={src} alt={label} width={500} height={900} className="w-full h-auto" />
+                </div>
+                <p className="text-[9px] font-mono uppercase tracking-[0.25em] text-center" style={{ color: c.textFaint }}>{label}</p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* 01 Problem */}
-        <div className="section-block" aria-labelledby="s-problem">
+        {/* ── PROBLEM ── */}
+        <div className="section-block">
           <SectionHeading num="01" title="The Problem" c={c} />
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mb-5" style={{ color: c.text }}>
                 Not a lack of information — a lack of clarity, order, and emotional support.
               </p>
+              <blockquote className="border-l-2 pl-4 mt-6" style={{ borderColor: brand.primary }}>
+                <p className="font-mono text-sm italic" style={{ color: c.textMuted }}>
+                  "Students rely heavily on peers and tutors, creating stress during their first weeks."
+                </p>
+              </blockquote>
             </div>
             <div className="space-y-4">
               <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
                 International students moving to Finland face a complex and fragmented settling-in process. Essential tasks — university registration, DVV appointments, bank account setup, transportation, housing — all happen at the same time, with limited step-by-step guidance.
               </p>
               <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-                Most information is scattered across university websites, emails, social media groups, and word-of-mouth. Students rely heavily on peers and tutors, creating stress and a feeling of being overwhelmed during the first weeks.
+                Most information is scattered across university websites, emails, social media groups, and word-of-mouth.
               </p>
             </div>
           </div>
         </div>
 
-        {/* 02 Research */}
-        <div className="section-block" aria-labelledby="s-research">
+        {/* ── RESEARCH ── */}
+        <div className="section-block">
           <SectionHeading num="02" title="Research & Synthesis" c={c} />
           <div className="mb-8 space-y-4">
             <p className="font-mono text-sm leading-relaxed max-w-2xl" style={{ color: c.textMuted }}>
-              Research used a qualitative, user-centered approach. Semi-structured interviews explored early settling-in experiences, practical challenges, emotional stress, and how students currently find support.
-            </p>
-            <p className="font-mono text-sm leading-relaxed max-w-2xl" style={{ color: c.textMuted }}>
-              A co-creation workshop was organised with recently arrived international students. Participants individually documented challenges, successes, and unmet needs — then collaboratively grouped notes to perform affinity mapping within the workshop itself.
+              Research used a qualitative, user-centered approach. Semi-structured interviews explored early settling-in experiences, practical challenges, emotional stress, and how students currently find support. A co-creation workshop was organised with recently arrived international students.
             </p>
           </div>
-
-          {/* Persona */}
-          <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-6">Persona — Sheldon</p>
-            <PersonaGrid
-              c={c}
-              columns={[
-                {
-                  heading: 'About',
-                  items: [
-                    '18-year-old first-year student from the USA',
-                    'Motivated and independent',
-                    'Overwhelmed by unfamiliar systems and bureaucracy',
-                    'Relies on peers and familiar tools',
-                  ],
-                },
-                {
-                  heading: 'Problems',
-                  items: [
-                    'Bureaucracy overload',
-                    'Finnish-only documents',
-                    'Information scattered across apps',
-                    'Social isolation and homesickness',
-                    'Confusing public transport rules',
-                  ],
-                },
-                {
-                  heading: 'Needs',
-                  items: [
-                    'Step-by-step settling guide',
-                    'Clear instructions for DVV, banking, SIM',
-                    'Essentials map with tips and locations',
-                    'Peer and mentor support',
-                  ],
-                },
-              ]}
-            />
-          </Card>
-
-          {/* Journey stages */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6" role="list" aria-label="Journey map stages">
+          <div className="grid md:grid-cols-2 gap-4">
             {[
-              { phase: 'Before Arrival', emotion: 'Anxious / Overwhelmed', note: 'No single trusted source of information' },
-              { phase: 'Arrival Week',   emotion: 'Confused / Rushed',     note: 'Long queues, transport confusion, feels alone' },
-              { phase: 'Settling In',    emotion: 'Curious / Lonely',      note: "Hard to socialise, doesn't know local events" },
-              { phase: 'Long-Term',      emotion: 'Empowered / Confident', note: 'Hard to maintain engagement, seasonal challenges' },
-            ].map(stage => (
-              <Card key={stage.phase} c={c} accentBorder="#ff4d00">
-                <p className="text-[9px] uppercase font-mono tracking-widest text-[#FF844B] mb-2">{stage.phase}</p>
-                <p className="text-xs font-mono mb-2" style={{ color: c.textMuted }}>{stage.emotion}</p>
-                <p className="text-[10px] font-mono italic" style={{ color: c.textFaint }}>{stage.note}</p>
+              'Bureaucracy overload — multiple official tasks (DVV, banking, SIM) happen simultaneously with no clear order.',
+              'Finnish-only documents and interfaces create confusion for non-Finnish speakers.',
+              'Social isolation hits hardest in the first weeks — students feel disconnected before they find their community.',
+              'Information is scattered — students switch between university portals, WhatsApp groups, and tutors to get answers.',
+            ].map((text, i) => (
+              <Card key={i} c={c} accentBorder={brand.primary}>
+                <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>{text}</p>
               </Card>
             ))}
           </div>
         </div>
 
-        {/* 03 Design Goals */}
-        <div className="section-block" aria-labelledby="s-goals">
-          <SectionHeading num="03" title="Design Goals & Service Concept" c={c} />
-          <div className="grid md:grid-cols-3 gap-5 mb-6">
+        {/* ── SITEMAP ── */}
+        <div className="section-block">
+          <SectionHeading num="03" title="Information Architecture" c={c} />
+          <p className="font-mono text-sm leading-relaxed max-w-2xl mb-8" style={{ color: c.textMuted }}>
+            The sitemap maps the four core pillars of MyTown — Discover, Student Life & Events, Help, and Support Hub — organised around the user's natural settling-in journey.
+          </p>
+          <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+            <Image src="/sitemap.png" alt="MyTown Sitemap" width={1400} height={800} className="w-full h-auto" />
+          </div>
+        </div>
+
+        {/* ── DESIGN PROCESS ── */}
+        <div className="section-block">
+          <SectionHeading num="04" title="Design Process" c={c} />
+          <div className="space-y-8">
             {[
-              { title: 'Simplify the settling-in', desc: 'Help students understand what to do, in what order, and where to go. Reduce mental overload.' },
-              { title: 'Support existing habits',  desc: 'Add context and guidance around tools students already use, rather than replacing them.' },
-              { title: 'Value beyond onboarding',  desc: 'Offer ongoing support through events, practical tips, and peer or mentor guidance.' },
-            ].map(g => (
-              <Card key={g.title} c={c}>
-                <div className="w-5 h-[1px] mb-4" style={{ background: c.text }} aria-hidden="true" />
-                <h3 className="text-sm font-black uppercase tracking-tight mb-2" style={{ color: c.text }}>{g.title}</h3>
-                <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>{g.desc}</p>
-              </Card>
+              { step: '01 — Co-creation Workshop', body: 'We co-hosted a workshop with recently arrived international students. Participants individually documented challenges, successes, and unmet needs — then collaboratively performed affinity mapping within the session itself.' },
+              { step: '02 — Defining the Service Concept', body: 'Four pillars emerged from research: The Roadmaps (step-by-step task guides), Discovery Map (essentials around campus), Student Life (events and clubs), and Support Hub (mentor chat, AI FAQ, emergency info).' },
+              { step: '03 — Wireframes to High-Fidelity', body: 'We moved from low-fidelity flows to a complete design system in Figma — including a full color token library, button system, form controls, and component states.' },
+              { step: '04 — Heuristic Evaluation', body: 'The prototype was reviewed using heuristic evaluation and cognitive walkthroughs. This helped simplify the onboarding flow and clarify the first-week checklist priority order.' },
+            ].map(p => (
+              <ProcessStep key={p.step} step={p.step} body={p.body} c={c} accentBorder={brand.primary} />
             ))}
           </div>
+        </div>
 
-          {/* Four pillars */}
-          <Card c={c}>
-            <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-5">The Four Pillars of MyTown</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4" role="list">
-              {[
-                { name: 'The Roadmaps',  desc: 'Step-by-step task guides: Arrival → DVV → Bank' },
-                { name: 'Discovery Map', desc: 'University, groceries, student lunch, essentials' },
-                { name: 'Student Life',  desc: 'Events, clubs, community connections' },
-                { name: 'Support Hub',   desc: 'Mentor chat, AI FAQ, emergency info' },
-              ].map(p => (
-                <div key={p.name} role="listitem" className="text-center p-3 border" style={{ borderColor: c.border }}>
-                  <p className="text-[10px] uppercase font-mono tracking-widest text-[#FF844B] mb-2">{p.name}</p>
-                  <p className="text-[10px] font-mono leading-relaxed" style={{ color: c.textFaint }}>{p.desc}</p>
-                </div>
-              ))}
+        {/* ── DESIGN SYSTEM ── */}
+        <div className="section-block">
+          <SectionHeading num="05" title="Design System" c={c} />
+          <p className="font-mono text-sm leading-relaxed max-w-2xl mb-10" style={{ color: c.textMuted }}>
+            A complete design system was built in Figma — color tokens, button variants, form controls, and icon libraries — ensuring consistency across all screens and states.
+          </p>
+
+          {/* Color system */}
+          <div className="mb-6">
+            <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Color System</p>
+            <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+              <Image src="/Colors.png" alt="MyTown Color System" width={1200} height={700} className="w-full h-auto" />
             </div>
-          </Card>
-        </div>
+          </div>
 
-        {/* 04 Design System */}
-        <div className="section-block" aria-labelledby="s-system">
-          <SectionHeading num="04" title="Design System" c={c} />
-          <div className="grid md:grid-cols-3 gap-5">
-            <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-4">Color Tokens</p>
-              <div className="grid grid-cols-3 gap-2 mb-4" role="img" aria-label="MyTown palette: orange primary, blue secondary, purple tertiary">
-                {[
-                  { bg: '#FF844B', label: 'Primary' },
-                  { bg: '#4A86EC', label: 'Secondary' },
-                  { bg: '#28285F', label: 'Tertiary' },
-                ].map(col => (
-                  <div key={col.label} className="flex flex-col items-center gap-1">
-                    <div className="w-8 h-8 rounded border" style={{ background: col.bg, borderColor: c.border }} title={col.bg} />
-                    <p className="text-[8px] font-mono" style={{ color: c.textFaint }}>{col.label}</p>
-                  </div>
-                ))}
+          {/* Button + Form side by side */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Button System</p>
+              <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+                <Image src="/Button_System.png" alt="MyTown Button System" width={800} height={600} className="w-full h-auto" />
               </div>
-              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Semantic tokens: primary_main, text_primary, grey_500 — calm neutral base with a strong orange accent.
-              </p>
-            </Card>
-            <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-4">Typography</p>
-              <p className="text-lg font-bold mb-1" style={{ color: c.text }}>Nunito</p>
-              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Chosen for readability and friendly tone. Clear scale: Display, H1–H4, Body L/M/S, Button, Caption. Tokens connected to components.
-              </p>
-            </Card>
-            <Card c={c}>
-              <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#FF844B] mb-4">Components</p>
-              <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
-                Buttons, inputs, switches, checkboxes, radio buttons — reusable with predefined states: default, focused, pressed, disabled, error. Icons follow Material Design Icons.
-              </p>
-            </Card>
+            </div>
+            <div>
+              <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Form Controls</p>
+              <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+                <Image src="/Form_Controls.png" alt="MyTown Form Controls" width={800} height={600} className="w-full h-auto" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 05 Prototype */}
-        <div className="section-block" aria-labelledby="s-prototype">
-          <SectionHeading num="05" title="Prototype Highlights" c={c} />
-          <div className="space-y-6">
+        {/* ── FOUR PILLARS ── */}
+        <div className="section-block">
+          <SectionHeading num="06" title="The Four Pillars" c={c} />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { flow: 'Arrival & Onboarding Flow',       desc: 'Helps students complete essential tasks step by step during their first week. The "First Week Checklist" — SIM card, DVV, Polisi Card, Public Transport Card — with detailed step-by-step guidance, required documents, tips, and a completion state inside each task.' },
-              { flow: 'Practical Guidance & Map View',   desc: 'A map-based view that highlights student-relevant locations such as offices, services, and everyday essentials. Categories include public spaces, grocery stores, and university buildings.' },
-              { flow: 'Support Hub',                     desc: 'Centralizes guides, FAQs, and direct help. Students access step-by-step information, search common questions (Registration, Housing, Banking, Transport, Daily Life, Events), and get support through mentor chat or AI assistant.' },
-              { flow: 'Events & Social Discovery',       desc: 'Helps students discover relevant academic and social activities without searching across multiple platforms. All events and university events separated, with robust filter options.' },
-            ].map(f => (
-              <ProcessStep key={f.flow} step={f.flow} body={f.desc} c={c} />
+              { name: 'The Roadmaps',  desc: 'Step-by-step task guides: Arrival → DVV → Bank → SIM' },
+              { name: 'Discovery Map', desc: 'University, groceries, student lunch, essentials nearby' },
+              { name: 'Student Life',  desc: 'Events, clubs, community connections' },
+              { name: 'Support Hub',   desc: 'Mentor chat, AI FAQ, settling guides, emergency info' },
+            ].map(p => (
+              <Card key={p.name} c={c} accentBorder={brand.primary}>
+                <p className="text-[10px] uppercase font-mono tracking-widest mb-2" style={{ color: brand.primary }}>{p.name}</p>
+                <p className="text-[10px] font-mono leading-relaxed" style={{ color: c.textMuted }}>{p.desc}</p>
+              </Card>
             ))}
           </div>
         </div>
 
-        {/* 06 Reflection */}
-        <div className="section-block border-t pt-14" style={{ borderColor: c.border }} aria-labelledby="s-reflection">
-          <SectionHeading num="06" title="Reflection" c={c} />
+        {/* ── REFLECTION ── */}
+        <div className="section-block border-t pt-14" style={{ borderColor: c.border }}>
+          <SectionHeading num="07" title="Reflection" c={c} />
           <div className="max-w-2xl space-y-4">
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              This project changed how I think about design beyond interfaces. Coming from a computer science background and being relatively new to HCI, I initially approached the problem with a solution-first mindset. Through this course, I learned to slow down and focus on understanding why users struggle before designing features.
+              This project changed how I think about design beyond interfaces. Coming from a computer science background, I initially approached the problem with a solution-first mindset. Through this course, I learned to slow down and focus on understanding why users struggle before designing features.
             </p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
               One key learning was the value of asking deeper questions. Students mentioned Google Maps and Telegram, but interviews revealed these choices were driven by trust and peer recommendations — helping us avoid designing unnecessary replacements.
-            </p>
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              I also learned to see research artifacts as decision-making tools rather than documentation. Personas and journey maps highlighted moments of confusion and overload that directly shaped our design priorities.
             </p>
           </div>
         </div>
 
         <ProjectNav
           prev={{ label: 'CityLoop', href: '/projects/cityloop' }}
-          next={{ label: 'PlayPal',  href: '/projects/playpal' }}
+          next={{ label: 'PlayPal',  href: '/projects/playpal'  }}
           c={c}
         />
       </div>
