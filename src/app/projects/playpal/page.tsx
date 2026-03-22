@@ -66,7 +66,7 @@ export default function PlayPalPage() {
       <section
         id="main-content"
         className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b overflow-hidden ${tr}`}
-        style={{ borderColor: c.border, background: brand.bg }}
+        style={{ borderColor: c.border, background: theme === 'dark' ? brand.bg : c.bg }}
         aria-label="PlayPal — project hero"
       >
         <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 30% 60%, ${brand.glow} 0%, transparent 65%)` }} aria-hidden="true" />

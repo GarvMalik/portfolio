@@ -122,10 +122,10 @@ export const ThemeToggle = ({
 )
 
 // ─── Site nav (fixed top bar) ─────────────────────────────────────────────────
-export const SiteNav = ({ c, projectLinks }: {
+export const SiteNav = ({ c, projectLinks, projectName }: {
   c: Tokens
-  // Optional sibling project links shown in the mobile overlay
   projectLinks?: { label: string; href: string }[]
+  projectName?: string
 }) => {
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -161,7 +161,7 @@ export const SiteNav = ({ c, projectLinks }: {
           href="/"
           className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
         >
-          / Garv Malik / Vol. 1
+          / Garv Malik {projectName ? `/ ${projectName}` : '/ Vol. 1'}
         </Link>
 
         <div className="flex items-center gap-4">

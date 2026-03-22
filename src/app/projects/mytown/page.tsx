@@ -66,7 +66,7 @@ export default function MyTownPage() {
       <section
         id="main-content"
         className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b overflow-hidden ${tr}`}
-        style={{ borderColor: c.border, background: brand.bg }}
+        style={{ borderColor: c.border, background: theme === 'dark' ? brand.bg : c.bg }}
         aria-label="MyTown — project hero"
       >
         {/* Brand glow */}

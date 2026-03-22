@@ -66,23 +66,18 @@ export default function CityLoopPage() {
     >
       <SkipLink />
       <Grain opacity={c.grain} />
-      <SiteNav c={c} />
+      <SiteNav c={c} projectName="CityLoop" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 
       {/* ── HERO ── */}
       <section
         id="main-content"
         className={`relative min-h-[70vh] flex flex-col justify-end px-6 md:px-16 pb-16 pt-28 border-b overflow-hidden ${tr}`}
-        style={{ borderColor: c.border, background: brand.bg }}
+        style={{ borderColor: c.border, background: theme === 'dark' ? brand.bg : c.bg }}
         aria-label="CityLoop — project hero"
       >
         {/* Glow */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 70% 40%, ${brand.glow} 0%, transparent 65%)` }} aria-hidden="true" />
-
-        {/* Floating phone mockup top-right */}
-        <div className="absolute right-6 md:right-24 top-24 md:top-16 w-28 md:w-48 opacity-70 z-0 pointer-events-none" aria-hidden="true">
-          <Image src="/home-moodcast.png" alt="" width={300} height={600} className="w-full h-auto rounded-2xl" style={{ boxShadow: `0 0 80px ${brand.glow}` }} />
-        </div>
 
         <div className="project-fade-in mb-8 relative z-10">
           <BackButton c={c} />
