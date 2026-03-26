@@ -378,11 +378,11 @@ export default function Home() {
     )
   }, { scope: container, dependencies: [isMobile] })
 
-  const MARQUEE_ITEMS = ['UX/UI Design', 'Interaction Design', 'Figma', 'Design Systems', 'User Research', 'Prototyping', 'Tampere, Finland', 'Open to Work']
+  const MARQUEE_ITEMS = ['UX/UI Designer', 'Open to Work', 'Tampere, Finland', 'Interaction Design', 'User Research', 'Figma', 'Design Systems', 'Prototyping']
   const projects = [
     {
       title: 'CityLoop Discovery',
-      desc: 'Lifestyle discovery app helping users find places and events based on mood and weather in Tampere.',
+      desc: 'How do you help someone decide what to do when they don\'t know what they want? CityLoop surfaces local places and events based on mood, weather, and time of day.',
       tags: ['UX/UI Design', 'Figma', 'UX Research', 'Prototyping'],
       accentColor: '#D95F30',   // CityLoop terracotta
       pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
@@ -391,7 +391,7 @@ export default function Home() {
     },
     {
       title: 'MyTown Relocation',
-      desc: 'Service concept centralizing guidance and peer support for international students moving to Finland.',
+      desc: 'Moving to a new country is overwhelming. MyTown guides international students through their first weeks in Finland — step by step.',
       tags: ['Product Design', 'Service Concept', 'Figma', 'Research'],
       accentColor: '#FF844B',   // MyTown orange
       pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
@@ -400,7 +400,7 @@ export default function Home() {
     },
     {
       title: 'PlayPal Community',
-      desc: 'Concept designed to help people find sports partners, organize games, and book venues effortlessly.',
+      desc: 'Finding someone to play sports with is harder than it should be. PlayPal connects people by sport, skill level, and location — and handles the logistics too.',
       tags: ['Design System', 'Interaction', 'Figma', 'Motion'],
       accentColor: '#2978FF',   // PlayPal blue
       pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
@@ -446,14 +446,14 @@ export default function Home() {
           className="intro-label opacity-0 text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded"
           aria-label="Garv Malik — scroll to top"
         >
-          / Garv Malik
+          / Garv Malik — UX/UI Designer
         </a>
 
         {/* Centre nav links — desktop only */}
         <div className="hidden md:flex items-center gap-10" role="list">
           {[
             { label: 'Home',   id: 'main-content' },
-            { label: 'Skills',   id: 'about-skills' },
+            { label: 'Approach', id: 'about-skills' },
             { label: 'Work',     id: 'projects'    },
             { label: 'About',    id: 'about'        },
             { label: 'Contact',  id: 'contact'      },
@@ -539,7 +539,7 @@ export default function Home() {
       >
         {[
           { label: 'Home',    id: 'main-content' },
-          { label: 'Skills',  id: 'about-skills' },
+          { label: 'Approach', id: 'about-skills' },
           { label: 'Work',    id: 'projects'     },
           { label: 'About',   id: 'about'        },
           { label: 'Contact', id: 'contact'      },
@@ -701,7 +701,7 @@ export default function Home() {
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
         <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Home / P. 001</div>
-        <h1 className="sr-only">Garv Malik UX UI Designer</h1>
+        <h1 className="sr-only">Garv Malik — UX/UI Designer based in Tampere, Finland</h1>
         
         {/* Stacked bottom-left style */}
         <div className="hero-name-wrap flex flex-col items-start gap-0 relative z-10 w-full" aria-hidden="true">
@@ -713,12 +713,39 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Hero CTAs */}
+        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-3 mt-6 md:mt-8" aria-hidden="false">
+          <a
+            href="#projects"
+            onClick={e => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) }}
+            className="inline-flex items-center gap-2 bg-[#ff4d00] text-black font-mono text-[9px] uppercase tracking-[0.2em] px-4 py-2.5 hover:bg-[#e04300] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
+          >
+            View Work →
+          </a>
+          <a
+            href="/garv-malik-cv.pdf"
+            download
+            className="inline-flex items-center gap-2 border font-mono text-[9px] uppercase tracking-[0.2em] px-4 py-2.5 hover:bg-[#ff4d00] hover:text-black hover:border-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
+            style={{ borderColor: c.border, color: c.textMuted }}
+          >
+            Download CV ↓
+          </a>
+          <a
+            href="#contact"
+            onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) }}
+            className="inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] px-4 py-2.5 hover:text-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
+            style={{ color: c.textMuted }}
+          >
+            Contact
+          </a>
+        </div>
+
 
 
 
         <div className="intro-label opacity-0 hidden md:flex absolute right-16 top-1/2 -translate-y-1/2 flex-col items-end gap-3 text-right" aria-hidden="true">
           <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
-          <p className="text-[9px] uppercase font-mono tracking-[0.25em] max-w-[160px] leading-loose" style={{ color: c.textMuted }}>UX/UI Designer<br />& Creative Developer</p>
+          <p className="text-[9px] uppercase font-mono tracking-[0.25em] max-w-[160px] leading-loose" style={{ color: c.textMuted }}>UX/UI Designer<br />Research · Interaction · Figma</p>
           <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
         </div>
         <div className="intro-label opacity-0 absolute bottom-0 left-0 right-0 border-t" style={{ borderColor: c.border }}>
@@ -772,7 +799,7 @@ export default function Home() {
           ))}
           <div className="overflow-hidden mt-8 ml-auto">
             <p className="manifesto-sub opacity-0 translate-y-4 text-[9px] font-mono uppercase tracking-[0.3em] text-right max-w-xs leading-loose" style={{ color: c.textMuted }}>
-              — A belief in invisible craft.<br />In feeling over function. In rawness.
+              — A belief in invisible craft.<br />In clarity over complexity. In design that earns trust.
             </p>
           </div>
         </blockquote>
@@ -786,26 +813,26 @@ export default function Home() {
           <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">The Practice</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />I Build</h2>
           <dl className="flex flex-col">
-            <ListRow label="Design"  value="UX/UI · Design Systems"      borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Process" value="User Flows · Prototyping"     borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Design"  value="UX/UI · Accessibility · Design Systems"      borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Process" value="Research · Flows · Prototyping"     borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
             <ListRow label="Tools"   value="Figma · Miro · Mural"         borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Output"  value="AI-assisted product building" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Research" value="Interviews · Usability Testing · Affinity Mapping" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
           </dl>
         </div>
         <div className="w-full md:w-1/2 md:pl-20 flex flex-col justify-center">
           <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">The Mindset</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />Moves Me</h2>
           <dl className="flex flex-col">
-            <ListRow label="Principle"     value="Human-centered clarity"        borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Interest"      value="Emotional interaction"          borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Curious about" value="Behavior and research"          borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Goal"          value="Interfaces that feel intuitive" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Principle"     value="Clarity and calm over complexity"        borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Interest"      value="Context-aware, human-centered design"          borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Curious about" value="AI and how it shapes human behavior"          borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Goal"          value="Interfaces people use without thinking" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
           </dl>
         </div>
       </section>
 
       <div className="w-full bg-[#ff4d00] py-3 overflow-hidden" aria-hidden="true">
-        <Marquee items={['Selected Work', 'Case Studies', '2024–2026', 'Figma', 'UX Research', 'Interaction Design']} speed={60} reverse textColor="rgba(255,255,255,0.88)" />
+        <Marquee items={['Selected Work', '3 Projects', 'Research-Led Design', 'Figma', 'Tampere, Finland', '2024–2026']} speed={60} reverse textColor="rgba(255,255,255,0.88)" />
       </div>
 
       {/* ── PROJECTS ── */}
@@ -927,7 +954,7 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-center">
           <ul className="flex flex-col gap-4" aria-label="Credentials">
-            {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Prototyping'].map(item => (
+            {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Accessibility'].map(item => (
               <li key={item} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] flex-shrink-0" aria-hidden="true" />
                 <span className="text-[11px] font-mono uppercase tracking-[0.22em]" style={{ color: c.textMuted }}>{item}</span>
@@ -935,11 +962,11 @@ export default function Home() {
             ))}
           </ul>
           <div className="flex flex-col gap-5">
-            <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv, a student at Tampere University pursuing a Master's in Human-Technology Interaction.</p>
-            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I enjoy designing thoughtful digital experiences that feel calm, intuitive, and accessible. My work is rooted in research, where I explore user needs through interviews, testing, and iterative design. I’ve built projects ranging from lifestyle discovery apps to student support services, always focusing on clarity and real-world impact. I care deeply about how technology fits into everyday life, and I aim to create solutions that are not just functional, but genuinely meaningful for the people who use them.</p>
+            <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv — a UI/UX Designer with a background in Computer Science, currently pursuing a Master's in Human-Technology Interaction at Tampere University, Finland.</p>
+            <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I design with research at the centre. That means talking to users early, testing often, and making decisions based on what people actually do — not what they say they do. I’m drawn to calm, accessible interfaces and experiences that work well in real, messy contexts.</p>
 
             <blockquote className="border-l-2 border-[#ff4d00] pl-4">
-              <p className="font-mono text-sm italic" style={{ color: c.text }}>Building, learning, and sharing the process.</p>
+              <p className="font-mono text-sm italic" style={{ color: c.text }}>"Design is how it works — I'm here to figure that out."</p>
             </blockquote>
           </div>
         </div>
@@ -954,7 +981,7 @@ export default function Home() {
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Pink Floyed\nGorillaz\n Tame Impala' },
+            { label: 'Listening', value: 'Pink Floyd\nGorillaz\nTame Impala' },
             { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
             { label: 'Building',  value: 'Talos - AI Medical Screen' },
             { label: 'Wearing',   value: "YSL Y" },
@@ -973,7 +1000,7 @@ export default function Home() {
         <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none" style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)' }} aria-hidden="true">+</div>
         <div className="footer-email opacity-0 mt-20 mb-10">
           {/* Issue 6 fix: label bumped from text-[9px] → text-[11px] for light mode readability */}
-          <p className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#ff4d00] mb-6 font-bold">Let's make something that means something.</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#ff4d00] mb-6 font-bold">Open to internships and UX roles in Finland and Europe.</p>
           <a href="mailto:thegarvmalik@gmail.com" data-cursor-hover aria-label="Send email to thegarvmalik@gmail.com" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1">
             <HoverWaveText text="THEGARVMALIK@GMAIL.COM" color={c.text} />
           </a>
@@ -994,10 +1021,10 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textFaint }}>© 2026 Garv Malik — Built Raw</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textFaint }}>© 2026 Garv Malik — Designed &amp; Built from scratch</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 border-t py-1" style={{ borderColor: c.border }} aria-hidden="true">
-          <Marquee items={['Available for work', 'UX/UI Design', 'Interaction Design', 'Open to collaboration', 'Tampere, Finland']} speed={30} textColor={c.textFaint} />
+          <Marquee items={['Open to Work', 'UX/UI Design Roles', 'Finland & Europe', 'Interaction Design', 'Research-Led', 'Tampere, Finland', 'Let\'s Talk']} speed={30} textColor={c.textFaint} />
         </div>
       </footer>
     </main>
