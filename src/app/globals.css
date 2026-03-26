@@ -3,6 +3,8 @@
 /* === BASE ================================================================= */
 html {
   scroll-behavior: smooth;
+  /* PERF: prevent scroll chaining on iOS — keeps page scroll contained */
+  overscroll-behavior: none;
 }
 
 body {
@@ -10,6 +12,11 @@ body {
   color: #e6e2d3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* PERF: tell the browser scrolling is the primary interaction on body */
+  touch-action: pan-y;
+  /* PERF: contain layout/style within body so child animations don't
+     bubble up and invalidate ancestor layout */
+  contain: layout style;
 }
 
 /* === TYPOGRAPHY ============================================================ */
@@ -23,7 +30,7 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
   font-family: var(--font-jetbrains), 'Courier New', monospace;
 }
 
-/* === FOCUS (WCAG 2.4.7 / 2.4.11) ========================================= */
+/* === FOCUS (WCAG 2.4.7) =================================================== */
 :focus-visible {
   outline: 2px solid #ff4d00;
   outline-offset: 3px;
@@ -50,7 +57,39 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
   }
 }
 
-/* === SCROLLBAR (cosmetic only) ============================================= */
+/* === PERFORMANCE HELPERS ================================================== */
+
+/* PERF: sections are independent paint containers.
+   contain: paint tells the browser nothing inside a section will paint
+   outside its bounds — safe to skip repainting adjacent sections. */
+section, footer {
+  contain: paint;
+}
+
+/* PERF: fixed elements that never change content get content-visibility: auto
+   only for off-screen sections — browser can skip layout for them. */
+.about-section,
+.now-section,
+.footer-section {
+  content-visibility: auto;
+  /* Reserve approximate height so scroll position doesn't jump
+     when section is painted for the first time */
+  contain-intrinsic-size: 0 100vh;
+}
+
+/* PERF: hero background SVG — isolate so theme-color changes
+   in parent don't trigger repaint of the SVG */
+.hero-bg-svg {
+  isolation: isolate;
+}
+
+/* PERF: horizontal project cards — each is its own stacking context
+   so GPU can composite them independently during horizontal scroll */
+.project-card {
+  isolation: isolate;
+}
+
+/* === SCROLLBAR (cosmetic) ================================================= */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 77, 0, 0.4); border-radius: 2px; }
