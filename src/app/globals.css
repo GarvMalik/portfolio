@@ -10,6 +10,10 @@ body {
   color: #e6e2d3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Hint to browser: handle vertical scroll natively, no delay */
+  touch-action: pan-y;
+  /* Prevent iOS momentum scroll from causing layout jank */
+  overscroll-behavior-y: none;
 }
 
 /* === TYPOGRAPHY ============================================================ */
@@ -55,3 +59,19 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 77, 0, 0.4); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: #ff4d00; }
+
+/* === PERFORMANCE: GPU layer hints for animated elements ==================== */
+/* Compositor-promoted layers — set during animation by GSAP will-change,
+   but these CSS rules ensure the fixed elements are always composited. */
+.hero-garv,
+.hero-malik {
+  /* These are parallax-animated — tell browser upfront */
+  transform: translateZ(0);
+}
+
+/* Fixed overlays should be on their own layer to avoid triggering
+   full-page repaints when their opacity changes */
+nav,
+.footer-section {
+  transform: translateZ(0);
+}
