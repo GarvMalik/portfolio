@@ -2,177 +2,171 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-// Matrix characters — mix of katakana, latin, numbers
-const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*'
+// Characters for the rain
+const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%*'
+
+// Brand palette
+const COL_DIM    = 'rgba(180,70,0,0.55)'   // dim orange — trail
+const COL_MID    = 'rgba(255,100,20,0.80)' // mid orange
+const COL_BRIGHT = 'rgba(255,77,0,1)'      // full orange — head of drop
+const COL_HEAD   = 'rgba(255,220,190,1)'   // cream-white — very tip
 
 export default function Loader({ onComplete }: { onComplete: () => void }) {
-  const canvasRef    = useRef<HTMLCanvasElement>(null)
-  const overlayRef   = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [show, setShow] = useState(false)
 
-  // ── Step 1: session check after mount ──────────────────────────────────
   useEffect(() => {
     try {
-      if (sessionStorage.getItem('gm-loaded')) {
-        onComplete()
-        return
-      }
-    } catch {
-      onComplete()
-      return
-    }
+      if (sessionStorage.getItem('gm-loaded')) { onComplete(); return }
+    } catch { onComplete(); return }
     setShow(true)
   }, [onComplete])
 
-  // ── Step 2: run canvas animation once show=true ─────────────────────────
   useEffect(() => {
     if (!show) return
-
     try { sessionStorage.setItem('gm-loaded', '1') } catch {}
     document.body.style.overflow = 'hidden'
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
-      const t = setTimeout(() => {
-        document.body.style.overflow = ''
-        onComplete()
-      }, 400)
+      const t = setTimeout(() => { document.body.style.overflow = ''; onComplete() }, 400)
       return () => clearTimeout(t)
     }
 
     const canvas = canvasRef.current!
     const ctx    = canvas.getContext('2d')!
-
-    const W = window.innerWidth
-    const H = window.innerHeight
+    const W      = window.innerWidth
+    const H      = window.innerHeight
     canvas.width  = W
     canvas.height = H
 
-    const FONT_SIZE  = 14
-    const COLS       = Math.floor(W / FONT_SIZE)
+    const FS   = 14                        // font size / column width
+    const COLS = Math.floor(W / FS)
+    const ROWS = Math.floor(H / FS)
 
-    // Each column tracks: y position, speed, chars
-    const drops: number[] = Array(COLS).fill(0).map(() => Math.random() * -80)
-    const speeds: number[] = Array(COLS).fill(0).map(() => 0.4 + Math.random() * 0.8)
+    // Each column: current y position (in rows), speed
+    const drops  = Array.from({ length: COLS }, () => -(Math.random() * ROWS * 0.8))
+    const speeds = Array.from({ length: COLS }, () => 0.35 + Math.random() * 0.55)
 
-    // ── Load face image, process brightness map ─────────────────────────
-    let facePixels: Uint8ClampedArray | null = null
-    let faceW = 0
-    let faceH = 0
-    const faceImg = new Image()
+    // ── Pre-process face image into a brightness grid ───────────────────
+    // Grid is COLS × ROWS — same resolution as the character grid
+    let brightnessGrid: Float32Array | null = null
+
+    const faceImg = new window.Image()
     faceImg.crossOrigin = 'anonymous'
     faceImg.src = '/garv_face.jpg'
-
     faceImg.onload = () => {
       const off    = document.createElement('canvas')
-      off.width    = Math.floor(W / FONT_SIZE)
-      off.height   = Math.floor(H / FONT_SIZE)
+      off.width    = COLS
+      off.height   = ROWS
       const offCtx = off.getContext('2d')!
-      offCtx.drawImage(faceImg, 0, 0, off.width, off.height)
-      const data   = offCtx.getImageData(0, 0, off.width, off.height)
-      facePixels   = data.data
-      faceW        = off.width
-      faceH        = off.height
+      // Draw face centred — preserve aspect ratio, fill height
+      const aspect = faceImg.naturalWidth / faceImg.naturalHeight
+      const drawW  = ROWS * aspect
+      const drawX  = (COLS - drawW) / 2
+      offCtx.drawImage(faceImg, drawX, 0, drawW, ROWS)
+      const px = offCtx.getImageData(0, 0, COLS, ROWS).data
+      brightnessGrid = new Float32Array(COLS * ROWS)
+      for (let i = 0; i < COLS * ROWS; i++) {
+        const r = px[i * 4]
+        const g = px[i * 4 + 1]
+        const b = px[i * 4 + 2]
+        brightnessGrid[i] = (r * 0.299 + g * 0.587 + b * 0.114) / 255
+      }
     }
 
-    // ── Phase tracking ──────────────────────────────────────────────────
-    // Phase 0: pure rain (0 – 2.8s)
-    // Phase 1: face emerges from rain (2.8 – 4.8s)
-    // Phase 2: face holds, rain slows (4.8 – 6.2s)
-    // Phase 3: fade out (6.2 – 7.0s)
+    // ── Timeline ────────────────────────────────────────────────────────
     const START      = performance.now()
-    const P1_START   = 2800
-    const P2_START   = 4800
-    const P3_START   = 6200
-    const P3_END     = 7000
+    const T_RAIN     = 2600   // pure rain
+    const T_EMERGE   = 4600   // face emerges (2 sec transition)
+    const T_HOLD     = 6200   // face fully visible, hold
+    const T_FADE     = 7000   // fade to black
 
     let animId: number
-    let done = false
+    let finished = false
 
-    const getChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
+    const rnd = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)]
+    const CHAR_ARR = CHARS.split('')
 
     const draw = () => {
       const now     = performance.now()
       const elapsed = now - START
-      const phase   = elapsed < P1_START ? 0
-                    : elapsed < P2_START ? 1
-                    : elapsed < P3_START ? 2
-                    : 3
 
-      // Fade-to-black trail
-      ctx.fillStyle = 'rgba(5,5,5,0.12)'
+      // Fade trail — alpha controls how long the tail persists
+      ctx.fillStyle = 'rgba(5,5,5,0.18)'
       ctx.fillRect(0, 0, W, H)
 
-      ctx.font = `bold ${FONT_SIZE}px monospace`
+      ctx.font = `bold ${FS}px monospace`
 
-      const faceProgress = phase === 1
-        ? (elapsed - P1_START) / (P2_START - P1_START)  // 0→1 during phase 1
-        : phase >= 2 ? 1 : 0
+      // Face reveal progress 0→1 during emerge phase
+      const faceT = elapsed < T_RAIN    ? 0
+                  : elapsed < T_EMERGE  ? (elapsed - T_RAIN) / (T_EMERGE - T_RAIN)
+                  : 1
 
       for (let col = 0; col < COLS; col++) {
-        const x  = col * FONT_SIZE
-        const y  = drops[col] * FONT_SIZE
-        const ch = getChar()
+        const row = Math.floor(drops[col])
+        const y   = drops[col] * FS
+        const ch  = rnd(CHAR_ARR)
 
-        // ── Sample face brightness at this column/row ──────────────────
-        let faceBrightness = 0
-        if (facePixels && faceProgress > 0) {
-          // Map canvas column to face image column
-          const fx = Math.floor((col / COLS) * faceW)
-          const fy = Math.floor(((drops[col] % (H / FONT_SIZE)) / (H / FONT_SIZE)) * faceH)
-          const idx = (fy * faceW + fx) * 4
-          if (idx >= 0 && idx < facePixels.length) {
-            const r = facePixels[idx]
-            const g = facePixels[idx + 1]
-            const b = facePixels[idx + 2]
-            faceBrightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255
-          }
+        // ── Sample brightness from face grid at this cell ──────────────
+        let brightness = 0
+        if (brightnessGrid && faceT > 0 && row >= 0 && row < ROWS) {
+          brightness = brightnessGrid[row * COLS + col] * faceT
         }
 
-        // ── Color: blend between pure rain green and face-mapped orange/cream ──
-        if (faceProgress > 0 && faceBrightness > 0.25) {
-          // Face highlight: use orange for bright areas, dark for shadows
-          const t = faceProgress * faceBrightness
-          if (faceBrightness > 0.7) {
-            // Very bright areas — cream/white
-            const v = Math.floor(180 + faceBrightness * 75)
-            ctx.fillStyle = `rgba(${v},${Math.floor(v*0.97)},${Math.floor(v*0.87)},${Math.min(1, t * 1.4)})`
-          } else if (faceBrightness > 0.45) {
-            // Mid tones — orange
-            ctx.fillStyle = `rgba(255,${Math.floor(77 + faceBrightness * 60)},0,${Math.min(1, t * 1.2)})`
+        // ── Colour decision ────────────────────────────────────────────
+        const isHead = row >= 0 && Math.floor(drops[col]) === row
+
+        if (brightness > 0.08) {
+          // Face area — map brightness to orange/cream spectrum
+          if (brightness > 0.75) {
+            // Very bright — cream white (highlight)
+            const v = Math.min(255, Math.floor(200 + brightness * 55))
+            ctx.fillStyle = `rgba(${v},${Math.floor(v * 0.93)},${Math.floor(v * 0.82)},${Math.min(1, brightness * 1.4)})`
+          } else if (brightness > 0.45) {
+            // Mid — full orange
+            ctx.fillStyle = `rgba(255,${Math.floor(60 + brightness * 100)},10,${Math.min(1, brightness * 1.3)})`
           } else {
-            // Shadows — dim green
-            ctx.fillStyle = `rgba(0,${Math.floor(80 + faceBrightness * 120)},0,${Math.min(0.7, t)})`
+            // Shadow — dim orange
+            ctx.fillStyle = `rgba(180,${Math.floor(30 + brightness * 80)},0,${brightness * 1.2})`
           }
         } else {
-          // Pure matrix rain — head of column is bright, trail fades
-          const isHead = drops[col] > 0 && Math.abs(y - (drops[col] - 1) * FONT_SIZE) < FONT_SIZE * 1.5
-          if (isHead) {
-            ctx.fillStyle = 'rgba(220,255,220,0.95)' // bright white-green head
+          // Pure rain column — brand orange palette
+          if (isHead && row >= 0) {
+            ctx.fillStyle = COL_HEAD    // cream tip
+          } else if (row >= 0 && drops[col] - row < 0.3) {
+            ctx.fillStyle = COL_BRIGHT  // just under tip
           } else {
-            const fadeDepth = Math.min(1, (drops[col] * FONT_SIZE) / H)
-            const green = Math.floor(120 + fadeDepth * 80)
-            ctx.fillStyle = `rgba(0,${green},40,0.85)`
+            // Trail fades based on distance from head
+            const dist = drops[col] - row
+            if (dist < 3) {
+              ctx.fillStyle = COL_MID
+            } else {
+              ctx.fillStyle = COL_DIM
+            }
           }
         }
 
-        ctx.fillText(ch, x, Math.max(FONT_SIZE, y))
+        if (y > 0 && y < H + FS) {
+          ctx.fillText(ch, col * FS, Math.min(H - 2, y))
+        }
 
         // Advance drop
         drops[col] += speeds[col]
-        if (drops[col] * FONT_SIZE > H && Math.random() > 0.975) {
-          drops[col] = -Math.random() * 20
+        // Randomly reset drop to top
+        if (drops[col] * FS > H + FS * 5 && Math.random() > 0.97) {
+          drops[col] = -(Math.random() * ROWS * 0.5)
         }
       }
 
-      // ── Phase 3: fade entire canvas to black ──────────────────────────
-      if (phase === 3) {
-        const fadeProgress = (elapsed - P3_START) / (P3_END - P3_START)
-        ctx.fillStyle = `rgba(5,5,5,${Math.min(1, fadeProgress * 1.2)})`
+      // ── Fade out phase ───────────────────────────────────────────────
+      if (elapsed > T_HOLD) {
+        const fp = Math.min(1, (elapsed - T_HOLD) / (T_FADE - T_HOLD))
+        ctx.fillStyle = `rgba(5,5,5,${fp * 0.95})`
         ctx.fillRect(0, 0, W, H)
 
-        if (!done && fadeProgress >= 1) {
-          done = true
+        if (!finished && fp >= 1) {
+          finished = true
           cancelAnimationFrame(animId)
           document.body.style.overflow = ''
           onComplete()
@@ -184,11 +178,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     }
 
     animId = requestAnimationFrame(draw)
-
-    return () => {
-      cancelAnimationFrame(animId)
-      document.body.style.overflow = ''
-    }
+    return () => { cancelAnimationFrame(animId); document.body.style.overflow = '' }
   }, [show, onComplete])
 
   if (!show) return null
@@ -198,40 +188,17 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
       className="fixed inset-0 z-[99999]"
       style={{ background: '#050505' }}
       role="status"
-      aria-label="Loading portfolio"
+      aria-label="Loading"
     >
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-      {/* Corner labels */}
-      <p
-        className="absolute top-6 left-8 z-10 select-none"
-        style={{
-          fontSize: '8px',
-          color: '#1a3a1a',
-          fontFamily: 'monospace',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-        }}
-        aria-hidden="true"
-      >
-        / Garv Malik / Vol. 1
-      </p>
-      <p
-        className="absolute bottom-6 right-8 z-10 select-none"
-        style={{
-          fontSize: '8px',
-          color: '#1a3a1a',
-          fontFamily: 'monospace',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-        }}
-        aria-hidden="true"
-      >
-        Portfolio 2026
-      </p>
+      <p className="absolute top-5 left-7 z-10 select-none pointer-events-none"
+        style={{ fontSize: '8px', color: 'rgba(255,77,0,0.25)', fontFamily: 'monospace', letterSpacing: '0.3em', textTransform: 'uppercase' }}
+        aria-hidden="true">/ Garv Malik / Vol. 1</p>
+
+      <p className="absolute bottom-5 right-7 z-10 select-none pointer-events-none"
+        style={{ fontSize: '8px', color: 'rgba(255,77,0,0.25)', fontFamily: 'monospace', letterSpacing: '0.3em', textTransform: 'uppercase' }}
+        aria-hidden="true">Portfolio 2026</p>
     </div>
   )
 }
