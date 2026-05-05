@@ -35,9 +35,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
-        {/* LoaderWrapper handles the loader state client-side.
-            Children are rendered beneath the loader from the start
-            so they hydrate normally — the loader just sits on top. */}
+        {/*
+          LoaderWrapper is a dynamic client component — it never runs on the
+          server, so it cannot crash SSR or block hydration. The site renders
+          normally underneath it while the loader plays on top.
+        */}
         <LoaderWrapper />
         {children}
       </body>
