@@ -1,18 +1,16 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
 
-const LINE_COUNT = 18 // number of sweep lines
+// Matrix characters — mix of katakana, latin, numbers
+const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*'
 
 export default function Loader({ onComplete }: { onComplete: () => void }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const linesRef     = useRef<(HTMLDivElement | null)[]>([])
-  const labelRef     = useRef<HTMLDivElement>(null)
-  const progressRef  = useRef<HTMLDivElement>(null)
-  const [show, setShow]   = useState(false)
+  const canvasRef    = useRef<HTMLCanvasElement>(null)
+  const overlayRef   = useRef<HTMLDivElement>(null)
+  const [show, setShow] = useState(false)
 
-  // ── Step 1: check session after mount ────────────────────────────────────
+  // ── Step 1: session check after mount ──────────────────────────────────
   useEffect(() => {
     try {
       if (sessionStorage.getItem('gm-loaded')) {
@@ -26,7 +24,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     setShow(true)
   }, [onComplete])
 
-  // ── Step 2: run animation only after show=true ────────────────────────────
+  // ── Step 2: run canvas animation once show=true ─────────────────────────
   useEffect(() => {
     if (!show) return
 
@@ -42,196 +40,197 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
       return () => clearTimeout(t)
     }
 
-    const lines = linesRef.current.filter(Boolean) as HTMLDivElement[]
+    const canvas = canvasRef.current!
+    const ctx    = canvas.getContext('2d')!
 
-    // Set all lines starting off-screen left
-    gsap.set(lines, { x: '-100%', opacity: 1 })
-    gsap.set(labelRef.current, { opacity: 0, y: 8 })
-    gsap.set(progressRef.current, { scaleX: 0, transformOrigin: 'left center' })
+    const W = window.innerWidth
+    const H = window.innerHeight
+    canvas.width  = W
+    canvas.height = H
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        document.body.style.overflow = ''
-        onComplete()
-      },
-    })
+    const FONT_SIZE  = 14
+    const COLS       = Math.floor(W / FONT_SIZE)
 
-    // ── Phase 1 (0–1.2s): lines sweep in from left, staggered ──────────────
-    // Each line sweeps from x:-100% to x:0 at slightly different speeds
-    // creating a wave / matrix feel
-    lines.forEach((line, i) => {
-      const delay  = i * 0.055           // stagger each line
-      const dur    = 0.55 + Math.random() * 0.3  // vary speed slightly
-      tl.to(line, {
-        x: '0%',
-        duration: dur,
-        ease: 'power2.inOut',
-      }, delay)
-    })
+    // Each column tracks: y position, speed, chars
+    const drops: number[] = Array(COLS).fill(0).map(() => Math.random() * -80)
+    const speeds: number[] = Array(COLS).fill(0).map(() => 0.4 + Math.random() * 0.8)
 
-    // ── Phase 2 (1.2–2.0s): label + progress bar appear ───────────────────
-    tl.to(labelRef.current, {
-      opacity: 1, y: 0, duration: 0.5, ease: 'power2.out',
-    }, 1.1)
-    tl.to(progressRef.current, {
-      scaleX: 1, duration: 0.9, ease: 'power2.inOut',
-    }, 1.1)
+    // ── Load face image, process brightness map ─────────────────────────
+    let facePixels: Uint8ClampedArray | null = null
+    let faceW = 0
+    let faceH = 0
+    const faceImg = new Image()
+    faceImg.crossOrigin = 'anonymous'
+    faceImg.src = '/garv_face.jpg'
 
-    // ── Phase 3 (2.2–3.0s): lines sweep out to the right ──────────────────
-    lines.forEach((line, i) => {
-      const delay = 2.2 + i * 0.045
-      const dur   = 0.5 + Math.random() * 0.25
-      tl.to(line, {
-        x: '100%',
-        duration: dur,
-        ease: 'power2.inOut',
-      }, delay)
-    })
+    faceImg.onload = () => {
+      const off    = document.createElement('canvas')
+      off.width    = Math.floor(W / FONT_SIZE)
+      off.height   = Math.floor(H / FONT_SIZE)
+      const offCtx = off.getContext('2d')!
+      offCtx.drawImage(faceImg, 0, 0, off.width, off.height)
+      const data   = offCtx.getImageData(0, 0, off.width, off.height)
+      facePixels   = data.data
+      faceW        = off.width
+      faceH        = off.height
+    }
 
-    // ── Phase 4 (3.0s): page wipes in from bottom ─────────────────────────
-    tl.to(containerRef.current, {
-      yPercent: -100,
-      duration: 0.65,
-      ease: 'power3.inOut',
-    }, 3.0)
+    // ── Phase tracking ──────────────────────────────────────────────────
+    // Phase 0: pure rain (0 – 2.8s)
+    // Phase 1: face emerges from rain (2.8 – 4.8s)
+    // Phase 2: face holds, rain slows (4.8 – 6.2s)
+    // Phase 3: fade out (6.2 – 7.0s)
+    const START      = performance.now()
+    const P1_START   = 2800
+    const P2_START   = 4800
+    const P3_START   = 6200
+    const P3_END     = 7000
+
+    let animId: number
+    let done = false
+
+    const getChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
+
+    const draw = () => {
+      const now     = performance.now()
+      const elapsed = now - START
+      const phase   = elapsed < P1_START ? 0
+                    : elapsed < P2_START ? 1
+                    : elapsed < P3_START ? 2
+                    : 3
+
+      // Fade-to-black trail
+      ctx.fillStyle = 'rgba(5,5,5,0.12)'
+      ctx.fillRect(0, 0, W, H)
+
+      ctx.font = `bold ${FONT_SIZE}px monospace`
+
+      const faceProgress = phase === 1
+        ? (elapsed - P1_START) / (P2_START - P1_START)  // 0→1 during phase 1
+        : phase >= 2 ? 1 : 0
+
+      for (let col = 0; col < COLS; col++) {
+        const x  = col * FONT_SIZE
+        const y  = drops[col] * FONT_SIZE
+        const ch = getChar()
+
+        // ── Sample face brightness at this column/row ──────────────────
+        let faceBrightness = 0
+        if (facePixels && faceProgress > 0) {
+          // Map canvas column to face image column
+          const fx = Math.floor((col / COLS) * faceW)
+          const fy = Math.floor(((drops[col] % (H / FONT_SIZE)) / (H / FONT_SIZE)) * faceH)
+          const idx = (fy * faceW + fx) * 4
+          if (idx >= 0 && idx < facePixels.length) {
+            const r = facePixels[idx]
+            const g = facePixels[idx + 1]
+            const b = facePixels[idx + 2]
+            faceBrightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255
+          }
+        }
+
+        // ── Color: blend between pure rain green and face-mapped orange/cream ──
+        if (faceProgress > 0 && faceBrightness > 0.25) {
+          // Face highlight: use orange for bright areas, dark for shadows
+          const t = faceProgress * faceBrightness
+          if (faceBrightness > 0.7) {
+            // Very bright areas — cream/white
+            const v = Math.floor(180 + faceBrightness * 75)
+            ctx.fillStyle = `rgba(${v},${Math.floor(v*0.97)},${Math.floor(v*0.87)},${Math.min(1, t * 1.4)})`
+          } else if (faceBrightness > 0.45) {
+            // Mid tones — orange
+            ctx.fillStyle = `rgba(255,${Math.floor(77 + faceBrightness * 60)},0,${Math.min(1, t * 1.2)})`
+          } else {
+            // Shadows — dim green
+            ctx.fillStyle = `rgba(0,${Math.floor(80 + faceBrightness * 120)},0,${Math.min(0.7, t)})`
+          }
+        } else {
+          // Pure matrix rain — head of column is bright, trail fades
+          const isHead = drops[col] > 0 && Math.abs(y - (drops[col] - 1) * FONT_SIZE) < FONT_SIZE * 1.5
+          if (isHead) {
+            ctx.fillStyle = 'rgba(220,255,220,0.95)' // bright white-green head
+          } else {
+            const fadeDepth = Math.min(1, (drops[col] * FONT_SIZE) / H)
+            const green = Math.floor(120 + fadeDepth * 80)
+            ctx.fillStyle = `rgba(0,${green},40,0.85)`
+          }
+        }
+
+        ctx.fillText(ch, x, Math.max(FONT_SIZE, y))
+
+        // Advance drop
+        drops[col] += speeds[col]
+        if (drops[col] * FONT_SIZE > H && Math.random() > 0.975) {
+          drops[col] = -Math.random() * 20
+        }
+      }
+
+      // ── Phase 3: fade entire canvas to black ──────────────────────────
+      if (phase === 3) {
+        const fadeProgress = (elapsed - P3_START) / (P3_END - P3_START)
+        ctx.fillStyle = `rgba(5,5,5,${Math.min(1, fadeProgress * 1.2)})`
+        ctx.fillRect(0, 0, W, H)
+
+        if (!done && fadeProgress >= 1) {
+          done = true
+          cancelAnimationFrame(animId)
+          document.body.style.overflow = ''
+          onComplete()
+          return
+        }
+      }
+
+      animId = requestAnimationFrame(draw)
+    }
+
+    animId = requestAnimationFrame(draw)
 
     return () => {
-      tl.kill()
+      cancelAnimationFrame(animId)
       document.body.style.overflow = ''
     }
   }, [show, onComplete])
 
   if (!show) return null
 
-  // Generate line heights — varied to look organic
-  const lineHeights = Array.from({ length: LINE_COUNT }, (_, i) => {
-    const base = 100 / LINE_COUNT
-    return base
-  })
-
   return (
     <div
-      ref={containerRef}
-      className="fixed inset-0 z-[99999] overflow-hidden"
+      className="fixed inset-0 z-[99999]"
       style={{ background: '#050505' }}
       role="status"
       aria-label="Loading portfolio"
     >
-      {/* ── Grain ── */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
-          backgroundSize: '128px 128px',
-          opacity: 0.04,
-        }}
-        aria-hidden="true"
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
       />
 
-      {/* ── Sweep lines ── */}
-      <div className="absolute inset-0 z-[1] flex flex-col" aria-hidden="true">
-        {Array.from({ length: LINE_COUNT }).map((_, i) => {
-          // Alternate between orange, cream, and dark grey for visual depth
-          const colors = [
-            'rgba(255,77,0,0.55)',
-            'rgba(230,226,211,0.12)',
-            'rgba(255,77,0,0.25)',
-            'rgba(230,226,211,0.07)',
-            'rgba(255,77,0,0.40)',
-            'rgba(100,100,100,0.15)',
-          ]
-          const color = colors[i % colors.length]
-          return (
-            <div
-              key={i}
-              ref={el => { linesRef.current[i] = el }}
-              className="w-full flex-1"
-              style={{
-                background: color,
-                // Slight height variation per line for organic feel
-                flexGrow: i % 3 === 0 ? 1.4 : i % 5 === 0 ? 0.6 : 1,
-              }}
-            />
-          )
-        })}
-      </div>
-
-      {/* ── Center label + bar ── */}
-      <div
-        className="absolute inset-0 z-[2] flex flex-col items-center justify-center pointer-events-none"
-      >
-        <div ref={labelRef} className="flex flex-col items-center gap-4">
-          {/* Name — small, refined, not huge */}
-          <div className="flex flex-col items-center leading-none select-none">
-            <span
-              className="tracking-[0.15em] uppercase"
-              style={{
-                fontSize: 'clamp(11px, 1.4vw, 14px)',
-                color: '#a09c8f',
-                fontFamily: 'var(--font-jetbrains), monospace',
-                letterSpacing: '0.35em',
-              }}
-            >
-              GARV MALIK
-            </span>
-            <span
-              className="tracking-[0.4em] uppercase mt-1"
-              style={{
-                fontSize: 'clamp(9px, 1vw, 11px)',
-                color: '#ff4d00',
-                fontFamily: 'var(--font-jetbrains), monospace',
-                letterSpacing: '0.45em',
-              }}
-            >
-              UX/UI DESIGNER · TAMPERE
-            </span>
-          </div>
-
-          {/* Progress bar */}
-          <div
-            className="h-[1.5px] overflow-hidden"
-            style={{
-              width: 'clamp(160px, 25vw, 240px)',
-              background: 'rgba(255,255,255,0.08)',
-            }}
-          >
-            <div
-              ref={progressRef}
-              className="h-full w-full"
-              style={{ background: '#ff4d00' }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ── Bottom corner label ── */}
+      {/* Corner labels */}
       <p
-        className="absolute bottom-6 right-8 z-[2]"
+        className="absolute top-6 left-8 z-10 select-none"
         style={{
           fontSize: '8px',
-          color: '#2a2a2a',
-          fontFamily: 'var(--font-jetbrains), monospace',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-        }}
-        aria-hidden="true"
-      >
-        Portfolio 2026
-      </p>
-
-      {/* ── Top left corner label ── */}
-      <p
-        className="absolute top-6 left-8 z-[2]"
-        style={{
-          fontSize: '8px',
-          color: '#2a2a2a',
-          fontFamily: 'var(--font-jetbrains), monospace',
+          color: '#1a3a1a',
+          fontFamily: 'monospace',
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
         }}
         aria-hidden="true"
       >
         / Garv Malik / Vol. 1
+      </p>
+      <p
+        className="absolute bottom-6 right-8 z-10 select-none"
+        style={{
+          fontSize: '8px',
+          color: '#1a3a1a',
+          fontFamily: 'monospace',
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+        }}
+        aria-hidden="true"
+      >
+        Portfolio 2026
       </p>
     </div>
   )
