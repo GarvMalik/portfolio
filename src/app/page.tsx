@@ -1,5 +1,5 @@
 "use client"
-import { useRef, useEffect, useState, useCallback, useMemo, memo } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -10,18 +10,12 @@ import { useTheme, T } from './projects/_shared'
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
 /* ── Marquee ─────────────────────────────────────────────────────────────── */
-const Marquee = memo(({ items, speed = 40, reverse = false, textColor }: {
+const Marquee = ({ items, speed = 40, reverse = false, textColor }: {
   items: string[], speed?: number, reverse?: boolean, textColor: string
 }) => {
   const trackRef = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
   useEffect(() => {
     const track = trackRef.current
     if (!track || reduced) return
@@ -40,7 +34,7 @@ const Marquee = memo(({ items, speed = 40, reverse = false, textColor }: {
       </div>
     </div>
   )
-})
+}
 
 /* ── Layered hero text ───────────────────────────────────────────────────── */
 const LayeredText = ({ text, className = '', color }: { text: string, className?: string, color: string }) => (
@@ -59,7 +53,7 @@ const ListRow = ({ label, value, borderColor, textColor, labelColor }: {
   label: string, value: string, borderColor: string, textColor: string, labelColor: string
 }) => (
   // Issue 3 fix: increased label from 9px→11px, value from 11px→13px for readability
-  <div className="split-item opacity-0 translate-y-8 flex justify-between items-baseline py-3.5 border-b transition-colors duration-300" style={{ borderColor }}>
+  <div className="split-item flex justify-between items-baseline py-3.5 border-b transition-colors duration-300" style={{ borderColor }}>
     <span className="text-[11px] uppercase font-mono tracking-[0.2em] flex-shrink-0 mr-6" style={{ color: labelColor }}>{label}</span>
     <span className="text-[13px] uppercase tracking-wide font-mono text-right leading-snug" style={{ color: textColor }}>{value}</span>
   </div>
@@ -69,13 +63,7 @@ const ListRow = ({ label, value, borderColor, textColor, labelColor }: {
 const HoverWaveText = ({ text, color }: { text: string, color: string }) => {
   const ref = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
   return (
     <div
       ref={ref}
@@ -129,7 +117,7 @@ const ThemeToggle = ({ theme, toggle, bg, fg }: { theme: 'dark' | 'light', toggl
  * FIX: Link has aria-label with project title (WCAG 2.4.4)
  * FIX: focus-visible on link (WCAG 2.4.7)
  */
-const ProjectCard = memo(({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, videoSrc, surfaceColor, borderColor }: {
+const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, videoSrc, surfaceColor, borderColor }: {
   index: number, title: string, desc: string, tags: string[], accentColor: string,
   pageNum: string, showLabel: boolean, href: string, bgGradient: string,
   videoSrc?: string, surfaceColor: string, borderColor: string
@@ -193,7 +181,7 @@ const ProjectCard = memo(({ index, title, desc, tags, accentColor, pageNum, show
       <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em]">View Project</span>
     </Link>
   </article>
-))
+)
 
 /* ── Main page ───────────────────────────────────────────────────────────── */
 export default function Home() {
@@ -203,10 +191,7 @@ export default function Home() {
   const [cursorVisible, setCursorVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check, { passive: true })
-    return () => window.removeEventListener('resize', check)
+    setIsMobile(window.innerWidth < 768)
   }, [])
   const [mobileScrolled, setMobileScrolled] = useState(false)
   const [reduced, setReduced] = useState(false)
@@ -235,60 +220,47 @@ export default function Home() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  // Mobile scroll listener — only attach on mobile, desktop never needs this
+  // Mobile scroll listener
   useEffect(() => {
-    if (!isMobile) return
     const h = () => setMobileScrolled(window.scrollY > 60)
     window.addEventListener('scroll', h, { passive: true })
     return () => window.removeEventListener('scroll', h)
-  }, [isMobile])
+  }, [])
 
   // Scrollspy — highlights the active nav link based on visible section
   useEffect(() => {
     const ids = ['main-content', 'manifesto', 'about-skills', 'projects', 'about', 'contact']
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id) }),
-      // 0.1 threshold: horizontal-section is 300vw wide, 0.25 was never reached
       { threshold: 0.1 }
     )
     ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el) })
     return () => observer.disconnect()
   }, [])
 
-  // Close mobile menu on Escape key — only attaches listener when menu is open
+  // Close mobile menu on Escape key
   useEffect(() => {
-    if (!menuOpen) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [menuOpen])
+  }, [])
 
-  // Custom cursor — desktop only, not reduced-motion
-  // cursorVisible deliberately excluded from deps: we only need to register
-  // hover targets once (and re-register only if reduced changes).
-  // Using a ref to track visibility avoids re-running this entire effect on first mousemove.
-  const cursorShown = useRef(false)
+  // Custom cursor — desktop, not reduced-motion
   useEffect(() => {
-    if (reduced || isMobile) return
+    if (reduced) return
     const onMove = (e: MouseEvent) => {
-      if (!cursorShown.current) {
-        cursorShown.current = true
-        setCursorVisible(true)
-      }
-      // Use direct style mutation via GSAP for zero React overhead on mousemove
-      gsap.set(cursorDot.current, { x: e.clientX, y: e.clientY })
-      gsap.to(cursorRing.current, { x: e.clientX, y: e.clientY, duration: 0.12, ease: 'power3.out', overwrite: 'auto' })
+      if (!cursorVisible) setCursorVisible(true)
+      gsap.to(cursorDot.current, { x: e.clientX, y: e.clientY, duration: 0 })
+      gsap.to(cursorRing.current, { x: e.clientX, y: e.clientY, duration: 0.12, ease: 'power3.out' })
     }
-    const onEnter = () => {
-      gsap.to(cursorRing.current, { scale: 2.5, duration: 0.2, overwrite: 'auto' })
-      gsap.to(cursorDot.current, { scale: 0, duration: 0.2, overwrite: 'auto' })
-    }
-    const onLeave = () => {
-      gsap.to(cursorRing.current, { scale: 1, duration: 0.2, overwrite: 'auto' })
-      gsap.to(cursorDot.current, { scale: 1, duration: 0.2, overwrite: 'auto' })
-    }
+    const onEnter = () => { gsap.to(cursorRing.current, { scale: 2.5, duration: 0.2 }); gsap.to(cursorDot.current, { scale: 0, duration: 0.2 }) }
+    const onLeave = () => { gsap.to(cursorRing.current, { scale: 1, duration: 0.2 }); gsap.to(cursorDot.current, { scale: 1, duration: 0.2 }) }
+
+    // Fix: capture the NodeList as an array so we can remove the same
+    // listeners on cleanup — prevents memory leak on remount.
     const hoverTargets = Array.from(document.querySelectorAll('a, button, [data-cursor-hover]'))
-    window.addEventListener('mousemove', onMove, { passive: true })
+
+    window.addEventListener('mousemove', onMove)
     hoverTargets.forEach(el => {
       el.addEventListener('mouseenter', onEnter)
       el.addEventListener('mouseleave', onLeave)
@@ -300,51 +272,32 @@ export default function Home() {
         el.removeEventListener('mouseleave', onLeave)
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced, isMobile])
+  }, [cursorVisible, reduced])
 
   // Lightweight CSS parallax for hero on mobile — avoids GSAP scrub entirely
-  // Elements are cached once outside the scroll handler to prevent DOM queries on every frame
   useEffect(() => {
     if (!isMobile || reduced) return
-    const garv  = document.querySelector<HTMLElement>('.hero-garv')
-    const malik = document.querySelector<HTMLElement>('.hero-malik')
-    if (!garv || !malik) return
-    // Apply will-change once so the browser promotes to compositor layer
-    garv.style.willChange  = 'transform'
-    malik.style.willChange = 'transform'
     const onScroll = () => {
       const y = window.scrollY
-      garv.style.transform  = `translateY(${y * -0.18}px)`
-      malik.style.transform = `translateY(${y * -0.10}px)`
+      const garv  = document.querySelector<HTMLElement>('.hero-garv')
+      const malik = document.querySelector<HTMLElement>('.hero-malik')
+      if (garv)  garv.style.transform  = `translateY(${y * -0.18}px)`
+      if (malik) malik.style.transform = `translateY(${y * -0.10}px)`
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      garv.style.willChange  = 'auto'
-      malik.style.willChange = 'auto'
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [isMobile, reduced])
 
   // GSAP scroll animations
   useGSAP(() => {
-    // Kill all existing ScrollTriggers before re-initialising — prevents
-    // accumulation when isMobile changes (e.g. orientation flip)
-    ScrollTrigger.getAll().forEach(t => t.kill())
-
     if (reduced) {
       gsap.set(['.layered-top', '.layered-bottom', '.intro-label', '.quote-line', '.manifesto-sub', '.split-header', '.split-item', '.now-item', '.footer-email'], { clearProps: 'all' })
       return
     }
 
-    // Promote hero text to compositor layers before animating
-    gsap.set(['.hero-garv', '.hero-malik', '.layered-top', '.layered-bottom'], { willChange: 'transform, opacity' })
-
     // ── Hero entrance — same on all devices ──
-    gsap.fromTo('.layered-top',    { yPercent: 105 }, { yPercent: 0, duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3,
-      onComplete: () => { gsap.set('.layered-top', { willChange: 'auto' }) } })
-    gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3,
-      onComplete: () => { gsap.set('.layered-bottom', { willChange: 'auto' }) } })
+    gsap.fromTo('.layered-top',    { yPercent: 105 }, { yPercent: 0, duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3 })
+    gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3 })
     gsap.fromTo('.intro-label',    { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, delay: 1.2, ease: 'power2.out' })
 
     if (!isMobile) {
@@ -425,11 +378,11 @@ export default function Home() {
     )
   }, { scope: container, dependencies: [isMobile] })
 
-  const MARQUEE_ITEMS = ['UX/UI Design', 'Interaction Design', 'Figma', 'Design Systems', 'User Research', 'Prototyping', 'Tampere, Finland', 'Open to Work']
+  const MARQUEE_ITEMS = ['UX/UI Designer', 'Open to Work', 'Tampere, Finland', 'Interaction Design', 'User Research', 'Figma', 'Design Systems', 'Prototyping']
   const projects = [
     {
       title: 'CityLoop Discovery',
-      desc: 'Lifestyle discovery app helping users find places and events based on mood and weather in Tampere.',
+      desc: 'How do you help someone decide what to do when they don\'t know what they want? CityLoop surfaces local places and events based on mood, weather, and time of day.',
       tags: ['UX/UI Design', 'Figma', 'UX Research', 'Prototyping'],
       accentColor: '#D95F30',   // CityLoop terracotta
       pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
@@ -438,7 +391,7 @@ export default function Home() {
     },
     {
       title: 'MyTown Relocation',
-      desc: 'Service concept centralizing guidance and peer support for international students moving to Finland.',
+      desc: 'Moving to a new country is overwhelming. MyTown guides international students through their first weeks in Finland — step by step.',
       tags: ['Product Design', 'Service Concept', 'Figma', 'Research'],
       accentColor: '#FF844B',   // MyTown orange
       pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
@@ -447,12 +400,21 @@ export default function Home() {
     },
     {
       title: 'PlayPal Community',
-      desc: 'Concept designed to help people find sports partners, organize games, and book venues effortlessly.',
+      desc: 'Finding someone to play sports with is harder than it should be. PlayPal connects people by sport, skill level, and location.',
       tags: ['Design System', 'Interaction', 'Figma', 'Motion'],
       accentColor: '#2978FF',   // PlayPal blue
       pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #0a1530 0%, #050c1e 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #0d1828 0%, transparent 60%)',
       videoSrc: '/playpal-bg.mp4',
+    },
+    {
+      title: 'Noise & Reaction',
+      desc: 'Does environmental noise slow people down? We ran a controlled experiment across 3 noise conditions — and found the answer is more nuanced than expected.',
+      tags: ['Experimental Research', 'ANOVA', 'E-Prime', 'SPSS'],
+      accentColor: '#E8B84B',   // Amber — research/academic
+      pageNum: 'P. 007', showLabel: false, href: '/projects/noise-experiment',
+      bgGradient: 'radial-gradient(ellipse at 30% 60%, #1e1500 0%, #0c0b08 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #0a0e1a 0%, transparent 60%)',
+      videoSrc: '',
     },
   ]
 
@@ -500,7 +462,7 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-10" role="list">
           {[
             { label: 'Home',   id: 'main-content' },
-            { label: 'Skills',   id: 'about-skills' },
+            { label: 'Approach', id: 'about-skills' },
             { label: 'Work',     id: 'projects'    },
             { label: 'About',    id: 'about'        },
             { label: 'Contact',  id: 'contact'      },
@@ -586,7 +548,7 @@ export default function Home() {
       >
         {[
           { label: 'Home',    id: 'main-content' },
-          { label: 'Skills',  id: 'about-skills' },
+          { label: 'Approach', id: 'about-skills' },
           { label: 'Work',    id: 'projects'     },
           { label: 'About',   id: 'about'        },
           { label: 'Contact', id: 'contact'      },
@@ -702,50 +664,53 @@ export default function Home() {
             </g>
           </svg>
         ) : (
-          /* Mobile terrain — ZERO SVG filters. feTurbulence/feDisplacementMap/feGaussianBlur
-             are GPU-intensive on mobile and cause scroll jank. Replaced with plain SVG lines
-             that produce the same visual appearance with no filter cost at all. */
+          /* Mobile terrain — static SVG topographic contour map, no filters, no animation.
+             More lines, tighter spacing, higher opacity than before to match desktop richness. */
           <svg
             className="absolute inset-0 w-full h-full z-0 pointer-events-none"
-            style={{ opacity: theme === 'dark' ? 0.42 : 0.28 }}
+            style={{ opacity: theme === 'dark' ? 0.55 : 0.40 }}
             viewBox="0 0 390 844"
             xmlns="http://www.w3.org/2000/svg"
             preserveAspectRatio="xMidYMid slice"
             aria-hidden="true"
           >
-            {/* Base contour lines — gently offset to simulate warp without filters */}
-            {Array.from({ length: 56 }).map((_, i) => {
-              const y = i * 16
-              const offset = Math.sin(i * 0.7) * 18
-              return (
-                <path
+            <defs>
+              {/* Gentle warp — lighter than desktop, GPU-safe on mobile */}
+              <filter id="m-warp" x="-15%" y="-15%" width="130%" height="130%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.006 0.005" numOctaves="3" seed="17" result="n" />
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="90" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <filter id="m-glow">
+                <feGaussianBlur stdDeviation="1.8" result="b" />
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            {/* Base contour lines — warped horizontal bands */}
+            <g filter="url(#m-warp)" stroke={theme === 'dark' ? 'rgba(180,210,220,0.18)' : 'rgba(30,60,100,0.12)'} strokeWidth="0.8" fill="none">
+              {Array.from({ length: 60 }).map((_, i) => (
+                <line key={i} x1="-60" y1={i * 15} x2="450" y2={i * 15} />
+              ))}
+            </g>
+
+            {/* Accent highlight contours — teal/cyan, glowing */}
+            <g filter="url(#m-warp)" fill="none">
+              {[45, 105, 180, 255, 330, 405, 480, 555, 630, 705, 780].map((y, i) => (
+                <line
                   key={i}
-                  d={`M -60 ${y} Q 100 ${y + offset} 200 ${y - offset * 0.5} Q 300 ${y + offset * 0.3} 450 ${y}`}
-                  stroke={theme === 'dark' ? 'rgba(180,210,220,0.14)' : 'rgba(30,60,100,0.10)'}
-                  strokeWidth="0.8"
-                  fill="none"
+                  x1="-60" y1={y} x2="450" y2={y}
+                  stroke={theme === 'dark' ? 'rgba(100,210,200,0.50)' : 'rgba(0,120,160,0.35)'}
+                  strokeWidth="1.2"
+                  filter="url(#m-glow)"
                 />
-              )
-            })}
-            {/* Accent contours — teal, no glow filter, slightly thicker */}
-            {[45, 120, 210, 300, 390, 480, 570, 660, 750, 840].map((y, i) => {
-              const offset = Math.sin(i * 1.3) * 22
-              return (
-                <path
-                  key={i}
-                  d={`M -60 ${y} Q 100 ${y + offset} 200 ${y - offset * 0.6} Q 310 ${y + offset * 0.4} 450 ${y}`}
-                  stroke={theme === 'dark' ? 'rgba(100,210,200,0.38)' : 'rgba(0,120,160,0.28)'}
-                  strokeWidth="1.3"
-                  fill="none"
-                />
-              )
-            })}
+              ))}
+            </g>
           </svg>
         )}
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
         <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Home / P. 001</div>
-        <h1 className="sr-only">Garv Malik UX UI Designer</h1>
+        <h1 className="sr-only">Garv Malik — UX/UI Designer specialising in research-led, accessible digital products. Based in Tampere, Finland.</h1>
         
         {/* Stacked bottom-left style */}
         <div className="hero-name-wrap flex flex-col items-start gap-0 relative z-10 w-full" aria-hidden="true">
@@ -762,7 +727,7 @@ export default function Home() {
 
         <div className="intro-label opacity-0 hidden md:flex absolute right-16 top-1/2 -translate-y-1/2 flex-col items-end gap-3 text-right" aria-hidden="true">
           <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
-          <p className="text-[9px] uppercase font-mono tracking-[0.25em] max-w-[160px] leading-loose" style={{ color: c.textMuted }}>UX/UI Designer<br />& Creative Developer</p>
+          <p className="text-[9px] uppercase font-mono tracking-[0.25em] max-w-[160px] leading-loose" style={{ color: c.textMuted }}>UX/UI Designer<br />Research · Figma<br />Tampere, Finland</p>
           <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
         </div>
         <div className="intro-label opacity-0 absolute bottom-0 left-0 right-0 border-t" style={{ borderColor: c.border }}>
@@ -816,7 +781,7 @@ export default function Home() {
           ))}
           <div className="overflow-hidden mt-8 ml-auto">
             <p className="manifesto-sub opacity-0 translate-y-4 text-[9px] font-mono uppercase tracking-[0.3em] text-right max-w-xs leading-loose" style={{ color: c.textMuted }}>
-              — A belief in invisible craft.<br />In feeling over function. In rawness.
+              — A belief in invisible craft.<br />In clarity over complexity. In design that earns trust.
             </p>
           </div>
         </blockquote>
@@ -827,17 +792,17 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Who Am I / P. 003</div>
         <div className="center-line absolute left-1/2 top-0 w-[1px] h-0 -translate-x-1/2 hidden md:block" style={{ background: 'rgba(255,77,0,0.22)' }} aria-hidden="true" />
         <div className="w-full md:w-1/2 md:pr-20 flex flex-col justify-center pt-10 md:pt-0">
-          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">The Practice</p>
+          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">What I Do</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />I Build</h2>
           <dl className="flex flex-col">
             <ListRow label="Design"  value="UX/UI · Design Systems"      borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
             <ListRow label="Process" value="User Flows · Prototyping"     borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
             <ListRow label="Tools"   value="Figma · Miro · Mural"         borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Output"  value="AI-assisted product building" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Research" value="Interviews · Testing · Affinity Mapping" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
           </dl>
         </div>
         <div className="w-full md:w-1/2 md:pl-20 flex flex-col justify-center">
-          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">The Mindset</p>
+          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">What Drives Me</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />Moves Me</h2>
           <dl className="flex flex-col">
             <ListRow label="Principle"     value="Human-centered clarity"        borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
@@ -849,7 +814,7 @@ export default function Home() {
       </section>
 
       <div className="w-full bg-[#ff4d00] py-3 overflow-hidden" aria-hidden="true">
-        <Marquee items={['Selected Work', 'Case Studies', '2024–2026', 'Figma', 'UX Research', 'Interaction Design']} speed={60} reverse textColor="rgba(255,255,255,0.88)" />
+        <Marquee items={['3 Projects', 'Research-Led Design', 'Figma', 'Tampere, Finland', '2024–2026', 'UX/UI Design']} speed={60} reverse textColor="rgba(255,255,255,0.88)" />
       </div>
 
       {/* ── PROJECTS ── */}
@@ -865,14 +830,17 @@ export default function Home() {
               {i === 0 && (
                 // CityLoop — concentric circles / radar motif
                 <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  {/* No SVG filters — feGaussianBlur causes scroll jank on mobile */}
+                  <defs>
+                    <filter id="cl-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
                   {[40, 90, 140, 195, 255, 320, 390].map((r, ri) => (
                     <circle key={ri} cx="310" cy="160" r={r} fill="none"
                       stroke={ri % 2 === 0 ? '#D95F30' : '#D7DFD8'}
                       strokeWidth={ri % 2 === 0 ? '2' : '1'}
+                      filter={ri % 2 === 0 ? 'url(#cl-glow)' : undefined}
                     />
                   ))}
-                  <circle cx="310" cy="160" r="8" fill="#D95F30" />
+                  <circle cx="310" cy="160" r="8" fill="#D95F30" filter="url(#cl-glow)" />
                   <line x1="310" y1="160" x2="310" y2="-230" stroke="#D95F30" strokeWidth="1.5" opacity="0.6" />
                   <line x1="310" y1="160" x2="650" y2="450" stroke="#D7DFD8" strokeWidth="1" opacity="0.4" />
                 </svg>
@@ -881,7 +849,9 @@ export default function Home() {
               {i === 1 && (
                 // MyTown — city grid + building silhouettes
                 <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  {/* No SVG filters — feGaussianBlur causes scroll jank on mobile */}
+                  <defs>
+                    <filter id="mt-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
                   {[0,1,2,3,4,5,6].map(col => (
                     <line key={`v${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#FF844B" strokeWidth="0.8" opacity="0.5" />
                   ))}
@@ -892,28 +862,78 @@ export default function Home() {
                   <rect x="278" y="310" width="40" height="270" fill="#FF844B" opacity="0.40" rx="1" />
                   <rect x="326" y="350" width="28" height="230" fill="#FF844B" opacity="0.25" />
                   <rect x="362" y="420" width="28" height="160" fill="#55A6EC" opacity="0.25" />
-                  <polyline points="298,310 298,255 285,272 298,252 311,272 298,255" stroke="#FF844B" strokeWidth="2.5" fill="none" />
+                  <polyline points="298,310 298,255 285,272 298,252 311,272 298,255" stroke="#FF844B" strokeWidth="2.5" fill="none" filter="url(#mt-glow)" />
                 </svg>
               )}
 
               {i === 2 && (
                 // PlayPal — basketball court
                 <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  {/* No SVG filters — feGaussianBlur causes scroll jank on mobile */}
+                  <defs>
+                    <filter id="pp-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
                   <rect x="30" y="80" width="330" height="540" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" rx="4" />
                   <line x1="30" y1="350" x2="360" y2="350" stroke="#2978FF" strokeWidth="1.5" opacity="0.6" />
-                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
-                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.9" />
+                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" filter="url(#pp-glow)" />
+                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.9" filter="url(#pp-glow)" />
                   <path d="M 60 80 A 135 135 0 0 1 330 80" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
                   <path d="M 60 620 A 135 135 0 0 0 330 620" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
                   <rect x="130" y="80" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
                   <rect x="130" y="480" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
-                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.8" />
+                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.8" filter="url(#pp-glow)" />
                   <line x1="195" y1="135" x2="195" y2="225" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
                   <line x1="150" y1="180" x2="240" y2="180" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
                   <path d="M 165 140 Q 195 162 165 220" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.7" />
                   <path d="M 225 140 Q 195 162 225 220" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.7" />
                   <line x1="30" y1="638" x2="360" y2="638" stroke="#FFC107" strokeWidth="4" opacity="0.7" />
+                </svg>
+              )}
+
+              {i === 3 && (
+                // Noise & Reaction — waveform / soundwave pattern
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
+                  {/* Horizontal axis */}
+                  <line x1="20" y1="350" x2="370" y2="350" stroke="#E8B84B" strokeWidth="1" opacity="0.4" />
+                  {/* Waveform bars — simulated audio waveform */}
+                  {Array.from({ length: 48 }).map((_, idx) => {
+                    const x = 20 + idx * 7.3
+                    const h = 8 + Math.abs(Math.sin(idx * 0.7 + 1.2) * 80 + Math.sin(idx * 1.5) * 40)
+                    return (
+                      <rect key={idx}
+                        x={x} y={350 - h / 2} width="3.5" height={h}
+                        fill={idx % 4 === 0 ? '#E8B84B' : 'rgba(232,184,75,0.35)'}
+                        rx="1.5"
+                      />
+                    )
+                  })}
+                  {/* Second waveform — quieter, offset */}
+                  {Array.from({ length: 48 }).map((_, idx) => {
+                    const x = 20 + idx * 7.3
+                    const h = 4 + Math.abs(Math.sin(idx * 1.1 + 2.5) * 30)
+                    return (
+                      <rect key={`b${idx}`}
+                        x={x} y={210 - h / 2} width="3.5" height={h}
+                        fill="rgba(232,184,75,0.2)"
+                        rx="1"
+                      />
+                    )
+                  })}
+                  {/* Third waveform — high noise */}
+                  {Array.from({ length: 48 }).map((_, idx) => {
+                    const x = 20 + idx * 7.3
+                    const h = 4 + Math.abs(Math.sin(idx * 0.9 + 0.5) * 50 + Math.sin(idx * 2.1) * 25)
+                    return (
+                      <rect key={`c${idx}`}
+                        x={x} y={490 - h / 2} width="3.5" height={h}
+                        fill="rgba(232,184,75,0.25)"
+                        rx="1"
+                      />
+                    )
+                  })}
+                  {/* dB labels */}
+                  <text x="25" y="200" fontSize="9" fill="rgba(232,184,75,0.4)" fontFamily="monospace">40–60 dB</text>
+                  <text x="25" y="345" fontSize="9" fill="rgba(232,184,75,0.6)" fontFamily="monospace">SILENT</text>
+                  <text x="25" y="485" fontSize="9" fill="rgba(232,184,75,0.4)" fontFamily="monospace">60–80 dB</text>
                 </svg>
               )}
 
@@ -947,7 +967,7 @@ export default function Home() {
           ))}
         </div>
       ) : (
-        <div id="projects" className="horizontal-section flex w-[300vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
+        <div id="projects" className="horizontal-section flex w-[400vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
           {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} />)}
         </div>
       )}
@@ -964,7 +984,7 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-center">
           <ul className="flex flex-col gap-4" aria-label="Credentials">
-            {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Prototyping'].map(item => (
+            {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Accessibility'].map(item => (
               <li key={item} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] flex-shrink-0" aria-hidden="true" />
                 <span className="text-[11px] font-mono uppercase tracking-[0.22em]" style={{ color: c.textMuted }}>{item}</span>
@@ -972,11 +992,11 @@ export default function Home() {
             ))}
           </ul>
           <div className="flex flex-col gap-5">
-            <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv, a student at Tampere University pursuing a Master's in Human-Technology Interaction.</p>
+            <p className="text-base md:text-lg font-mono leading-relaxed" style={{ color: c.text }}>I'm Garv — a UI/UX Designer with a background in Computer Science, currently pursuing a Master's in Human-Technology Interaction at Tampere University, Finland.</p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>I enjoy designing thoughtful digital experiences that feel calm, intuitive, and accessible. My work is rooted in research, where I explore user needs through interviews, testing, and iterative design. I’ve built projects ranging from lifestyle discovery apps to student support services, always focusing on clarity and real-world impact. I care deeply about how technology fits into everyday life, and I aim to create solutions that are not just functional, but genuinely meaningful for the people who use them.</p>
 
             <blockquote className="border-l-2 border-[#ff4d00] pl-4">
-              <p className="font-mono text-sm italic" style={{ color: c.text }}>Building, learning, and sharing the process.</p>
+              <p className="font-mono text-sm italic" style={{ color: c.text }}>"Good design removes itself from the conversation." — that's what I'm working towards.</p>
             </blockquote>
           </div>
         </div>
@@ -991,7 +1011,7 @@ export default function Home() {
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Pink Floyed\nGorillaz\n Tame Impala' },
+            { label: 'Listening', value: 'Pink Floyd\nGorillaz\nTame Impala' },
             { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
             { label: 'Building',  value: 'Talos - AI Medical Screen' },
             { label: 'Wearing',   value: "YSL Y" },
@@ -1010,7 +1030,7 @@ export default function Home() {
         <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none" style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)' }} aria-hidden="true">+</div>
         <div className="footer-email opacity-0 mt-20 mb-10">
           {/* Issue 6 fix: label bumped from text-[9px] → text-[11px] for light mode readability */}
-          <p className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#ff4d00] mb-6 font-bold">Let's make something that means something.</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#ff4d00] mb-6 font-bold">Open to UX/UI internships in Finland and Europe.</p>
           <a href="mailto:thegarvmalik@gmail.com" data-cursor-hover aria-label="Send email to thegarvmalik@gmail.com" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1">
             <HoverWaveText text="THEGARVMALIK@GMAIL.COM" color={c.text} />
           </a>
@@ -1031,10 +1051,10 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textFaint }}>© 2026 Garv Malik — Built Raw</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textFaint }}>© 2026 Garv Malik</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 border-t py-1" style={{ borderColor: c.border }} aria-hidden="true">
-          <Marquee items={['Available for work', 'UX/UI Design', 'Interaction Design', 'Open to collaboration', 'Tampere, Finland']} speed={30} textColor={c.textFaint} />
+          <Marquee items={['Open to Work', 'UX/UI Internships', 'Finland & Europe', 'Interaction Design', 'Research-Led', 'Tampere, Finland']} speed={30} textColor={c.textFaint} />
         </div>
       </footer>
     </main>
