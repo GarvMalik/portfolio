@@ -34,13 +34,22 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     }
 
     const canvas = canvasRef.current!
-    const ctx    = canvas.getContext('2d')!
+    // willReadFrequently=false — we never read pixels back, this hint prevents
+    // Safari from using a slow CPU-side canvas buffer
+    const ctx    = canvas.getContext('2d', { willReadFrequently: false, alpha: false })!
     const W      = window.innerWidth
     const H      = window.innerHeight
-    canvas.width  = W
-    canvas.height = H
+    // Cap at 1x pixel ratio — prevents 4x canvas on Retina/Safari which kills perf.
+    // Matrix rain doesn't need sharp pixels; it looks better slightly soft anyway.
+    const DPR    = 1  // intentionally fixed at 1, NOT window.devicePixelRatio
+    canvas.width  = W * DPR
+    canvas.height = H * DPR
+    canvas.style.width  = W + 'px'
+    canvas.style.height = H + 'px'
+    if (DPR !== 1) ctx.scale(DPR, DPR)
 
-    const FS   = 14                        // font size / column width
+    // Smaller font on mobile = fewer columns = fewer draw calls = smoother on Safari
+    const FS   = window.innerWidth < 768 ? 16 : 14
     const COLS = Math.floor(W / FS)
     const ROWS = Math.floor(H / FS)
 
@@ -59,7 +68,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
       const off    = document.createElement('canvas')
       off.width    = COLS
       off.height   = ROWS
-      const offCtx = off.getContext('2d')!
+      const offCtx = off.getContext('2d', { willReadFrequently: true })!  // we DO read this one
       // Draw face centred — preserve aspect ratio, fill height
       const aspect = faceImg.naturalWidth / faceImg.naturalHeight
       const drawW  = ROWS * aspect
@@ -77,10 +86,10 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
 
     // ── Timeline ────────────────────────────────────────────────────────
     const START      = performance.now()
-    const T_RAIN     = 2600   // pure rain
-    const T_EMERGE   = 4600   // face emerges (2 sec transition)
-    const T_HOLD     = 6200   // face fully visible, hold
-    const T_FADE     = 7000   // fade to black
+    const T_RAIN     = 1200   // pure rain — short, just enough to set the scene
+    const T_EMERGE   = 2600   // face emerges (1.4s transition)
+    const T_HOLD     = 3400   // face fully visible, hold
+    const T_FADE     = 4000   // fade to black
 
     let animId: number
     let finished = false
@@ -88,12 +97,27 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     const rnd = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)]
     const CHAR_ARR = CHARS.split('')
 
+    // Frame throttle — target 30fps on mobile to prevent Safari GPU overload
+    // Desktop stays at 60fps (lastFrame = 0 means no skip)
+    let lastFrame = 0
+    const TARGET_FPS = window.innerWidth < 768 ? 30 : 60
+    const FRAME_MS   = 1000 / TARGET_FPS
+
     const draw = () => {
       const now     = performance.now()
+
+      // Skip frame if we're running faster than target FPS
+      if (now - lastFrame < FRAME_MS) {
+        animId = requestAnimationFrame(draw)
+        return
+      }
+      lastFrame = now
+
       const elapsed = now - START
 
       // Fade trail — alpha controls how long the tail persists
-      ctx.fillStyle = 'rgba(5,5,5,0.18)'
+      // Higher alpha = trail clears faster = fewer translucent layers = faster Safari compositing
+      ctx.fillStyle = 'rgba(5,5,5,0.22)'
       ctx.fillRect(0, 0, W, H)
 
       ctx.font = `bold ${FS}px monospace`
