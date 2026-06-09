@@ -518,6 +518,7 @@ export default function NoiseExperimentPage() {
 
         <ProjectNav
           prev={{ label: 'PlayPal', href: '/projects/playpal' }}
+          next={{ label: 'Talos Care', href: '/projects/talos' }}
           c={c}
         />
       </div>

@@ -416,6 +416,15 @@ export default function Home() {
       bgGradient: 'radial-gradient(ellipse at 30% 60%, #1e1500 0%, #0c0b08 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #0a0e1a 0%, transparent 60%)',
       videoSrc: '',
     },
+    {
+      title: 'Talos Care',
+      desc: 'Patients lie to their doctors out of shame. Talos is a conversational AI pre-screening agent that uses the Automaton Effect to help them disclose sensitive symptoms safely.',
+      tags: ['Conversational UX', 'Voice Design', 'AI Integration', 'Accessibility'],
+      accentColor: '#5B9B43',   // Talos sage green
+      pageNum: 'P. 008', showLabel: false, href: '/projects/talos',
+      bgGradient: 'radial-gradient(ellipse at 25% 65%, #061208 0%, #030805 40%, transparent 70%), radial-gradient(ellipse at 72% 28%, #081a0a 0%, transparent 60%)',
+      videoSrc: '',
+    },
   ]
 
   return (
@@ -814,7 +823,7 @@ export default function Home() {
       </section>
 
       <div className="w-full bg-[#ff4d00] py-3 overflow-hidden" aria-hidden="true">
-        <Marquee items={['3 Projects', 'Research-Led Design', 'Figma', 'Tampere, Finland', '2024–2026', 'UX/UI Design']} speed={60} reverse textColor="rgba(255,255,255,0.88)" />
+        <Marquee items={['5 Projects', 'Research-Led Design', 'Figma', 'Tampere, Finland', '2024–2026', 'UX/UI Design']} speed={60} reverse textColor="rgba(255,255,255,0.88)" />
       </div>
 
       {/* ── PROJECTS ── */}
@@ -937,6 +946,35 @@ export default function Home() {
                 </svg>
               )}
 
+              {i === 4 && (
+                // Talos Care — ECG heartbeat + medical grid
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
+                  <defs>
+                    <filter id="talos-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  {[0,1,2,3,4,5,6].map(col => (
+                    <line key={`tv${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#386641" strokeWidth="0.6" opacity="0.4" />
+                  ))}
+                  {[0,1,2,3,4,5,6,7,8,9,10].map(row => (
+                    <line key={`th${row}`} x1="0" y1={row * 70} x2="390" y2={row * 70} stroke="#5B9B43" strokeWidth="0.6" opacity="0.3" />
+                  ))}
+                  <polyline
+                    points="20,350 60,350 80,350 100,290 118,420 135,310 152,365 170,350 230,350 260,350 278,350 296,295 314,415 332,305 350,360 370,350"
+                    stroke="#5B9B43" strokeWidth="2.5" fill="none"
+                    strokeLinejoin="round" strokeLinecap="round"
+                    filter="url(#talos-glow)" opacity="0.9"
+                  />
+                  <polyline
+                    points="20,200 60,200 80,200 98,165 112,235 126,178 140,205 160,200 220,200 250,200 268,200 284,168 298,230 312,173 326,202 370,200"
+                    stroke="#386641" strokeWidth="1.5" fill="none"
+                    strokeLinejoin="round" strokeLinecap="round" opacity="0.5"
+                  />
+                  <rect x="175" y="480" width="40" height="12" fill="#5B9B43" opacity="0.6" rx="2" />
+                  <rect x="189" y="466" width="12" height="40" fill="#5B9B43" opacity="0.6" rx="2" />
+                  <circle cx="195" cy="350" r="5" fill="#A7C957" filter="url(#talos-glow)" opacity="0.9" />
+                </svg>
+              )}
+
               {/* Dark overlay — lighter so patterns show through, still keeps text readable */}
               <div className="absolute inset-0" style={{ background: theme === 'dark'
                 ? 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.55) 55%, rgba(5,5,5,0.10) 100%)'
@@ -967,7 +1005,7 @@ export default function Home() {
           ))}
         </div>
       ) : (
-        <div id="projects" className="horizontal-section flex w-[400vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
+        <div id="projects" className="horizontal-section flex w-[500vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
           {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} />)}
         </div>
       )}
@@ -1011,10 +1049,10 @@ export default function Home() {
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Pink Floyd\nGorillaz\nTame Impala' },
-            { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
-            { label: 'Building',  value: 'Talos - AI Medical Screen' },
-            { label: 'Wearing',   value: "YSL Y" },
+            { label: 'Listening', value: 'Pink Floyd\nJ.Cole\nGoldspot' },
+            { label: 'Reading',   value: "1984\nHarry Potter and the Deathly Hallows" },
+            { label: 'Building',  value: 'Project Forma: hairstyle app' },
+            { label: 'Wearing',   value: "light Blue" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
               <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>
