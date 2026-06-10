@@ -189,9 +189,16 @@ export default function Home() {
   const cursorDot = useRef<HTMLDivElement>(null)
   const cursorRing = useRef<HTMLDivElement>(null)
   const [cursorVisible, setCursorVisible] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => {
+    // Server always returns false; client reads immediately on first render
+    if (typeof window === 'undefined') return false
+    return window.innerWidth < 768
+  })
+  // Keep isMobile in sync with orientation changes
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler, { passive: true })
+    return () => window.removeEventListener('resize', handler)
   }, [])
   const [mobileScrolled, setMobileScrolled] = useState(false)
   const [reduced, setReduced] = useState(false)
@@ -800,7 +807,7 @@ export default function Home() {
       <section id="about-skills" className="split-section relative min-h-screen w-full border-t flex flex-col md:flex-row px-6 md:px-16 py-28 md:py-36 gap-16 md:gap-0 transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="Skills and values">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Who Am I / P. 003</div>
         <div className="center-line absolute left-1/2 top-0 w-[1px] h-0 -translate-x-1/2 hidden md:block" style={{ background: 'rgba(255,77,0,0.22)' }} aria-hidden="true" />
-        <div className="w-full md:w-1/2 md:pr-20 flex flex-col justify-center pt-10 md:pt-0">
+        <div className="w-full md:w-1/2 md:pr-20 flex flex-col justify-center pt-16 md:pt-0">
           <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">What I Do</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />I Build</h2>
           <dl className="flex flex-col">
@@ -832,8 +839,8 @@ export default function Home() {
           {projects.map((p, i) => (
             <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border }}>
 
-              {/* Base brand gradient — stronger */}
-              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: theme === 'dark' ? 0.9 : 0.6 }} aria-hidden="true" />
+              {/* Base brand gradient — full opacity always so card stays dark/rich in both themes */}
+              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.95 }} aria-hidden="true" />
 
               {/* Per-project decorative SVG pattern — unique to each brand */}
               {i === 0 && (
@@ -975,10 +982,9 @@ export default function Home() {
                 </svg>
               )}
 
-              {/* Dark overlay — lighter so patterns show through, still keeps text readable */}
-              <div className="absolute inset-0" style={{ background: theme === 'dark'
-                ? 'linear-gradient(to top, #050505 28%, rgba(5,5,5,0.55) 55%, rgba(5,5,5,0.10) 100%)'
-                : 'linear-gradient(to top, rgba(20,10,5,0.92) 28%, rgba(20,10,5,0.65) 55%, rgba(20,10,5,0.15) 100%)'
+              {/* Dark overlay — always dark regardless of theme so patterns/text are readable over any bg */}
+              <div className="absolute inset-0" style={{
+                background: 'linear-gradient(to top, rgba(5,5,5,0.96) 30%, rgba(5,5,5,0.70) 58%, rgba(5,5,5,0.30) 100%)'
               }} aria-hidden="true" />
 
               {/* Content */}
@@ -1015,7 +1021,7 @@ export default function Home() {
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
 
         {/* WHO AM I */}
-        <h2 className="flex flex-col mb-8 md:mb-12 pt-12 md:pt-0" aria-label="Who am I">
+        <h2 className="flex flex-col mb-8 md:mb-12 pt-16 md:pt-6" aria-label="Who am I">
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text, fontFamily: "'Bebas Neue', sans-serif" }}>WHO</span>
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00', fontFamily: "'Bebas Neue', sans-serif" }}>AM I</span>
         </h2>
@@ -1043,16 +1049,16 @@ export default function Home() {
       {/* ── RIGHT NOW ── */}
       <section className="now-section relative min-h-[55vh] flex flex-col justify-center px-6 md:px-16 py-24 border-t transition-colors duration-300" style={{ background: c.bg, borderColor: c.border }} aria-label="What Garv is doing right now">
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Right Now / P. 008</div>
-        <h2 className="now-item opacity-0 flex flex-col mb-10 md:mb-14" aria-label="Right Now">
+        <h2 className="now-item opacity-0 flex flex-col mb-10 md:mb-14 pt-16 md:pt-6" aria-label="Right Now">
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text, fontFamily: "'Bebas Neue', sans-serif" }}>RIGHT</span>
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00', fontFamily: "'Bebas Neue', sans-serif" }}>NOW</span>
         </h2>
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 font-mono">
           {[
-            { label: 'Listening', value: 'Pink Floyd\nJ.Cole\nGoldspot' },
-            { label: 'Reading',   value: "1984\nHarry Potter and the Deathly Hallows" },
-            { label: 'Building',  value: 'Project Forma: hairstyle app' },
-            { label: 'Wearing',   value: "light Blue" },
+            { label: 'Listening', value: 'Pink Floyd\nGorillaz\nTame Impala' },
+            { label: 'Reading',   value: "1984\nHarry Potter and the Chamber of Secrets" },
+            { label: 'Building',  value: 'Talos - AI Medical Screen' },
+            { label: 'Wearing',   value: "YSL Y" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
               <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>

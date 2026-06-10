@@ -133,11 +133,13 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
   }, [menuOpen])
 
   const defaultLinks = [
-    { label: 'Portfolio', href: '/' },
+    { label: 'Portfolio',        href: '/' },
     ...(projectLinks ?? [
-      { label: 'CityLoop', href: '/projects/cityloop' },
-      { label: 'MyTown',   href: '/projects/mytown'   },
-      { label: 'PlayPal',  href: '/projects/playpal'  },
+      { label: 'CityLoop',       href: '/projects/cityloop'         },
+      { label: 'MyTown',         href: '/projects/mytown'           },
+      { label: 'PlayPal',        href: '/projects/playpal'          },
+      { label: 'Noise & React',  href: '/projects/noise-experiment' },
+      { label: 'Talos Care',     href: '/projects/talos'            },
     ]),
   ]
 
@@ -292,7 +294,7 @@ export const Stat = ({
 }: {
   label: string, value: string, c: Tokens
 }) => (
-  <div className="flex flex-col gap-2 py-5 border-b transition-colors duration-300" style={{ borderColor: c.border }}>
+  <div className="flex flex-col gap-2 py-6 transition-colors duration-300">
     <span className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00]">{label}</span>
     <span className="text-sm font-mono leading-snug" style={{ color: c.textMuted }}>{value}</span>
   </div>

@@ -319,6 +319,7 @@ export default function PlayPalPage() {
 
         <ProjectNav
           prev={{ label: 'MyTown', href: '/projects/mytown' }}
+          next={{ label: 'Noise & Reaction', href: '/projects/noise-experiment' }}
           c={c}
         />
       </div>
