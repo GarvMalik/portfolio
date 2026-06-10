@@ -91,7 +91,7 @@ const ThemeToggle = ({ theme, toggle, bg, fg }: { theme: 'dark' | 'light', toggl
   <button
     onClick={toggle}
     aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-    className="fixed bottom-6 right-6 z-[10001] w-12 h-12 rounded-full border flex items-center justify-center transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
+    className="fixed bottom-6 right-6 z-[10001] w-12 h-12 rounded-full border flex items-center justify-center transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
     style={{ background: bg, borderColor: 'rgba(255,77,0,0.45)' }}
   >
     {theme === 'dark' ? (
@@ -281,18 +281,25 @@ export default function Home() {
     }
   }, [cursorVisible, reduced])
 
-  // Lightweight CSS parallax for hero on mobile — avoids GSAP scrub entirely
+  // Lightweight CSS parallax for hero on mobile — rAF-throttled to prevent layout thrash on Safari
   useEffect(() => {
     if (!isMobile || reduced) return
+    let rafId = 0
     const onScroll = () => {
-      const y = window.scrollY
-      const garv  = document.querySelector<HTMLElement>('.hero-garv')
-      const malik = document.querySelector<HTMLElement>('.hero-malik')
-      if (garv)  garv.style.transform  = `translateY(${y * -0.18}px)`
-      if (malik) malik.style.transform = `translateY(${y * -0.10}px)`
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        const y = window.scrollY
+        const garv  = document.querySelector<HTMLElement>('.hero-garv')
+        const malik = document.querySelector<HTMLElement>('.hero-malik')
+        if (garv)  garv.style.transform  = `translateY(${y * -0.18}px)`
+        if (malik) malik.style.transform = `translateY(${y * -0.10}px)`
+      })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      cancelAnimationFrame(rafId)
+    }
   }, [isMobile, reduced])
 
   // GSAP scroll animations
@@ -555,7 +562,6 @@ export default function Home() {
         className="md:hidden fixed inset-0 z-[49] flex flex-col justify-center items-start px-8 transition-all duration-300"
         style={{
           background: c.navBg,
-          backdropFilter: 'blur(16px)',
           opacity: menuOpen ? 1 : 0,
           pointerEvents: menuOpen ? 'all' : 'none',
           transform: menuOpen ? 'none' : 'translateY(-8px)',
@@ -617,7 +623,6 @@ export default function Home() {
           paddingBottom: mobileScrolled ? '0.75rem' : '0',
           background:       mobileScrolled ? c.navBg        : 'transparent',
           borderBottom:     mobileScrolled ? `1px solid ${c.border}` : 'none',
-          backdropFilter:   mobileScrolled ? 'blur(12px)'   : 'none',
           transition: 'top 0.45s ease, bottom 0.45s ease, padding 0.45s ease, background 0.45s ease',
         }}
         aria-hidden="true"
@@ -680,47 +685,28 @@ export default function Home() {
             </g>
           </svg>
         ) : (
-          /* Mobile terrain — static SVG topographic contour map, no filters, no animation.
-             More lines, tighter spacing, higher opacity than before to match desktop richness. */
+          /* Mobile terrain — zero SVG filters. feTurbulence/feDisplacementMap/feGaussianBlur
+             all force CPU fallback on Safari mobile. Pure straight lines render in < 1ms. */
           <svg
-            className="absolute inset-0 w-full h-full z-0 pointer-events-none"
-            style={{ opacity: theme === 'dark' ? 0.55 : 0.40 }}
+            className="absolute inset-0 w-full h-full z-0 pointer-events-none project-svg-illustration"
+            style={{ opacity: theme === 'dark' ? 0.50 : 0.35 }}
             viewBox="0 0 390 844"
             xmlns="http://www.w3.org/2000/svg"
             preserveAspectRatio="xMidYMid slice"
             aria-hidden="true"
           >
-            <defs>
-              {/* Gentle warp — lighter than desktop, GPU-safe on mobile */}
-              <filter id="m-warp" x="-15%" y="-15%" width="130%" height="130%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.006 0.005" numOctaves="3" seed="17" result="n" />
-                <feDisplacementMap in="SourceGraphic" in2="n" scale="90" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
-              <filter id="m-glow">
-                <feGaussianBlur stdDeviation="1.8" result="b" />
-                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-
-            {/* Base contour lines — warped horizontal bands */}
-            <g filter="url(#m-warp)" stroke={theme === 'dark' ? 'rgba(180,210,220,0.18)' : 'rgba(30,60,100,0.12)'} strokeWidth="0.8" fill="none">
-              {Array.from({ length: 60 }).map((_, i) => (
-                <line key={i} x1="-60" y1={i * 15} x2="450" y2={i * 15} />
-              ))}
-            </g>
-
-            {/* Accent highlight contours — teal/cyan, glowing */}
-            <g filter="url(#m-warp)" fill="none">
-              {[45, 105, 180, 255, 330, 405, 480, 555, 630, 705, 780].map((y, i) => (
-                <line
-                  key={i}
-                  x1="-60" y1={y} x2="450" y2={y}
-                  stroke={theme === 'dark' ? 'rgba(100,210,200,0.50)' : 'rgba(0,120,160,0.35)'}
-                  strokeWidth="1.2"
-                  filter="url(#m-glow)"
-                />
-              ))}
-            </g>
+            {/* Base contour lines — NO filter, pure vector */}
+            {Array.from({ length: 56 }).map((_, i) => (
+              <line key={i} x1="-60" y1={i * 16} x2="450" y2={i * 16}
+                stroke={theme === 'dark' ? 'rgba(180,210,220,0.16)' : 'rgba(30,60,100,0.10)'}
+                strokeWidth="0.75" />
+            ))}
+            {/* Accent highlight contours — thicker, no glow filter needed */}
+            {[48, 112, 192, 272, 352, 432, 512, 592, 672, 752, 832].map((y, i) => (
+              <line key={i} x1="-60" y1={y} x2="450" y2={y}
+                stroke={theme === 'dark' ? 'rgba(100,210,200,0.45)' : 'rgba(0,120,160,0.30)'}
+                strokeWidth="1.4" />
+            ))}
           </svg>
         )}
 
@@ -837,37 +823,33 @@ export default function Home() {
       {isMobile ? (
         <div id="projects" className="flex flex-col scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects">
           {projects.map((p, i) => (
-            <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border }}>
+            <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border, background: theme === 'light' ? '#f5f2ec' : '#050505' }}>
 
-              {/* Base brand gradient — full opacity always so card stays dark/rich in both themes */}
-              <div className="absolute inset-0" style={{ background: p.bgGradient, opacity: 0.95 }} aria-hidden="true" />
+              {/* Base brand gradient — dark theme: rich dark; light theme: soft tinted wash */}
+              <div className="absolute inset-0" style={{
+                background: p.bgGradient,
+                opacity: theme === 'dark' ? 0.95 : 0.12
+              }} aria-hidden="true" />
 
               {/* Per-project decorative SVG pattern — unique to each brand */}
               {i === 0 && (
-                // CityLoop — concentric circles / radar motif
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  <defs>
-                    <filter id="cl-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                  </defs>
+                // CityLoop — concentric circles / radar motif — no SVG filters (Safari perf)
+                <svg className="absolute inset-0 w-full h-full pointer-events-none project-svg-illustration" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.55 }}>
                   {[40, 90, 140, 195, 255, 320, 390].map((r, ri) => (
                     <circle key={ri} cx="310" cy="160" r={r} fill="none"
                       stroke={ri % 2 === 0 ? '#D95F30' : '#D7DFD8'}
-                      strokeWidth={ri % 2 === 0 ? '2' : '1'}
-                      filter={ri % 2 === 0 ? 'url(#cl-glow)' : undefined}
+                      strokeWidth={ri % 2 === 0 ? '2.5' : '1'}
                     />
                   ))}
-                  <circle cx="310" cy="160" r="8" fill="#D95F30" filter="url(#cl-glow)" />
-                  <line x1="310" y1="160" x2="310" y2="-230" stroke="#D95F30" strokeWidth="1.5" opacity="0.6" />
+                  <circle cx="310" cy="160" r="10" fill="#D95F30" />
+                  <line x1="310" y1="160" x2="310" y2="-230" stroke="#D95F30" strokeWidth="2" opacity="0.6" />
                   <line x1="310" y1="160" x2="650" y2="450" stroke="#D7DFD8" strokeWidth="1" opacity="0.4" />
                 </svg>
               )}
 
               {i === 1 && (
-                // MyTown — city grid + building silhouettes
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  <defs>
-                    <filter id="mt-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                  </defs>
+                // MyTown — city grid + building silhouettes — no SVG filters
+                <svg className="absolute inset-0 w-full h-full pointer-events-none project-svg-illustration" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.55 }}>
                   {[0,1,2,3,4,5,6].map(col => (
                     <line key={`v${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#FF844B" strokeWidth="0.8" opacity="0.5" />
                   ))}
@@ -878,25 +860,22 @@ export default function Home() {
                   <rect x="278" y="310" width="40" height="270" fill="#FF844B" opacity="0.40" rx="1" />
                   <rect x="326" y="350" width="28" height="230" fill="#FF844B" opacity="0.25" />
                   <rect x="362" y="420" width="28" height="160" fill="#55A6EC" opacity="0.25" />
-                  <polyline points="298,310 298,255 285,272 298,252 311,272 298,255" stroke="#FF844B" strokeWidth="2.5" fill="none" filter="url(#mt-glow)" />
+                  <polyline points="298,310 298,255 285,272 298,252 311,272 298,255" stroke="#FF844B" strokeWidth="3" fill="none" opacity="0.85" />
                 </svg>
               )}
 
               {i === 2 && (
-                // PlayPal — basketball court
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  <defs>
-                    <filter id="pp-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                  </defs>
+                // PlayPal — basketball court — no SVG filters
+                <svg className="absolute inset-0 w-full h-full pointer-events-none project-svg-illustration" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.55 }}>
                   <rect x="30" y="80" width="330" height="540" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" rx="4" />
                   <line x1="30" y1="350" x2="360" y2="350" stroke="#2978FF" strokeWidth="1.5" opacity="0.6" />
-                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" filter="url(#pp-glow)" />
-                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.9" filter="url(#pp-glow)" />
+                  <circle cx="195" cy="350" r="55" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.8" />
+                  <circle cx="195" cy="350" r="8" fill="#FFC107" opacity="0.9" />
                   <path d="M 60 80 A 135 135 0 0 1 330 80" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
                   <path d="M 60 620 A 135 135 0 0 0 330 620" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
                   <rect x="130" y="80" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
                   <rect x="130" y="480" width="130" height="140" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
-                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.8" filter="url(#pp-glow)" />
+                  <circle cx="195" cy="180" r="45" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.9" />
                   <line x1="195" y1="135" x2="195" y2="225" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
                   <line x1="150" y1="180" x2="240" y2="180" stroke="#2978FF" strokeWidth="2" opacity="0.7" />
                   <path d="M 165 140 Q 195 162 165 220" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.7" />
@@ -906,8 +885,8 @@ export default function Home() {
               )}
 
               {i === 3 && (
-                // Noise & Reaction — waveform / soundwave pattern
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
+                // Noise & Reaction — waveform / soundwave pattern — no SVG filters
+                <svg className="absolute inset-0 w-full h-full pointer-events-none project-svg-illustration" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.55 }}>
                   {/* Horizontal axis */}
                   <line x1="20" y1="350" x2="370" y2="350" stroke="#E8B84B" strokeWidth="1" opacity="0.4" />
                   {/* Waveform bars — simulated audio waveform */}
@@ -954,11 +933,8 @@ export default function Home() {
               )}
 
               {i === 4 && (
-                // Talos Care — ECG heartbeat + medical grid
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.5 }}>
-                  <defs>
-                    <filter id="talos-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                  </defs>
+                // Talos Care — ECG heartbeat + medical grid — no SVG filters
+                <svg className="absolute inset-0 w-full h-full pointer-events-none project-svg-illustration" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.55 }}>
                   {[0,1,2,3,4,5,6].map(col => (
                     <line key={`tv${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#386641" strokeWidth="0.6" opacity="0.4" />
                   ))}
@@ -967,9 +943,8 @@ export default function Home() {
                   ))}
                   <polyline
                     points="20,350 60,350 80,350 100,290 118,420 135,310 152,365 170,350 230,350 260,350 278,350 296,295 314,415 332,305 350,360 370,350"
-                    stroke="#5B9B43" strokeWidth="2.5" fill="none"
-                    strokeLinejoin="round" strokeLinecap="round"
-                    filter="url(#talos-glow)" opacity="0.9"
+                    stroke="#5B9B43" strokeWidth="3" fill="none"
+                    strokeLinejoin="round" strokeLinecap="round" opacity="0.9"
                   />
                   <polyline
                     points="20,200 60,200 80,200 98,165 112,235 126,178 140,205 160,200 220,200 250,200 268,200 284,168 298,230 312,173 326,202 370,200"
@@ -978,14 +953,16 @@ export default function Home() {
                   />
                   <rect x="175" y="480" width="40" height="12" fill="#5B9B43" opacity="0.6" rx="2" />
                   <rect x="189" y="466" width="12" height="40" fill="#5B9B43" opacity="0.6" rx="2" />
-                  <circle cx="195" cy="350" r="5" fill="#A7C957" filter="url(#talos-glow)" opacity="0.9" />
+                  <circle cx="195" cy="350" r="6" fill="#A7C957" opacity="0.9" />
                 </svg>
               )}
 
-              {/* Dark overlay — always dark regardless of theme so patterns/text are readable over any bg */}
-              <div className="absolute inset-0" style={{
-                background: 'linear-gradient(to top, rgba(5,5,5,0.96) 30%, rgba(5,5,5,0.70) 58%, rgba(5,5,5,0.30) 100%)'
-              }} aria-hidden="true" />
+              {/* Overlay — dark mode: gradient to black; light mode: none needed (bg is already light) */}
+              {theme === 'dark' && (
+                <div className="absolute inset-0" style={{
+                  background: 'linear-gradient(to top, rgba(5,5,5,0.96) 30%, rgba(5,5,5,0.70) 58%, rgba(5,5,5,0.30) 100%)'
+                }} aria-hidden="true" />
+              )}
 
               {/* Content */}
               <div className="relative z-10">
@@ -994,10 +971,10 @@ export default function Home() {
                   <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#ff4d00]">Project 0{i + 1}</span>
                 </div>
                 <h2 className="text-[10vw] font-black uppercase tracking-tight mb-2 leading-[0.92]" style={{ color: p.accentColor }}>{p.title}</h2>
-                <p className="font-mono text-xs mb-4 leading-relaxed" style={{ color: 'rgba(230,226,211,0.85)' }}>{p.desc}</p>
+                <p className="font-mono text-xs mb-4 leading-relaxed" style={{ color: theme === 'dark' ? 'rgba(230,226,211,0.85)' : c.textMuted }}>{p.desc}</p>
                 <ul className="flex flex-wrap gap-2 mb-5">
                   {p.tags.map(tag => (
-                    <li key={tag} className="px-2 py-1 border text-[8px] font-bold uppercase font-mono tracking-widest" style={{ borderColor: c.border, color: 'rgba(230,226,211,0.6)' }}>{tag}</li>
+                    <li key={tag} className="px-2 py-1 border text-[8px] font-bold uppercase font-mono tracking-widest" style={{ borderColor: c.border, color: theme === 'dark' ? 'rgba(230,226,211,0.6)' : c.textFaint }}>{tag}</li>
                   ))}
                 </ul>
                 <Link href={p.href} className="inline-flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]" aria-label={`View project: ${p.title}`}>
