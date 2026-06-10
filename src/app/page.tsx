@@ -189,16 +189,14 @@ export default function Home() {
   const cursorDot = useRef<HTMLDivElement>(null)
   const cursorRing = useRef<HTMLDivElement>(null)
   const [cursorVisible, setCursorVisible] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => {
-    // Server always returns false; client reads immediately on first render
-    if (typeof window === 'undefined') return false
-    return window.innerWidth < 768
-  })
-  // Keep isMobile in sync with orientation changes
+  const [isMobile, setIsMobile] = useState(false)
+  // Set isMobile after mount (useEffect is client-only — safe for SSR/hydration)
+  // Also handles orientation changes
   useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', handler, { passive: true })
-    return () => window.removeEventListener('resize', handler)
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check() // run immediately on mount
+    window.addEventListener('resize', check, { passive: true })
+    return () => window.removeEventListener('resize', check)
   }, [])
   const [mobileScrolled, setMobileScrolled] = useState(false)
   const [reduced, setReduced] = useState(false)
@@ -304,6 +302,11 @@ export default function Home() {
 
   // GSAP scroll animations
   useGSAP(() => {
+    // Kill all existing ScrollTriggers before re-registering — prevents
+    // the horizontal trigger from competing with native mobile scroll
+    // during the isMobile state flip after hydration.
+    ScrollTrigger.getAll().forEach(t => t.kill())
+
     if (reduced) {
       gsap.set(['.layered-top', '.layered-bottom', '.intro-label', '.quote-line', '.manifesto-sub', '.split-header', '.split-item', '.now-item', '.footer-email'], { clearProps: 'all' })
       return
