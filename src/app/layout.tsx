@@ -17,13 +17,64 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Garv Malik — UX/UI Designer",
-  description: "Portfolio of Garv Malik, a UX/UI Designer based in Tampere, Finland. Pursuing a Master's in Human-Technology Interaction at Tampere University.",
-  authors: [{ name: "Garv Malik" }],
+  metadataBase: new URL("https://garvmalik.lol"),
+  title: {
+    default: "Garv Malik — UX/UI Designer",
+    template: "%s — Garv Malik",
+  },
+  description:
+    "Portfolio of Garv Malik, a UX/UI Designer based in Tampere, Finland. Pursuing an MSc in Human-Technology Interaction at Tampere University. Open to UX/UI internships in Finland and Europe.",
+  authors: [{ name: "Garv Malik", url: "https://garvmalik.lol" }],
+  keywords: [
+    "Garv Malik",
+    "UX designer",
+    "UI designer",
+    "portfolio",
+    "Tampere",
+    "Finland",
+    "Human-Technology Interaction",
+    "Tampere University",
+    "interaction design",
+    "Figma",
+  ],
+  creator: "Garv Malik",
+  alternates: {
+    canonical: "https://garvmalik.lol",
+  },
   openGraph: {
     title: "Garv Malik — UX/UI Designer",
-    description: "Portfolio of Garv Malik — UX/UI Designer based in Tampere, Finland.",
+    description:
+      "Portfolio of Garv Malik — UX/UI Designer based in Tampere, Finland. Research-led, accessible design across apps, services, and conversational AI.",
+    url: "https://garvmalik.lol",
+    siteName: "Garv Malik",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Garv Malik — UX/UI Designer portfolio",
+      },
+    ],
+    locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Garv Malik — UX/UI Designer",
+    description:
+      "Portfolio of Garv Malik — UX/UI Designer based in Tampere, Finland.",
+    images: ["/og-image.png"],
+    creator: "@thegarvmalik",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 }
 

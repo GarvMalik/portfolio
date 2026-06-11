@@ -730,6 +730,29 @@ export default function Home() {
 
 
 
+        {/* Hero CTAs — visible below the name on all screen sizes */}
+        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-4 mt-6 mb-2">
+          <a
+            href="mailto:thegarvmalik@gmail.com"
+            data-cursor-hover
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#ff4d00] text-[#ff4d00] text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-[#ff4d00] hover:text-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+            aria-label="Send email to Garv Malik"
+          >
+            Hire me →
+          </a>
+          <a
+            href="/garv-malik-cv.pdf"
+            download
+            data-cursor-hover
+            className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#ff4d00] hover:text-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+            style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.55)' }}
+            aria-label="Download Garv Malik CV PDF"
+          >
+            Download CV ↓
+          </a>
+        </div>
+
+        {/* Right side descriptor — desktop only */}
         <div className="intro-label opacity-0 hidden md:flex absolute right-16 top-1/2 -translate-y-1/2 flex-col items-end gap-3 text-right" aria-hidden="true">
           <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
           <p className="text-[9px] uppercase font-mono tracking-[0.25em] max-w-[160px] leading-loose" style={{ color: c.textMuted }}>UX/UI Designer<br />Research · Figma<br />Tampere, Finland</p>
@@ -827,6 +850,22 @@ export default function Home() {
         <div id="projects" className="flex flex-col scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects">
           {projects.map((p, i) => (
             <div key={i} className="relative w-full overflow-hidden flex flex-col justify-end p-6 border-b" style={{ minHeight: '85vh', borderColor: c.border, background: theme === 'light' ? '#f5f2ec' : '#050505' }}>
+
+              {/* Progress indicator — top right */}
+              <div className="absolute top-6 right-6 z-20 flex items-center gap-1.5" aria-label={`Project ${i + 1} of ${projects.length}`}>
+                {projects.map((_, di) => (
+                  <div
+                    key={di}
+                    className="rounded-full transition-all duration-300"
+                    style={{
+                      width:   di === i ? '16px' : '5px',
+                      height:  '5px',
+                      background: di === i ? p.accentColor : (theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.20)'),
+                    }}
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
 
               {/* Base brand gradient — dark theme: rich dark; light theme: soft tinted wash */}
               <div className="absolute inset-0" style={{
@@ -1074,6 +1113,16 @@ export default function Home() {
                 {link.display}
               </a>
             ))}
+            <a
+              href="/garv-malik-cv.pdf"
+              download
+              data-cursor-hover
+              aria-label="Download CV PDF"
+              className="text-[11px] font-mono uppercase tracking-[0.2em] transition-colors duration-200 hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1 border-b-2 border-transparent hover:border-[#ff4d00]"
+              style={{ color: c.textMuted }}
+            >
+              CV ↓
+            </a>
           </nav>
           <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textFaint }}>© 2026 Garv Malik</p>
         </div>
