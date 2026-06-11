@@ -251,6 +251,31 @@ export const BackButton = ({ c }: { c: Tokens }) => (
 )
 
 // ─── Project navigation (prev / next) ─────────────────────────────────────────
+// ─── Hire CTA — shown at the bottom of every project page ────────────────────
+export const HireCTA = ({ c }: { c: Tokens }) => (
+  <div
+    className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-t py-10 transition-colors duration-300"
+    style={{ borderColor: c.border }}
+  >
+    <div>
+      <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-2">
+        Open to UX/UI internships — Finland & Europe
+      </p>
+      <p className="font-mono text-sm" style={{ color: c.textMuted }}>
+        Interested in working together?
+      </p>
+    </div>
+    <a
+      href="mailto:thegarvmalik@gmail.com"
+      className="inline-flex items-center gap-3 px-5 py-3 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#ff4d00] hover:text-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+      style={{ borderColor: c.border, color: c.textMuted }}
+    >
+      thegarvmalik@gmail.com
+      <span className="text-[#ff4d00]">→</span>
+    </a>
+  </div>
+)
+
 export const ProjectNav = ({
   prev, next, c,
 }: {
@@ -258,7 +283,9 @@ export const ProjectNav = ({
   next?: { label: string; href: string }
   c: Tokens
 }) => (
-  <div className="section-block border-t pt-12 flex justify-between items-center" style={{ borderColor: c.border }}>
+  <div className="section-block">
+    <HireCTA c={c} />
+    <div className="border-t pt-10 flex justify-between items-center" style={{ borderColor: c.border }}>
     {prev ? (
       <Link
         href={prev.href}
@@ -285,6 +312,7 @@ export const ProjectNav = ({
         </span>
       </Link>
     )}
+    </div>
   </div>
 )
 
