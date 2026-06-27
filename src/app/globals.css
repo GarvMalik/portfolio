@@ -63,27 +63,18 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
 ::-webkit-scrollbar-thumb:hover { background: #ff4d00; }
 
 /* === PERFORMANCE: GPU layer hints ========================================= */
-/* Only promote elements that are actually animated on the compositor.
-   Over-promotion wastes VRAM and hurts Safari especially. */
-.hero-garv,
-.hero-malik {
-  /* Parallax-animated via GSAP translateY — promote upfront */
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-/* Nav is fixed + has backdrop-filter — needs its own layer */
+/* Nav is fixed + has backdrop-filter — needs its own compositing layer */
 nav {
   transform: translateZ(0);
 }
 
 /* === SAFARI SCROLL PERFORMANCE ============================================ */
-/* Tell WebKit to handle scroll natively — eliminates 300ms delay */
 html {
   -webkit-overflow-scrolling: touch;
 }
 
-/* content-visibility: auto lets Safari skip paint for off-screen sections */
+/* content-visibility: auto skips paint for off-screen sections.
+   Do NOT apply to sections with GSAP ScrollTrigger pinning — causes blank flash. */
 .about-section,
 .now-section,
 .footer-section {
@@ -91,8 +82,16 @@ html {
   contain-intrinsic-size: 0 800px;
 }
 
-/* Force GPU rasterisation for SVG illustrations — prevents CPU fallback */
+/* GPU rasterisation for SVG illustrations */
 .project-svg-illustration {
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* Available badge ping animation */
+@keyframes ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+.animate-ping {
+  animation: ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }

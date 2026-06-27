@@ -59,7 +59,6 @@ export default function NoiseExperimentPage() {
       style={{ background: c.bg, color: c.text }}
     >
       <SkipLink />
-      <Grain opacity={c.grain} />
       <SiteNav c={c} projectName="Noise Study" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

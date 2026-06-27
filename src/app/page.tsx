@@ -117,7 +117,76 @@ const ThemeToggle = ({ theme, toggle, bg, fg }: { theme: 'dark' | 'light', toggl
  * FIX: Link has aria-label with project title (WCAG 2.4.4)
  * FIX: focus-visible on link (WCAG 2.4.7)
  */
-const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, videoSrc, surfaceColor, borderColor }: {
+/* ── Desktop card illustrations — no SVG filters for Safari ─────────────── */
+const DESKTOP_ILLUSTRATIONS: Record<number, React.ReactNode> = {
+  0: ( // CityLoop — radar rings
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.55 }}>
+      {[120, 220, 330, 460, 600, 760, 930].map((r, ri) => (
+        <circle key={ri} cx="1100" cy="240" r={r} fill="none"
+          stroke={ri % 2 === 0 ? '#D95F30' : 'rgba(215,223,216,0.7)'}
+          strokeWidth={ri % 2 === 0 ? '2' : '0.8'} />
+      ))}
+      <circle cx="1100" cy="240" r="12" fill="#D95F30" />
+      <line x1="1100" y1="240" x2="1100" y2="-600" stroke="#D95F30" strokeWidth="1.5" opacity="0.5" />
+      <line x1="1100" y1="240" x2="1800" y2="800" stroke="rgba(215,223,216,0.4)" strokeWidth="1" />
+    </svg>
+  ),
+  1: ( // MyTown — city grid
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.5 }}>
+      {[0,1,2,3,4,5,6,7,8,9].map(col => <line key={`v${col}`} x1={col * 160} y1="0" x2={col * 160} y2="900" stroke="#FF844B" strokeWidth="0.7" opacity="0.5" />)}
+      {[0,1,2,3,4,5,6,7,8,9].map(row => <line key={`h${row}`} x1="0" y1={row * 100} x2="1440" y2={row * 100} stroke="#55A6EC" strokeWidth="0.7" opacity="0.45" />)}
+      <rect x="780" y="400" width="60" height="400" fill="#FF844B" opacity="0.28" />
+      <rect x="860" y="310" width="80" height="490" fill="#FF844B" opacity="0.35" rx="2" />
+      <rect x="960" y="360" width="56" height="440" fill="#FF844B" opacity="0.22" />
+      <rect x="1030" y="450" width="56" height="350" fill="#55A6EC" opacity="0.22" />
+      <polyline points="900,310 900,240 874,262 900,232 926,262 900,240" stroke="#FF844B" strokeWidth="4" fill="none" opacity="0.8" />
+    </svg>
+  ),
+  2: ( // PlayPal — basketball court
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.55 }}>
+      <rect x="700" y="60" width="640" height="780" fill="none" stroke="#2978FF" strokeWidth="2" opacity="0.7" rx="4" />
+      <line x1="700" y1="450" x2="1340" y2="450" stroke="#2978FF" strokeWidth="1.5" opacity="0.6" />
+      <circle cx="1020" cy="450" r="110" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.8" />
+      <circle cx="1020" cy="450" r="14" fill="#FFC107" opacity="0.9" />
+      <path d="M 740 60 A 260 260 0 0 1 1300 60" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
+      <path d="M 740 840 A 260 260 0 0 0 1300 840" fill="none" stroke="#FFC107" strokeWidth="2" opacity="0.6" />
+      <rect x="860" y="60" width="320" height="240" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
+      <rect x="860" y="600" width="320" height="240" fill="none" stroke="#2978FF" strokeWidth="1.5" opacity="0.55" />
+      <circle cx="1020" cy="230" r="90" fill="none" stroke="#2978FF" strokeWidth="2.5" opacity="0.9" />
+    </svg>
+  ),
+  3: ( // Noise — waveform
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.55 }}>
+      <line x1="700" y1="450" x2="1380" y2="450" stroke="#E8B84B" strokeWidth="1" opacity="0.4" />
+      {Array.from({ length: 60 }).map((_, idx) => {
+        const x = 720 + idx * 11
+        const h = 10 + Math.abs(Math.sin(idx * 0.7 + 1.2) * 160 + Math.sin(idx * 1.5) * 80)
+        return <rect key={idx} x={x} y={450 - h / 2} width="5" height={h} fill={idx % 4 === 0 ? '#E8B84B' : 'rgba(232,184,75,0.30)'} rx="2" />
+      })}
+      {Array.from({ length: 60 }).map((_, idx) => {
+        const x = 720 + idx * 11
+        const h = 6 + Math.abs(Math.sin(idx * 1.1 + 2.5) * 60)
+        return <rect key={`b${idx}`} x={x} y={260 - h / 2} width="5" height={h} fill="rgba(232,184,75,0.18)" rx="1" />
+      })}
+      {Array.from({ length: 60 }).map((_, idx) => {
+        const x = 720 + idx * 11
+        const h = 6 + Math.abs(Math.sin(idx * 0.9 + 0.5) * 100 + Math.sin(idx * 2.1) * 50)
+        return <rect key={`c${idx}`} x={x} y={640 - h / 2} width="5" height={h} fill="rgba(232,184,75,0.22)" rx="1" />
+      })}
+    </svg>
+  ),
+  4: ( // Talos — ECG
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.55 }}>
+      {[0,1,2,3,4,5,6,7,8].map(col => <line key={`tv${col}`} x1={col * 180} y1="0" x2={col * 180} y2="900" stroke="#386641" strokeWidth="0.6" opacity="0.35" />)}
+      {[0,1,2,3,4,5,6,7,8,9].map(row => <line key={`th${row}`} x1="0" y1={row * 100} x2="1440" y2={row * 100} stroke="#5B9B43" strokeWidth="0.6" opacity="0.25" />)}
+      <polyline points="600,450 700,450 760,450 820,340 878,580 934,400 980,460 1040,450 1140,450 1200,450 1260,450 1318,345 1374,570 1420,415 1440,452" stroke="#5B9B43" strokeWidth="3.5" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.9" />
+      <polyline points="600,270 700,270 760,270 820,230 876,310 930,248 984,272 1040,270 1140,270 1200,270 1260,270 1318,230 1374,310 1420,248 1440,270" stroke="#386641" strokeWidth="1.8" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.5" />
+      <circle cx="1020" cy="450" r="10" fill="#A7C957" opacity="0.9" />
+    </svg>
+  ),
+}
+
+const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, surfaceColor, borderColor }: {
   index: number, title: string, desc: string, tags: string[], accentColor: string,
   pageNum: string, showLabel: boolean, href: string, bgGradient: string,
   videoSrc?: string, surfaceColor: string, borderColor: string
@@ -126,18 +195,9 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
     {showLabel && <div className="absolute top-10 left-10 text-[10px] uppercase font-mono italic text-[#ff4d00] tracking-widest z-10" aria-hidden="true">/ STUFF I BUILT / {pageNum}</div>}
     <div className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none z-0 opacity-[0.04]" style={{ color: 'gray', fontVariantNumeric: 'tabular-nums' }} aria-hidden="true">0{index + 1}</div>
 
-    {videoSrc ? (
-      <>
-        <video src={videoSrc} autoPlay loop muted playsInline disablePictureInPicture className="absolute inset-0 w-full h-full object-cover z-0" style={{ opacity: 0.52 }} aria-hidden="true" tabIndex={-1} />
-        <div className="absolute inset-0 z-[1]" style={{ background: 'linear-gradient(to top, #050505 25%, rgba(5,5,5,0.65) 55%, rgba(5,5,5,0.18) 100%)' }} aria-hidden="true" />
-      </>
-    ) : (
-      <>
-        <div className="absolute inset-0" style={{ background: bgGradient, opacity: 0.38 }} aria-hidden="true" />
-        <div className="absolute inset-0" style={{ background: surfaceColor, mixBlendMode: 'multiply' as const }} aria-hidden="true" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 22%, rgba(5,5,5,0.72) 52%, rgba(5,5,5,0.22) 100%)' }} aria-hidden="true" />
-      </>
-    )}
+    <div className="absolute inset-0" style={{ background: bgGradient, opacity: 0.70 }} aria-hidden="true" />
+    {DESKTOP_ILLUSTRATIONS[index]}
+    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #050505 20%, rgba(5,5,5,0.68) 50%, rgba(5,5,5,0.12) 100%)' }} aria-hidden="true" />
 
     {/* Content — left-aligned text block, max half width on desktop so button has room */}
     <div className="relative z-10 max-w-xl flex flex-col">
@@ -404,7 +464,7 @@ export default function Home() {
       accentColor: '#D95F30',   // CityLoop terracotta
       pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
       bgGradient: 'radial-gradient(ellipse at 30% 60%, #3d1a0e 0%, #1a0a05 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #2a1208 0%, transparent 60%)',
-      videoSrc: '/cityloop-bg.mp4',
+      videoSrc: '',
     },
     {
       title: 'MyTown Relocation',
@@ -413,7 +473,7 @@ export default function Home() {
       accentColor: '#FF844B',   // MyTown orange
       pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
       bgGradient: 'radial-gradient(ellipse at 20% 70%, #2a1e18 0%, #1a1208 40%, transparent 70%), radial-gradient(ellipse at 75% 25%, #1e2535 0%, transparent 60%)',
-      videoSrc: '/mytown-bg.mp4',
+      videoSrc: '',
     },
     {
       title: 'PlayPal Community',
@@ -422,7 +482,7 @@ export default function Home() {
       accentColor: '#2978FF',   // PlayPal blue
       pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #0a1530 0%, #050c1e 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #0d1828 0%, transparent 60%)',
-      videoSrc: '/playpal-bg.mp4',
+      videoSrc: '',
     },
     {
       title: 'Noise & Reaction',
@@ -454,8 +514,7 @@ export default function Home() {
       {/* Hide system cursor only on desktop when not reduced */}
       {!reduced && <style>{`@media (min-width: 768px) { body { cursor: none; } }`}</style>}
 
-      {/* Grain — desktop only for performance, fixed layers cause constant repaints on mobile */}
-      {!isMobile && <div className="fixed inset-0 pointer-events-none z-[9998] transition-opacity duration-300" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat', backgroundSize: '128px 128px', opacity: c.grain }} aria-hidden="true" />}
+      {/* Grain removed — fixed SVG filter overlay caused constant repaints on every scroll frame */}
 
       {/* Custom cursor — desktop, decorative */}
       <div ref={cursorDot}  className="fixed top-0 left-0 w-1.5 h-1.5 bg-[#ff4d00] rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 hidden md:block" style={{ opacity: cursorVisible ? 1 : 0 }} aria-hidden="true" />
@@ -647,77 +706,46 @@ export default function Home() {
      {/* ── HERO ── */}
       <section id="main-content" className="hero-section relative h-screen flex flex-col justify-end pb-[12vh] md:justify-center md:pb-0 px-6 md:px-16 overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg }} aria-label="Hero Garv Malik, UX UI Designer">
         
-        {/* Topographic terrain background —
-             Desktop: animated SVG with feTurbulence (GPU-intensive, looks great on desktop)
-             Mobile:  lightweight CSS-only static contour lines (no filters, no JS, smooth) */}
-        {!isMobile ? (
-          <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none" style={{ opacity: theme === 'dark' ? 0.55 : 0.45 }} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 900" aria-hidden="true">
-            <defs>
-              <filter id="topo-warp" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.0028 0.0032" numOctaves="5" seed="42" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="220" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
-              <filter id="topo-glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2.5" result="blur" />
-                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-              </filter>
-              <style>{`
-                @keyframes topo-drift {
-                  0%   { transform: translate(0px,   0px)   scale(1.00); }
-                  33%  { transform: translate(-18px, 12px)  scale(1.02); }
-                  66%  { transform: translate(14px,  -8px)  scale(0.99); }
-                  100% { transform: translate(0px,   0px)   scale(1.00); }
-                }
-                @keyframes topo-accent-drift {
-                  0%   { transform: translate(0px,  0px); }
-                  50%  { transform: translate(22px, -14px); }
-                  100% { transform: translate(0px,  0px); }
-                }
-                .topo-base    { animation: topo-drift        42s ease-in-out infinite; transform-origin: 50% 50%; }
-                .topo-accent  { animation: topo-accent-drift 28s ease-in-out infinite; transform-origin: 50% 50%; }
-                @media (prefers-reduced-motion: reduce) { .topo-base, .topo-accent { animation: none; } }
-              `}</style>
-            </defs>
-            <g className="topo-base" filter="url(#topo-warp)" stroke={theme === 'dark' ? 'rgba(180,200,220,0.13)' : 'rgba(30,60,100,0.09)'} strokeWidth="1" fill="none">
-              {Array.from({ length: 52 }).map((_, i) => <line key={`h-${i}`} x1="-100" y1={i * 18} x2="1600" y2={i * 18} />)}
-            </g>
-            <g className="topo-accent" filter="url(#topo-warp)" fill="none">
-              {[36, 90, 162, 234, 306, 378, 450, 522, 594, 666, 738, 810, 882].map((y, i) => (
-                <line key={`a-${i}`} x1="-100" y1={y} x2="1600" y2={y} stroke={theme === 'dark' ? 'rgba(100,210,200,0.38)' : 'rgba(0,120,160,0.28)'} strokeWidth="1.4" filter="url(#topo-glow)" />
-              ))}
-            </g>
-          </svg>
-        ) : (
-          /* Mobile terrain — zero SVG filters. feTurbulence/feDisplacementMap/feGaussianBlur
-             all force CPU fallback on Safari mobile. Pure straight lines render in < 1ms. */
-          <svg
-            className="absolute inset-0 w-full h-full z-0 pointer-events-none project-svg-illustration"
-            style={{ opacity: theme === 'dark' ? 0.50 : 0.35 }}
-            viewBox="0 0 390 844"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid slice"
-            aria-hidden="true"
-          >
-            {/* Base contour lines — NO filter, pure vector */}
-            {Array.from({ length: 56 }).map((_, i) => (
-              <line key={i} x1="-60" y1={i * 16} x2="450" y2={i * 16}
-                stroke={theme === 'dark' ? 'rgba(180,210,220,0.16)' : 'rgba(30,60,100,0.10)'}
-                strokeWidth="0.75" />
-            ))}
-            {/* Accent highlight contours — thicker, no glow filter needed */}
-            {[48, 112, 192, 272, 352, 432, 512, 592, 672, 752, 832].map((y, i) => (
-              <line key={i} x1="-60" y1={y} x2="450" y2={y}
-                stroke={theme === 'dark' ? 'rgba(100,210,200,0.45)' : 'rgba(0,120,160,0.30)'}
-                strokeWidth="1.4" />
-            ))}
-          </svg>
-        )}
+        {/* Hero background — pure SVG, zero filters. feTurbulence/feDisplacementMap crash Safari. */}
+        <svg
+          className="absolute inset-0 w-full h-full z-0 pointer-events-none"
+          style={{ opacity: theme === 'dark' ? 0.48 : 0.32 }}
+          viewBox="0 0 1440 900"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+        >
+          {/* Horizontal grid lines */}
+          {Array.from({ length: 52 }).map((_, i) => (
+            <line key={`h-${i}`} x1="-60" y1={i * 18} x2="1500" y2={i * 18}
+              stroke={theme === 'dark' ? 'rgba(180,200,220,0.11)' : 'rgba(30,60,100,0.08)'}
+              strokeWidth="0.8" />
+          ))}
+          {/* Accent lines */}
+          {[54, 108, 198, 270, 360, 450, 522, 612, 684, 774, 846].map((y, i) => (
+            <line key={`a-${i}`} x1="-60" y1={y} x2="1500" y2={y}
+              stroke={theme === 'dark' ? 'rgba(255,77,0,0.18)' : 'rgba(255,77,0,0.12)'}
+              strokeWidth="1.2" />
+          ))}
+          {/* Diagonal accent — bottom-left to top-right */}
+          <line x1="0" y1="900" x2="600" y2="0" stroke={theme === 'dark' ? 'rgba(255,77,0,0.10)' : 'rgba(255,77,0,0.07)'} strokeWidth="1" />
+          <line x1="400" y1="900" x2="1000" y2="0" stroke={theme === 'dark' ? 'rgba(255,77,0,0.06)' : 'rgba(255,77,0,0.04)'} strokeWidth="1" />
+        </svg>
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
         <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Home / P. 001</div>
         <h1 className="sr-only">Garv Malik — UX/UI Designer specialising in research-led, accessible digital products. Based in Tampere, Finland.</h1>
-        
-        {/* Stacked bottom-left style */}
+
+        {/* Available badge — top right on desktop, below nav label on mobile */}
+        <div className="intro-label opacity-0 absolute top-[4.5rem] right-6 md:right-16 flex items-center gap-2 z-10" aria-label="Currently available for internships">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75" aria-hidden="true" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22c55e]" aria-hidden="true" />
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-[0.25em]" style={{ color: c.textMuted }}>Available · Summer 2026</span>
+        </div>
+
+        {/* Stacked name */}
         <div className="hero-name-wrap flex flex-col items-start gap-0 relative z-10 w-full" aria-hidden="true">
           <div className="hero-garv">
             <LayeredText text="GARV"  className="text-[28vw] md:text-[21vw] leading-[0.82] font-black uppercase tracking-tighter" color={c.text} />
@@ -727,11 +755,17 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Role + tagline line */}
+        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-3 mt-5 mb-1">
+          <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-[0.28em]" style={{ color: c.textMuted }}>UX/UI Designer</span>
+          <span className="text-[#ff4d00] opacity-50" aria-hidden="true">·</span>
+          <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-[0.28em]" style={{ color: c.textMuted }}>Research-led products</span>
+          <span className="text-[#ff4d00] opacity-50" aria-hidden="true">·</span>
+          <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-[0.28em]" style={{ color: c.textMuted }}>Tampere, Finland</span>
+        </div>
 
-
-
-        {/* Hero CTAs — visible below the name on all screen sizes */}
-        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-4 mt-6 mb-2">
+        {/* Hero CTAs */}
+        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-4 mt-5 mb-2">
           <a
             href="mailto:thegarvmalik@gmail.com"
             data-cursor-hover
@@ -753,17 +787,9 @@ export default function Home() {
           </a>
         </div>
 
-        {/* Right side descriptor — desktop only */}
-        <div className="intro-label opacity-0 hidden md:flex absolute right-16 top-1/2 -translate-y-1/2 flex-col items-end gap-3 text-right" aria-hidden="true">
-          <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
-          <p className="text-[9px] uppercase font-mono tracking-[0.25em] max-w-[160px] leading-loose" style={{ color: c.textMuted }}>UX/UI Designer<br />Research · Figma<br />Tampere, Finland</p>
-          <div className="w-[1px] h-20 self-center" style={{ background: c.border }} />
-        </div>
         <div className="intro-label opacity-0 absolute bottom-0 left-0 right-0 border-t" style={{ borderColor: c.border }}>
           <Marquee items={MARQUEE_ITEMS} speed={35} textColor={c.textMuted} />
         </div>
-        {/* Issue 2 fix: scroll cue moved up from bottom-8 to bottom-16
-            so it clears the marquee strip (~40px tall) and doesn't collide */}
         <div className="intro-label opacity-0 absolute bottom-16 left-6 md:left-16 flex items-center gap-3" aria-hidden="true">
           <div className="w-6 h-6 rounded-full border flex items-center justify-center" style={{ borderColor: c.border }}>
             <span className="text-[8px]" style={{ color: c.textFaint }}>↓</span>

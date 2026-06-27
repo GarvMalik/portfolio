@@ -60,7 +60,6 @@ export default function PlayPalPage() {
       style={{ background: c.bg, color: c.text }}
     >
       <SkipLink />
-      <Grain opacity={c.grain} />
       <SiteNav c={c} projectName="PlayPal" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

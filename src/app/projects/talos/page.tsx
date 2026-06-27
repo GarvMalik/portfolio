@@ -60,7 +60,6 @@ export default function TalosCare() {
       style={{ background: c.bg, color: c.text }}
     >
       <SkipLink />
-      <Grain opacity={c.grain} />
       <SiteNav c={c} projectName="Talos Care" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

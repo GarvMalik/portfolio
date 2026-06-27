@@ -60,7 +60,6 @@ export default function MyTownPage() {
       style={{ background: c.bg, color: c.text }}
     >
       <SkipLink />
-      <Grain opacity={c.grain} />
       <SiteNav c={c} projectName="MyTown" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 
