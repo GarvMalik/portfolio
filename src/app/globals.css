@@ -52,6 +52,8 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* Hide decorative autoplay videos — the gradient fallback shows instead */
+  video[autoplay] { display: none !important; }
 }
 
 /* === SCROLLBAR (cosmetic only) ============================================= */

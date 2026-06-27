@@ -485,7 +485,7 @@ export default function Home() {
         </a>
 
         {/* Centre nav links — desktop only */}
-        <div className="hidden md:flex items-center gap-10" role="list">
+        <div className="hidden md:flex items-center gap-10">
           {[
             { label: 'Home',   id: 'main-content' },
             { label: 'Approach', id: 'about-skills' },
@@ -498,13 +498,12 @@ export default function Home() {
               <a
                 key={id}
                 href={`#${id}`}
-                role="listitem"
                 onClick={e => {
                   e.preventDefault()
                   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
                 }}
                 className="relative px-3 py-1 text-[10px] uppercase font-mono tracking-[0.25em] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
-                style={{ color: isActive ? '#ff4d00' : c.textMuted }}
+                style={{ color: isActive ? c.accentText : c.textMuted }}
                 aria-current={isActive ? 'true' : undefined}
               >
                 {label}
@@ -606,6 +605,7 @@ export default function Home() {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`${link.label} — opens in a new tab`}
               className="text-[9px] font-mono uppercase tracking-[0.25em] hover:text-[#ff4d00] transition-colors duration-200"
               style={{ color: c.textMuted }}
               onClick={() => setMenuOpen(false)}
@@ -735,7 +735,8 @@ export default function Home() {
           <a
             href="mailto:thegarvmalik@gmail.com"
             data-cursor-hover
-            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#ff4d00] text-[#ff4d00] text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-[#ff4d00] hover:text-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-[#ff4d00] hover:text-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+            style={{ borderColor: c.accentText, color: c.accentText }}
             aria-label="Send email to Garv Malik"
           >
             Hire me →
@@ -1080,7 +1081,7 @@ export default function Home() {
             { label: 'Wearing',   value: "YSL Y" },
           ].map(({ label, value }) => (
             <div key={label} className="now-item opacity-0">
-              <dt className="text-[9px] text-[#ff4d00] uppercase tracking-[0.3em] mb-3">{label}</dt>
+              <dt className="text-[9px] uppercase tracking-[0.3em] mb-3" style={{ color: c.accentText }}>{label}</dt>
               <dd className="text-sm leading-relaxed whitespace-pre-line" style={{ color: c.textMuted }}>{value}</dd>
             </div>
           ))}
@@ -1093,7 +1094,7 @@ export default function Home() {
         <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none" style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)' }} aria-hidden="true">+</div>
         <div className="footer-email opacity-0 mt-20 mb-10">
           {/* Issue 6 fix: label bumped from text-[9px] → text-[11px] for light mode readability */}
-          <p className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#ff4d00] mb-6 font-bold">Open to UX/UI internships in Finland and Europe.</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.25em] mb-6 font-bold" style={{ color: c.accentText }}>Open to UX/UI internships in Finland and Europe.</p>
           <a href="mailto:thegarvmalik@gmail.com" data-cursor-hover aria-label="Send email to thegarvmalik@gmail.com" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1">
             <HoverWaveText text="THEGARVMALIK@GMAIL.COM" color={c.text} />
           </a>
@@ -1124,7 +1125,7 @@ export default function Home() {
               CV ↓
             </a>
           </nav>
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textFaint }}>© 2026 Garv Malik</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textMuted }}>© 2026 Garv Malik</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 border-t py-1" style={{ borderColor: c.border }} aria-hidden="true">
           <Marquee items={['Open to Work', 'UX/UI Internships', 'Finland & Europe', 'Interaction Design', 'Research-Led', 'Tampere, Finland']} speed={30} textColor={c.textFaint} />

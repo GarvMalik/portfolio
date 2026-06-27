@@ -4,10 +4,13 @@
  * used across all three project detail pages.
  *
  * WCAG 2.1 AA contrast ratios (verified):
- *  dark  text #e6e2d3 / bg #050505  = 13.5:1 AAA ✓
- *  dark  muted #a09c8f / bg #050505 = 4.9:1  AA  ✓
- *  light text #0d0c0a / bg #f5f2ec  = 14.0:1 AAA ✓
- *  light muted #4a4742 / bg #f5f2ec = 7.2:1  AA  ✓
+ *  dark  text #e6e2d3 / bg #050505       = 15.71:1 AAA ✓
+ *  dark  muted #a09c8f / bg #050505      =  7.42:1 AA  ✓
+ *  dark  accentText #ff4d00 / #050505    =  6.13:1 AA  ✓
+ *  light text #0d0c0a / bg #f5f2ec       = 17.50:1 AAA ✓
+ *  light muted #4a4742 / bg #f5f2ec      =  8.28:1 AA  ✓
+ *  light accentText #c03000 / #f5f2ec    =  5.19:1 AA  ✓
+ *  NOTE: decorative #ff4d00 on light bg = 2.98:1 — only used with aria-hidden
  */
 
 import { useEffect, useState, useCallback } from 'react'
@@ -44,6 +47,8 @@ export const T = {
     textMuted:   '#a09c8f',
     textFaint:   '#6b6760',
     accent:      '#ff4d00',
+    // accentText: accessible orange for visible text — same as accent in dark (6.13:1)
+    accentText:  '#ff4d00',
     accentGreen: '#42d392',
     border:      'rgba(255,255,255,0.07)',
     borderHover: 'rgba(255,77,0,0.40)',
@@ -61,6 +66,9 @@ export const T = {
     textMuted:   '#4a4742',
     textFaint:   '#8a8680',
     accent:      '#ff4d00',
+    // accentText: darker orange for visible text on light bg — 5.19:1 (WCAG AA ✓)
+    // #ff4d00 on #f5f2ec is only 2.98:1 so we use #c03000 for text labels
+    accentText:  '#c03000',
     accentGreen: '#1a7a4a',
     border:      'rgba(0,0,0,0.10)',
     borderHover: 'rgba(255,77,0,0.50)',
@@ -220,6 +228,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`${link.label} — opens in a new tab`}
               onClick={() => setMenuOpen(false)}
               className="text-[9px] font-mono uppercase tracking-[0.25em] hover:text-[#ff4d00] transition-colors duration-200"
               style={{ color: c.textMuted }}
