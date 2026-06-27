@@ -475,6 +475,7 @@ export default function TalosCare() {
 
         <ProjectNav
           prev={{ label: 'Noise Study', href: '/projects/noise-experiment' }}
+          next={{ label: 'EEG ADHD Thesis', href: '/projects/eeg-adhd' }}
           c={c}
         />
       </div>

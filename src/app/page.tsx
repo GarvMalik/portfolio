@@ -175,6 +175,20 @@ const DESKTOP_ILLUSTRATIONS: Record<number, React.ReactNode> = {
       })}
     </svg>
   ),
+  5: ( // EEG ADHD — brainwave / neural
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.55 }}>
+      {[0,1,2,3,4,5,6,7,8].map(col => <line key={`bv${col}`} x1={col * 180} y1="0" x2={col * 180} y2="900" stroke="#4c1d95" strokeWidth="0.6" opacity="0.4" />)}
+      {[0,1,2,3,4,5,6,7,8,9].map(row => <line key={`bh${row}`} x1="0" y1={row * 100} x2="1440" y2={row * 100} stroke="#7c3aed" strokeWidth="0.6" opacity="0.25" />)}
+      {/* EEG waveform — main */}
+      <polyline points="580,450 650,450 700,450 740,290 780,610 818,340 855,475 900,450 960,450 1020,450 1068,450 1108,295 1148,605 1186,338 1222,468 1270,450 1340,450" stroke="#8B5CF6" strokeWidth="3.5" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.9" />
+      {/* Secondary quieter wave */}
+      <polyline points="580,250 650,250 700,250 736,218 765,282 793,234 820,254 860,250 960,250 1020,250 1068,250 1104,222 1134,278 1162,232 1190,254 1270,250 1340,250" stroke="#6d28d9" strokeWidth="1.8" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.5" />
+      {/* Third wave */}
+      <polyline points="580,650 650,650 700,650 736,620 762,680 788,636 814,656 860,650 960,650 1020,650 1068,650 1104,620 1130,680 1156,634 1182,654 1270,650 1340,650" stroke="#7c3aed" strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.45" />
+      {/* Accuracy badge dot */}
+      <circle cx="780" cy="610" r="8" fill="#10B981" opacity="0.9" />
+    </svg>
+  ),
   4: ( // Talos — ECG
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: 0.55 }}>
       {[0,1,2,3,4,5,6,7,8].map(col => <line key={`tv${col}`} x1={col * 180} y1="0" x2={col * 180} y2="900" stroke="#386641" strokeWidth="0.6" opacity="0.35" />)}
@@ -500,6 +514,15 @@ export default function Home() {
       accentColor: '#5B9B43',   // Talos sage green
       pageNum: 'P. 008', showLabel: false, href: '/projects/talos',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #061208 0%, #030805 40%, transparent 70%), radial-gradient(ellipse at 72% 28%, #081a0a 0%, transparent 60%)',
+      videoSrc: '',
+    },
+    {
+      title: 'EEG ADHD Thesis',
+      desc: 'Can a machine read a child\'s brainwaves and detect ADHD? A full ML pipeline on 19-channel EEG from 121 children — CNN reached 98.53% accuracy. B.Tech final thesis.',
+      tags: ['Machine Learning', 'CNN', 'EEG Signal Processing', 'Python', 'Research'],
+      accentColor: '#8B5CF6',   // violet — neuro/brain
+      pageNum: 'P. 009', showLabel: false, href: '/projects/eeg-adhd',
+      bgGradient: 'radial-gradient(ellipse at 22% 60%, #0d0818 0%, #060410 40%, transparent 70%), radial-gradient(ellipse at 75% 28%, #10082a 0%, transparent 60%)',
       videoSrc: '',
     },
   ]
@@ -1023,6 +1046,18 @@ export default function Home() {
                   <rect x="175" y="480" width="40" height="12" fill="#5B9B43" opacity="0.6" rx="2" />
                   <rect x="189" y="466" width="12" height="40" fill="#5B9B43" opacity="0.6" rx="2" />
                   <circle cx="195" cy="350" r="6" fill="#A7C957" opacity="0.9" />
+                </svg>
+              )}
+
+              {i === 5 && (
+                // EEG ADHD — brainwave pattern — no SVG filters
+                <svg className="absolute inset-0 w-full h-full pointer-events-none project-svg-illustration" viewBox="0 0 390 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: theme === 'dark' ? 0.65 : 0.55 }}>
+                  {[0,1,2,3,4,5,6].map(col => <line key={`ev${col}`} x1={col * 65} y1="0" x2={col * 65} y2="700" stroke="#4c1d95" strokeWidth="0.6" opacity="0.4" />)}
+                  {[0,1,2,3,4,5,6,7,8,9,10].map(row => <line key={`eh${row}`} x1="0" y1={row * 70} x2="390" y2={row * 70} stroke="#7c3aed" strokeWidth="0.6" opacity="0.25" />)}
+                  <polyline points="20,350 60,350 90,350 118,250 148,460 174,300 198,365 230,350 270,350 300,350 320,350 344,252 364,462 384,350" stroke="#8B5CF6" strokeWidth="3.5" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.9" />
+                  <polyline points="20,200 60,200 90,200 116,178 138,222 158,188 178,204 210,200 270,200 300,200 320,200 340,180 360,220 380,200" stroke="#6d28d9" strokeWidth="1.8" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.5" />
+                  <polyline points="20,510 60,510 90,510 114,490 136,530 158,496 178,514 210,510 270,510 300,510 320,510 340,492 360,528 380,510" stroke="#7c3aed" strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.45" />
+                  <circle cx="148" cy="460" r="7" fill="#10B981" opacity="0.9" />
                 </svg>
               )}
 
