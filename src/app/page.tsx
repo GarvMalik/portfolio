@@ -354,10 +354,15 @@ export default function Home() {
       return
     }
 
-    // ── Hero entrance — same on all devices ──
-    gsap.fromTo('.layered-top',    { yPercent: 105 }, { yPercent: 0, duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3 })
-    gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: 0.3 })
-    gsap.fromTo('.intro-label',    { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, delay: 1.2, ease: 'power2.out' })
+    // ── Hero entrance — delayed on first visit to sync with the loader ──
+    // Loader: 3s count + 0.2s hold + 0.5s fade = 3.7s. Hero starts at 3.2s
+    // (same moment the overlay begins fading) so text slides in AS it reveals.
+    const firstVisit = !sessionStorage.getItem('portfolioLoaderSeen')
+    const hd = firstVisit ? 3.2 : 0.3   // hero delay
+    const ld = firstVisit ? 4.1 : 1.2   // label delay
+    gsap.fromTo('.layered-top',    { yPercent: 105 }, { yPercent: 0, duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: hd })
+    gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: hd })
+    gsap.fromTo('.intro-label',    { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, delay: ld, ease: 'power2.out' })
 
     if (!isMobile) {
       // ── DESKTOP: full scrub parallax + pinning ──
