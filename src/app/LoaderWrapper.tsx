@@ -6,6 +6,7 @@ export default function LoaderWrapper() {
   const wrapRef = useRef<HTMLDivElement>(null)
   const unitRef = useRef<HTMLDivElement>(null)
   const numRef  = useRef<HTMLSpanElement>(null)
+  const barRef  = useRef<HTMLDivElement>(null)
   const [gone, setGone] = useState(false)
 
   // Skip immediately on return visits (before paint — no flash)
@@ -31,12 +32,24 @@ export default function LoaderWrapper() {
       ease: 'none',
       onUpdate() {
         if (numRef.current)  numRef.current.textContent = Math.round(obj.pct) + '%'
-        // Anchor point (left edge of zero-width div) tracks pct% of viewport
         if (unitRef.current) unitRef.current.style.left  = obj.pct + '%'
+        // Bar shrinks from 8px → 0 as progress goes 75% → 100%
+        if (barRef.current) {
+          const h = obj.pct < 75 ? 8 : Math.max(0, 8 * (1 - (obj.pct - 75) / 25))
+          barRef.current.style.height = h + 'px'
+          barRef.current.style.top    = (-h / 2) + 'px'
+        }
       },
     })
 
-    // Phase 2 — brief hold, then fade the black overlay away
+    // Phase 2 — bar/indicator vanishes at 100%
+    .to(unitRef.current, {
+      opacity: 0,
+      duration: 0.25,
+      ease: 'power2.in',
+    }, '+=0')
+
+    // Phase 3 — brief hold, then fade the black overlay away
     .to(wrapRef.current, {
       opacity: 0,
       duration: 0.5,
@@ -45,7 +58,7 @@ export default function LoaderWrapper() {
         sessionStorage.setItem('portfolioLoaderSeen', '1')
         setGone(true)
       },
-    }, '+=0.2')
+    }, '+=0.15')
 
     return () => { tl.kill() }
   }, [gone])
@@ -114,12 +127,12 @@ export default function LoaderWrapper() {
         }} />
 
         {/* Comet bar — 240 px wide, trails LEFT behind the anchor */}
-        <div style={{
+        <div ref={barRef} style={{
           position: 'absolute',
-          top: 0,
+          top: '-4px',
           left: '-240px',  /* bar starts 240 px to the left of anchor */
           right: '3px',    /* right tip sits 3 px right of anchor */
-          height: '2px',
+          height: '8px',
           background: 'linear-gradient(to right, transparent 0%, rgba(255,77,0,0.10) 15%, rgba(255,77,0,0.50) 55%, rgba(255,100,40,0.92) 80%, #ffffff 100%)',
           boxShadow: '0 0 6px rgba(255,77,0,0.45), 0 0 18px rgba(255,77,0,0.18)',
         }} />

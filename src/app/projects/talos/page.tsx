@@ -147,6 +147,91 @@ export default function TalosCare() {
         ))}
       </section>
 
+      {/* ── LIVE APP BANNER ── */}
+      <div
+        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 px-6 md:px-16 py-7 border-b ${tr}`}
+        style={{ borderColor: c.border, background: theme === 'dark' ? 'rgba(56,102,65,0.07)' : 'rgba(56,102,65,0.04)' }}
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-[8px] uppercase font-mono tracking-[0.3em] mb-2" style={{ color: brand.secondary }}>
+            Live Deployment · GitHub Pages
+          </p>
+          <p className="font-mono text-xs leading-relaxed max-w-lg" style={{ color: c.textMuted }}>
+            The app is hosted and fully navigable. The AI screening chat requires a{' '}
+            <span style={{ color: c.text }}>Groq API key</span> — not embedded for security reasons.
+            To try it: paste your key in the app's Settings, or{' '}
+            <a
+              href="mailto:thegarvmalik@gmail.com"
+              className="underline hover:opacity-70 transition-opacity"
+              style={{ color: brand.secondary }}
+            >
+              contact Garv
+            </a>{' '}
+            for a live walkthrough.
+          </p>
+        </div>
+        <a
+          href="https://garvmalik.github.io/talos-app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-shrink-0 font-mono text-xs uppercase tracking-[0.18em] px-5 py-2.5 border transition-colors hover:opacity-70"
+          style={{ borderColor: brand.secondary, color: brand.secondary }}
+        >
+          Open Live App ↗
+        </a>
+      </div>
+
+      {/* ── APP SCREENSHOTS ── */}
+      <div className={`border-b ${tr}`} style={{ borderColor: c.border }}>
+        <div className="px-6 md:px-16 pt-12 pb-14">
+          <p className="text-[8px] uppercase font-mono tracking-[0.3em] mb-1" style={{ color: brand.secondary }}>
+            App Screens
+          </p>
+          <p className="font-mono text-[10px] mb-8" style={{ color: c.textFaint }}>
+            Real screens from the deployed application — scroll to explore
+          </p>
+
+          {/* Horizontal scroll strip */}
+          <div
+            className="flex gap-4 overflow-x-auto pb-2"
+            style={{ scrollSnapType: 'x mandatory', msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+          >
+            {[
+              { file: 'home.png',              label: 'Home' },
+              { file: 'chat-welcome.png',      label: 'Chat — Start' },
+              { file: 'chat-typing.png',       label: 'Chat — Input' },
+              { file: 'voice-thinking.png',    label: 'Voice — Thinking' },
+              { file: 'voice-listening.png',   label: 'Voice — Listening' },
+              { file: 'chat-conversation.png', label: 'Mid Session' },
+              { file: 'chat-summary.png',      label: 'Review Summary' },
+              { file: 'emergency.png',         label: 'Emergency' },
+              { file: 'settings.png',          label: 'Settings' },
+              { file: 'past-summaries.png',    label: 'Past Summaries' },
+            ].map(screen => (
+              <div key={screen.file} className="flex-shrink-0 flex flex-col gap-2.5" style={{ scrollSnapAlign: 'start' }}>
+                <div
+                  className="overflow-hidden border"
+                  style={{ width: 175, height: 380, borderColor: c.border }}
+                >
+                  <img
+                    src={`/talos/${screen.file}`}
+                    alt={screen.label}
+                    loading="lazy"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+                  />
+                </div>
+                <p
+                  className="font-mono uppercase"
+                  style={{ fontSize: '8px', letterSpacing: '0.12em', color: c.textFaint, width: 175 }}
+                >
+                  {screen.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="px-6 md:px-16 py-20 max-w-7xl mx-auto space-y-28">
 
         {/* ── THE PROBLEM ── */}
