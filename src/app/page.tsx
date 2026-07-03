@@ -260,9 +260,6 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
 /* ── Main page ───────────────────────────────────────────────────────────── */
 export default function Home() {
   const container = useRef<HTMLDivElement>(null)
-  const cursorDot = useRef<HTMLDivElement>(null)
-  const cursorRing = useRef<HTMLDivElement>(null)
-  const [cursorVisible, setCursorVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   // Set isMobile after mount (useEffect is client-only — safe for SSR/hydration)
   // Also handles orientation changes
@@ -323,35 +320,6 @@ export default function Home() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
-
-  // Custom cursor — desktop, not reduced-motion
-  useEffect(() => {
-    if (reduced) return
-    const onMove = (e: MouseEvent) => {
-      if (!cursorVisible) setCursorVisible(true)
-      gsap.to(cursorDot.current, { x: e.clientX, y: e.clientY, duration: 0 })
-      gsap.to(cursorRing.current, { x: e.clientX, y: e.clientY, duration: 0.12, ease: 'power3.out' })
-    }
-    const onEnter = () => { gsap.to(cursorRing.current, { scale: 2.5, duration: 0.2 }); gsap.to(cursorDot.current, { scale: 0, duration: 0.2 }) }
-    const onLeave = () => { gsap.to(cursorRing.current, { scale: 1, duration: 0.2 }); gsap.to(cursorDot.current, { scale: 1, duration: 0.2 }) }
-
-    // Fix: capture the NodeList as an array so we can remove the same
-    // listeners on cleanup — prevents memory leak on remount.
-    const hoverTargets = Array.from(document.querySelectorAll('a, button, [data-cursor-hover]'))
-
-    window.addEventListener('mousemove', onMove)
-    hoverTargets.forEach(el => {
-      el.addEventListener('mouseenter', onEnter)
-      el.addEventListener('mouseleave', onLeave)
-    })
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      hoverTargets.forEach(el => {
-        el.removeEventListener('mouseenter', onEnter)
-        el.removeEventListener('mouseleave', onLeave)
-      })
-    }
-  }, [cursorVisible, reduced])
 
   // Lightweight CSS parallax for hero on mobile — rAF-throttled to prevent layout thrash on Safari
   useEffect(() => {
@@ -533,15 +501,6 @@ export default function Home() {
       <a href="#main-content" className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[99999] focus-visible:px-4 focus-visible:py-2 focus-visible:bg-[#ff4d00] focus-visible:text-black focus-visible:font-mono focus-visible:text-sm focus-visible:uppercase focus-visible:tracking-widest focus-visible:rounded">
         Skip to main content
       </a>
-
-      {/* Hide system cursor only on desktop when not reduced */}
-      {!reduced && <style>{`@media (min-width: 768px) { body { cursor: none; } }`}</style>}
-
-      {/* Grain removed — fixed SVG filter overlay caused constant repaints on every scroll frame */}
-
-      {/* Custom cursor — desktop, decorative */}
-      <div ref={cursorDot}  className="fixed top-0 left-0 w-1.5 h-1.5 bg-[#ff4d00] rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 hidden md:block" style={{ opacity: cursorVisible ? 1 : 0 }} aria-hidden="true" />
-      <div ref={cursorRing} className="fixed top-0 left-0 w-8 h-8 border border-[#ff4d00] rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 hidden md:block" style={{ opacity: cursorVisible ? 1 : 0 }} aria-hidden="true" />
 
       <ThemeToggle theme={theme} toggle={toggle} bg={c.toggleBg} fg={c.toggleFg} />
 
@@ -729,30 +688,61 @@ export default function Home() {
      {/* ── HERO ── */}
       <section id="main-content" className="hero-section relative h-screen flex flex-col justify-end pb-[12vh] md:justify-center md:pb-0 px-6 md:px-16 overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg }} aria-label="Hero Garv Malik, UX UI Designer">
         
-        {/* Hero background — pure SVG, zero filters. feTurbulence/feDisplacementMap crash Safari. */}
+        {/* Hero background — concentric arcs + SVG gradients. No filters (Safari-safe). */}
         <svg
-          className="absolute inset-0 w-full h-full z-0 pointer-events-none"
-          style={{ opacity: theme === 'dark' ? 0.48 : 0.32 }}
+          className="hero-bg absolute inset-0 w-full h-full z-0 pointer-events-none"
+          style={{ opacity: theme === 'dark' ? 0.75 : 0.50 }}
           viewBox="0 0 1440 900"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMidYMid slice"
           aria-hidden="true"
         >
-          {/* Horizontal grid lines */}
-          {Array.from({ length: 52 }).map((_, i) => (
-            <line key={`h-${i}`} x1="-60" y1={i * 18} x2="1500" y2={i * 18}
-              stroke={theme === 'dark' ? 'rgba(180,200,220,0.11)' : 'rgba(30,60,100,0.08)'}
-              strokeWidth="0.8" />
+          <defs>
+            {/* Warm radial glow from bottom-left — gradient, not filter */}
+            <radialGradient id="cornerGlow" cx="0" cy="900" r="1300" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#ff4d00" stopOpacity={theme === 'dark' ? '0.22' : '0.14'} />
+              <stop offset="45%"  stopColor="#ff4d00" stopOpacity={theme === 'dark' ? '0.06' : '0.03'} />
+              <stop offset="100%" stopColor="#ff4d00" stopOpacity="0" />
+            </radialGradient>
+            {/* Cool violet accent top-right */}
+            <radialGradient id="topGlow" cx="1440" cy="0" r="820" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#8B5CF6" stopOpacity={theme === 'dark' ? '0.10' : '0.06'} />
+              <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+
+          {/* Gradient glow layers */}
+          <rect width="1440" height="900" fill="url(#cornerGlow)" />
+          <rect width="1440" height="900" fill="url(#topGlow)" />
+
+          {/* Concentric arcs radiating from bottom-left corner */}
+          {[300, 500, 700, 900, 1100, 1300, 1500, 1700, 1920].map((r, i) => (
+            <circle key={`arc-${i}`} cx="-60" cy="960" r={r} fill="none"
+              stroke={theme === 'dark' ? 'rgba(180,200,220,0.10)' : 'rgba(30,60,100,0.08)'}
+              strokeWidth={i === 3 || i === 6 ? 1.4 : 0.7}
+            />
           ))}
-          {/* Accent lines */}
-          {[54, 108, 198, 270, 360, 450, 522, 612, 684, 774, 846].map((y, i) => (
-            <line key={`a-${i}`} x1="-60" y1={y} x2="1500" y2={y}
-              stroke={theme === 'dark' ? 'rgba(255,77,0,0.18)' : 'rgba(255,77,0,0.12)'}
-              strokeWidth="1.2" />
+          {/* Orange accent arcs — every other ring */}
+          {[600, 1100, 1600].map((r, i) => (
+            <circle key={`oa-${i}`} cx="-60" cy="960" r={r} fill="none"
+              stroke={theme === 'dark' ? 'rgba(255,77,0,0.16)' : 'rgba(255,77,0,0.11)'}
+              strokeWidth="1.0"
+            />
           ))}
-          {/* Diagonal accent — bottom-left to top-right */}
-          <line x1="0" y1="900" x2="600" y2="0" stroke={theme === 'dark' ? 'rgba(255,77,0,0.10)' : 'rgba(255,77,0,0.07)'} strokeWidth="1" />
-          <line x1="400" y1="900" x2="1000" y2="0" stroke={theme === 'dark' ? 'rgba(255,77,0,0.06)' : 'rgba(255,77,0,0.04)'} strokeWidth="1" />
+
+          {/* Subtle verticals for rhythm */}
+          {[480, 960, 1200].map((x, i) => (
+            <line key={`v-${i}`} x1={x} y1="0" x2={x} y2="900"
+              stroke={theme === 'dark' ? 'rgba(180,200,220,0.05)' : 'rgba(30,60,100,0.04)'}
+              strokeWidth="0.7"
+            />
+          ))}
+
+          {/* Horizon accent line */}
+          <line x1="0" y1="520" x2="1440" y2="520"
+            stroke={theme === 'dark' ? 'rgba(255,77,0,0.09)' : 'rgba(255,77,0,0.06)'}
+            strokeWidth="0.9"
+          />
         </svg>
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />

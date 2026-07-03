@@ -95,3 +95,13 @@ html {
 .animate-ping {
   animation: ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
+
+/* Hero background — slow breathing scale from the arc origin (bottom-left corner) */
+@keyframes heroBreathe {
+  0%, 100% { transform: scale(1);    }
+  50%       { transform: scale(1.07); }
+}
+.hero-bg {
+  animation: heroBreathe 22s ease-in-out infinite;
+  transform-origin: 0% 100%;
+}
