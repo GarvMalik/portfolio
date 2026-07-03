@@ -749,14 +749,6 @@ export default function Home() {
         <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Home / P. 001</div>
         <h1 className="sr-only">Garv Malik — UX/UI Designer specialising in research-led, accessible digital products. Based in Tampere, Finland.</h1>
 
-        {/* Available badge — top right on desktop, below nav label on mobile */}
-        <div className="intro-label opacity-0 absolute top-[4.5rem] right-6 md:right-16 flex items-center gap-2 z-10" aria-label="Currently available for internships">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75" aria-hidden="true" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22c55e]" aria-hidden="true" />
-          </span>
-          <span className="text-[9px] font-mono uppercase tracking-[0.25em]" style={{ color: c.textMuted }}>Available · Summer 2026</span>
-        </div>
 
         {/* Stacked name */}
         <div className="hero-name-wrap flex flex-col items-start gap-0 relative z-10 w-full" aria-hidden="true">
