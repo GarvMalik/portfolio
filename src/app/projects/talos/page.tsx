@@ -125,10 +125,34 @@ export default function TalosCare() {
         >
           A multimodal conversational AI that helps patients disclose sensitive health information before a doctor's appointment — without the fear of human judgment.
         </p>
-        <div className="project-fade-in flex flex-wrap gap-2 relative z-10">
+        <div className="project-fade-in flex flex-wrap gap-2 mb-8 relative z-10">
           {['Conversational UX', 'Voice Design', 'AI Integration', 'Accessibility', 'Figma', 'JavaScript'].map(tag => (
             <Tag key={tag} label={tag} c={c} />
           ))}
+        </div>
+
+        {/* Live app CTA */}
+        <div className="project-fade-in flex flex-wrap gap-3 relative z-10">
+          <a
+            href="https://garvmalik.github.io/talos-app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-5 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
+            style={{ background: brand.primary, color: '#fff' }}
+            aria-label="Open Talos Care live app"
+          >
+            View Live App ↗
+          </a>
+          <a
+            href="https://github.com/GarvMalik/talos-app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#5B9B43] hover:text-[#5B9B43] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
+            style={{ borderColor: c.border, color: c.textMuted }}
+            aria-label="View source code on GitHub"
+          >
+            GitHub →
+          </a>
         </div>
       </section>
 
@@ -365,9 +389,104 @@ export default function TalosCare() {
                 step: '05 — Voice UX & Error Handling',
                 body: 'Implemented the Web Speech API with custom pitch-shifting logic for three distinct voice personas. Designed multimodal fallback: if speech recognition confidence dropped below 60%, the system automatically switched to on-screen buttons, preventing dead ends.',
               },
+              {
+                step: '06 — The Handoff Redesign',
+                body: 'The original plan emailed the summary to the doctor — until we asked one question: does any patient actually know their doctor\'s email address? Nobody does. We replaced the entire flow with a QR code: the summary is compressed into a link the doctor scans at the appointment, opening a clinical document on their own device. More realistic, and more private — the data never touches a server.',
+              },
             ].map(p => (
               <ProcessStep key={p.step} step={p.step} body={p.body} c={c} accentBorder={brand.primary} />
             ))}
+          </div>
+        </div>
+
+        {/* ── CONVERSATION DEMO ── */}
+        <div className="section-block">
+          <SectionHeading num="03.5" title="Sample Dialogue" c={c} />
+          <p className="font-mono text-sm leading-relaxed max-w-2xl mb-8" style={{ color: c.textMuted }}>
+            A real exchange from the anxiety pre-screening flow. Notice the agent never forces a yes/no — it always offers an escape hatch.
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Scenario 1 */}
+            <div className="border rounded-sm overflow-hidden" style={{ borderColor: c.border }}>
+              <div className="px-4 py-2 border-b flex items-center gap-2" style={{ borderColor: c.border, background: c.cardBg }}>
+                <div className="w-2 h-2 rounded-full" style={{ background: brand.primary }} />
+                <span className="font-mono text-[9px] uppercase tracking-[0.25em]" style={{ color: brand.secondary }}>
+                  Scenario 1 — Low Energy Screening
+                </span>
+              </div>
+              <div className="p-4 space-y-3">
+                {[
+                  { role: 'agent',  text: 'Have you felt significantly lower energy than usual in the past two weeks?' },
+                  { role: 'user',   text: 'I guess… maybe? I don\'t know if it\'s medical.' },
+                  { role: 'agent',  text: 'It can be hard to tell. Would you like to select "Unsure", or describe how it affects your daily routine?' },
+                  { role: 'user',   text: 'I\'ve just been sleeping more than usual.' },
+                  { role: 'agent',  text: 'I\'ve noted that. Thank you — that\'s helpful context for your doctor.' },
+                ].map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className="max-w-[80%] px-3 py-2 rounded-sm font-mono text-xs leading-relaxed"
+                      style={{
+                        background: msg.role === 'agent' ? `${brand.primary}18` : c.cardBg,
+                        color: c.textMuted,
+                        border: `1px solid ${msg.role === 'agent' ? brand.primary + '40' : c.border}`,
+                      }}
+                    >
+                      <span className="text-[8px] uppercase tracking-widest block mb-1"
+                        style={{ color: msg.role === 'agent' ? brand.secondary : c.textFaint }}>
+                        {msg.role === 'agent' ? 'Talos' : 'Patient'}
+                      </span>
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scenario 2 */}
+            <div className="border rounded-sm overflow-hidden" style={{ borderColor: c.border }}>
+              <div className="px-4 py-2 border-b flex items-center gap-2" style={{ borderColor: c.border, background: c.cardBg }}>
+                <div className="w-2 h-2 rounded-full" style={{ background: brand.secondary }} />
+                <span className="font-mono text-[9px] uppercase tracking-[0.25em]" style={{ color: brand.secondary }}>
+                  Scenario 2 — Mood & Social Withdrawal
+                </span>
+              </div>
+              <div className="p-4 space-y-3">
+                {[
+                  { role: 'agent', text: 'I need to ask a few questions about how your mood has been recently. You can skip any question if you prefer.' },
+                  { role: 'user',  text: 'Okay.' },
+                  { role: 'agent', text: 'Have you been avoiding social situations or daily activities more than usual?' },
+                  { role: 'user',  text: 'Maybe… I just feel tired all the time.' },
+                  { role: 'agent', text: 'That is okay. Would you like to describe what has felt difficult lately, or select "Unsure"?' },
+                  { role: 'user',  text: 'I think talking to people feels exhausting.' },
+                  { role: 'agent', text: 'I\'ve noted that. Your doctor will have this context before your appointment.' },
+                ].map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className="max-w-[80%] px-3 py-2 rounded-sm font-mono text-xs leading-relaxed"
+                      style={{
+                        background: msg.role === 'agent' ? `${brand.primary}18` : c.cardBg,
+                        color: c.textMuted,
+                        border: `1px solid ${msg.role === 'agent' ? brand.primary + '40' : c.border}`,
+                      }}
+                    >
+                      <span className="text-[8px] uppercase tracking-widest block mb-1"
+                        style={{ color: msg.role === 'agent' ? brand.secondary : c.textFaint }}>
+                        {msg.role === 'agent' ? 'Talos' : 'Patient'}
+                      </span>
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Design note */}
+          <div className="mt-6 border-l-2 pl-4 py-1" style={{ borderColor: brand.tertiary }}>
+            <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>
+              <span className="font-bold" style={{ color: brand.tertiary }}>Design note — </span>
+              The agent never says "I'm sorry you're going through this." It says "I've noted that." Clinical validation over performed empathy. CHI 2024 research showed the neutral bot was consistently rated more trustworthy.
+            </p>
           </div>
         </div>
 
@@ -421,8 +540,8 @@ export default function TalosCare() {
                 desc: 'Before any session ends, the AI is forced to produce a structured summary and ask for the patient\'s final confirmation. Nothing gets submitted without explicit patient approval.',
               },
               {
-                feature: 'Zero-Backend Privacy Architecture',
-                desc: 'The entire session runs locally in the browser. jsPDF generates the clinical document on-device. EmailJS routes it directly to the doctor. Patient data never touches a central server.',
+                feature: 'QR Clinical Handoff',
+                desc: 'The summary is compressed into the URL fragment of a shareable link — the doctor scans a QR code and a clinical document opens on their own device. Fragments never reach a server, so patient data never leaves the patient\'s control.',
               },
             ].map((f, i) => (
               <Card key={i} c={c} accentBorder={brand.primary}>
@@ -456,12 +575,12 @@ export default function TalosCare() {
               {
                 layer: 'Privacy Layer',
                 value: 'localStorage + jsPDF',
-                detail: 'All session data stays on-device. Clinical PDF generated in-browser. No backend database.',
+                detail: 'All session data stays on-device with enforced 30-day auto-deletion. Clinical PDF generated in-browser. No backend database.',
               },
               {
                 layer: 'Clinical Handoff',
-                value: 'EmailJS',
-                detail: 'Automated doctor email triggered on patient "Submit". PDF attached. Zero server infrastructure.',
+                value: 'QR + Web Share + lz-string',
+                detail: 'Summary compressed into a URL fragment — fragments never touch a server. The doctor scans a QR and gets a print-ready clinical document instantly.',
               },
               {
                 layer: 'Design',
@@ -487,9 +606,11 @@ export default function TalosCare() {
               <div className="space-y-2">
                 {[
                   'System architecture — zero-backend privacy model',
+                  'QR clinical handoff design (lz-string URL encoding)',
                   'Groq API integration and JSON-mode prompt engineering',
                   'Constraining LLM to clinical-safe behaviour (no diagnosis)',
                   'Multimodal voice state machine (orb, silence detection)',
+                  'UI localization across 10 languages, synced with Whisper + LLM',
                   'Error handling for API rate limits with animated fallback UI',
                   'GitHub deployment pipeline and live app delivery',
                   'Figma component library for interaction states',
@@ -542,12 +663,85 @@ export default function TalosCare() {
           </div>
         </div>
 
+        {/* ── ROADMAP ── */}
+        <div className="section-block">
+          <SectionHeading num="08" title="What's Next" c={c} />
+          <p className="font-mono text-sm leading-relaxed max-w-2xl mb-8" style={{ color: c.textMuted }}>
+            The app is live and functional. These are the concrete next milestones planned for the clinical handoff phase.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {
+                phase: 'Platform',
+                label: 'Progressive Web App',
+                detail: 'Service worker + manifest so patients can install Talos directly to their phone home screen. Offline caching keeps the UI functional without internet.',
+                status: 'Shipped',
+              },
+              {
+                phase: 'Platform',
+                label: 'Multilingual Support',
+                detail: 'Expanded from 3 to 10 languages. Whisper voice transcription, LLM responses, and the full UI all sync to the selected language.',
+                status: 'Shipped',
+              },
+              {
+                phase: 'Clinical',
+                label: 'Pre-Screening Intake Form',
+                detail: 'A dedicated optional form before the chat collects age, medications, and allergies. Frees the AI to focus purely on symptom screening.',
+                status: 'Shipped',
+              },
+              {
+                phase: 'Clinical',
+                label: 'QR Clinical Handoff',
+                detail: 'The summary travels inside a QR code / shareable link as a compressed URL fragment — the doctor scans it and a clinical document opens on their device. Replaced the original email plan: patients don\'t know their doctor\'s email.',
+                status: 'Shipped',
+              },
+              {
+                phase: 'Resilience',
+                label: 'Rate-Limit Error Handling',
+                detail: 'HTTP 429 responses trigger an animated banner with a live countdown timer and auto-retry logic — the user never hits a dead end due to API throttling.',
+                status: 'Shipped',
+              },
+              {
+                phase: 'Evaluation',
+                label: 'A/B Usability Study',
+                detail: 'Comparative test between Talos and a standard digital intake form, measuring "Ease of Disclosure" scores with real volunteers.',
+                status: 'Planned',
+              },
+            ].map((item) => (
+              <div key={item.label} className="border p-5 flex gap-4 transition-colors duration-300" style={{ borderColor: c.border, background: c.cardBg }}>
+                <div className="flex-shrink-0 mt-0.5">
+                  <div
+                    className="w-2 h-2 rounded-full mt-1"
+                    style={{ background: item.status === 'Shipped' ? brand.secondary : item.status === 'In progress' ? brand.tertiary : c.border }}
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-[8px] uppercase font-mono tracking-widest" style={{ color: brand.secondary }}>{item.phase}</p>
+                    {item.status !== 'Planned' && (
+                      <span className="text-[7px] uppercase font-mono tracking-widest px-1.5 py-0.5 rounded-sm"
+                        style={{
+                          background: (item.status === 'Shipped' ? brand.secondary : brand.tertiary) + '22',
+                          color: item.status === 'Shipped' ? brand.secondary : brand.tertiary,
+                        }}>
+                        {item.status}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-mono text-xs font-bold mb-1" style={{ color: c.text }}>{item.label}</p>
+                  <p className="font-mono text-xs leading-relaxed" style={{ color: c.textMuted }}>{item.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── REFLECTION ── */}
         <div className="section-block border-t pt-14" style={{ borderColor: c.border }}>
-          <SectionHeading num="08" title="Reflection" c={c} />
+          <SectionHeading num="09" title="Reflection" c={c} />
           <div className="max-w-2xl space-y-4">
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              Talos Care sits at the intersection of conversational UX, clinical ethics, and real AI implementation. Most portfolio projects exist as Figma prototypes. This one runs in a browser, speaks to users in a chosen voice, and generates a real PDF for a real doctor's inbox.
+              Talos Care sits at the intersection of conversational UX, clinical ethics, and real AI implementation. Most portfolio projects exist as Figma prototypes. This one runs in a browser, speaks ten languages in a chosen voice, and hands the doctor a scannable clinical document — no server ever sees the patient's data.
             </p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
               Designing for patients who are afraid required a level of care I hadn't applied to consumer apps. Every label, every fallback message, every moment of silence had to be intentional. The research wasn't decoration — it was load-bearing. The "Neutral bot is more trustworthy than Empathetic bot" finding directly rewrote our scripting.
