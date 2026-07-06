@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import {
   useTheme, T,
-  Grain, ThemeToggle, SiteNav, BackButton, ProjectNav,
+  ThemeToggle, SiteNav, BackButton, ProjectNav, LightboxImage,
   Stat, SectionHeading, ProcessStep, Card, Tag, PersonaGrid, SkipLink,
 } from '../_shared'
 
@@ -142,9 +142,11 @@ export default function MyTownPage() {
               { src: '/support-hub.png', label: 'Support Hub & FAQs' },
             ].map(({ src, label }) => (
               <div key={src} className="flex flex-col gap-3">
-                <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
-                  <Image src={src} alt={label} width={500} height={900} className="w-full h-auto" />
-                </div>
+                <LightboxImage src={src} alt={label} caption={label}>
+                  <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                    <Image src={src} alt={label} width={500} height={900} className="w-full h-auto" />
+                  </div>
+                </LightboxImage>
                 <p className="text-[9px] font-mono uppercase tracking-[0.25em] text-center" style={{ color: c.textFaint }}>{label}</p>
               </div>
             ))}
@@ -204,9 +206,11 @@ export default function MyTownPage() {
           <p className="font-mono text-sm leading-relaxed max-w-2xl mb-8" style={{ color: c.textMuted }}>
             The sitemap maps the four core pillars of MyTown — Discover, Student Life & Events, Help, and Support Hub — organised around the user's natural settling-in journey.
           </p>
-          <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
-            <Image src="/sitemap.png" alt="MyTown Sitemap" width={1400} height={800} className="w-full h-auto" />
-          </div>
+          <LightboxImage src="/sitemap.png" alt="MyTown Sitemap" caption="Information architecture — four core pillars">
+            <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+              <Image src="/sitemap.png" alt="MyTown Sitemap" width={1400} height={800} className="w-full h-auto" />
+            </div>
+          </LightboxImage>
         </div>
 
         {/* ── DESIGN PROCESS ── */}
@@ -234,24 +238,30 @@ export default function MyTownPage() {
           {/* Color system */}
           <div className="mb-6">
             <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Color System</p>
-            <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
-              <Image src="/Colors.png" alt="MyTown Color System" width={1200} height={700} className="w-full h-auto" />
-            </div>
+            <LightboxImage src="/Colors.png" alt="MyTown Color System" caption="Color tokens">
+              <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+                <Image src="/Colors.png" alt="MyTown Color System" width={1200} height={700} className="w-full h-auto" />
+              </div>
+            </LightboxImage>
           </div>
 
           {/* Button + Form side by side */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Button System</p>
-              <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
-                <Image src="/Button_System.png" alt="MyTown Button System" width={800} height={600} className="w-full h-auto" />
-              </div>
+              <LightboxImage src="/Button_System.png" alt="MyTown Button System" caption="Button variants & states">
+                <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+                  <Image src="/Button_System.png" alt="MyTown Button System" width={800} height={600} className="w-full h-auto" />
+                </div>
+              </LightboxImage>
             </div>
             <div>
               <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>Form Controls</p>
-              <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
-                <Image src="/Form_Controls.png" alt="MyTown Form Controls" width={800} height={600} className="w-full h-auto" />
-              </div>
+              <LightboxImage src="/Form_Controls.png" alt="MyTown Form Controls" caption="Form controls & inputs">
+                <div className="rounded-xl overflow-hidden border" style={{ borderColor: c.border }}>
+                  <Image src="/Form_Controls.png" alt="MyTown Form Controls" width={800} height={600} className="w-full h-auto" />
+                </div>
+              </LightboxImage>
             </div>
           </div>
         </div>

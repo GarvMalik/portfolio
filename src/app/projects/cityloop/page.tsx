@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import {
   useTheme, T,
-  Grain, ThemeToggle, SiteNav, BackButton, ProjectNav,
+  ThemeToggle, SiteNav, BackButton, ProjectNav, LightboxImage,
   Stat, SectionHeading, ProcessStep, Card, Tag, SkipLink,
 } from '../_shared'
 
@@ -143,9 +143,11 @@ export default function CityLoopPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {screens.map(({ src, label }) => (
               <div key={src} className="flex flex-col gap-3">
-                <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
-                  <Image src={src} alt={label} width={300} height={620} className="w-full h-auto" />
-                </div>
+                <LightboxImage src={src} alt={label} caption={label}>
+                  <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                    <Image src={src} alt={label} width={300} height={620} className="w-full h-auto" />
+                  </div>
+                </LightboxImage>
                 <p className="text-[9px] font-mono uppercase tracking-[0.25em] text-center" style={{ color: c.textFaint }}>{label}</p>
               </div>
             ))}

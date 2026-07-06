@@ -96,12 +96,83 @@ html {
   animation: ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* Hero background — slow breathing scale from the arc origin (bottom-left corner) */
-@keyframes heroBreathe {
-  0%, 100% { transform: scale(1);    }
-  50%       { transform: scale(1.07); }
+/* === LIGHTBOX ============================================================= */
+@keyframes lightboxPop {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1);    }
 }
-.hero-bg {
-  animation: heroBreathe 22s ease-in-out infinite;
-  transform-origin: 0% 100%;
+.lightbox-pop {
+  animation: lightboxPop 0.22s ease-out;
+}
+
+/* === HERO AURORA ===========================================================
+   Sui-style flowing gradient background. Radial gradients are inherently
+   soft — no CSS blur / SVG filter needed (Safari-safe). Transform-only
+   animations stay fully GPU-composited. */
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  pointer-events: none;
+}
+.aurora-1 {
+  width: 110vmax; height: 110vmax;
+  left: -38vmax; bottom: -62vmax;
+  background: radial-gradient(circle,
+    rgba(255,77,0,0.40) 0%,
+    rgba(255,77,0,0.15) 32%,
+    rgba(255,60,0,0.04) 52%,
+    transparent 68%);
+  animation: aurora-drift-1 26s ease-in-out infinite alternate;
+}
+.aurora-2 {
+  width: 85vmax; height: 85vmax;
+  right: -34vmax; top: -46vmax;
+  background: radial-gradient(circle,
+    rgba(120,60,255,0.18) 0%,
+    rgba(120,60,255,0.06) 40%,
+    transparent 66%);
+  animation: aurora-drift-2 34s ease-in-out infinite alternate;
+}
+.aurora-3 {
+  width: 72vmax; height: 72vmax;
+  left: 24vw; top: 32vh;
+  background: radial-gradient(circle,
+    rgba(255,150,60,0.13) 0%,
+    rgba(255,110,30,0.05) 38%,
+    transparent 62%);
+  animation: aurora-drift-3 42s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift-1 {
+  0%   { transform: translate(0, 0)        scale(1);    }
+  50%  { transform: translate(9vw, -7vh)   scale(1.14); }
+  100% { transform: translate(-5vw, 4vh)   scale(0.95); }
+}
+@keyframes aurora-drift-2 {
+  0%   { transform: translate(0, 0)        scale(1);    }
+  50%  { transform: translate(-8vw, 7vh)   scale(1.2);  }
+  100% { transform: translate(5vw, -4vh)   scale(0.93); }
+}
+@keyframes aurora-drift-3 {
+  0%   { transform: translate(0, 0)        scale(1);    }
+  50%  { transform: translate(-11vw, -9vh) scale(1.28); }
+  100% { transform: translate(9vw, 7vh)    scale(0.88); }
+}
+/* Light theme — softer pastel wash so the dark name stays dominant */
+.aurora-light .aurora-1 {
+  background: radial-gradient(circle,
+    rgba(255,77,0,0.22) 0%,
+    rgba(255,77,0,0.08) 34%,
+    transparent 64%);
+}
+.aurora-light .aurora-2 {
+  background: radial-gradient(circle,
+    rgba(110,70,255,0.13) 0%,
+    rgba(110,70,255,0.04) 42%,
+    transparent 64%);
+}
+.aurora-light .aurora-3 {
+  background: radial-gradient(circle,
+    rgba(255,140,60,0.12) 0%,
+    transparent 58%);
 }

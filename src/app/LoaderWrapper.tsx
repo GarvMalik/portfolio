@@ -23,33 +23,35 @@ export default function LoaderWrapper() {
 
     const obj = { pct: 0 }
 
+    const update = () => {
+      if (numRef.current)  numRef.current.textContent = Math.round(obj.pct) + '%'
+      if (unitRef.current) unitRef.current.style.left  = obj.pct + '%'
+      // Bar shrinks from 8px → 0 as progress goes 75% → 100%
+      if (barRef.current) {
+        const h = obj.pct < 75 ? 8 : Math.max(0, 8 * (1 - (obj.pct - 75) / 25))
+        barRef.current.style.height = h + 'px'
+        barRef.current.style.top    = (-h / 2) + 'px'
+      }
+    }
+
     const tl = gsap.timeline()
 
-    // Phase 1 — counter + comet travel left → right over 3 s
-    tl.to(obj, {
-      pct: 100,
-      duration: 3,
-      ease: 'none',
-      onUpdate() {
-        if (numRef.current)  numRef.current.textContent = Math.round(obj.pct) + '%'
-        if (unitRef.current) unitRef.current.style.left  = obj.pct + '%'
-        // Bar shrinks from 8px → 0 as progress goes 75% → 100%
-        if (barRef.current) {
-          const h = obj.pct < 75 ? 8 : Math.max(0, 8 * (1 - (obj.pct - 75) / 25))
-          barRef.current.style.height = h + 'px'
-          barRef.current.style.top    = (-h / 2) + 'px'
-        }
-      },
-    })
+    // Phase 1 — non-linear progress like real asset loading:
+    // quick burst, hesitation, steady pull, crawl, then snap to 100.
+    // Total count time ≈ 2.45 s (was a flat 3 s linear sweep).
+    tl.to(obj, { pct: 34,  duration: 0.50, ease: 'power2.out',   onUpdate: update })
+      .to(obj, { pct: 62,  duration: 0.55, ease: 'power1.inOut', onUpdate: update }, '+=0.18')
+      .to(obj, { pct: 89,  duration: 0.60, ease: 'power2.inOut', onUpdate: update }, '+=0.22')
+      .to(obj, { pct: 100, duration: 0.40, ease: 'power3.in',    onUpdate: update })
 
     // Phase 2 — bar/indicator vanishes at 100%
     .to(unitRef.current, {
       opacity: 0,
       duration: 0.25,
       ease: 'power2.in',
-    }, '+=0')
+    }, '+=0.05')
 
-    // Phase 3 — brief hold, then fade the black overlay away
+    // Phase 3 — fade the black overlay away
     .to(wrapRef.current, {
       opacity: 0,
       duration: 0.5,
@@ -58,7 +60,7 @@ export default function LoaderWrapper() {
         sessionStorage.setItem('portfolioLoaderSeen', '1')
         setGone(true)
       },
-    }, '+=0.15')
+    }, '+=0.12')
 
     return () => { tl.kill() }
   }, [gone])

@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 
 // ─── Theme hook ───────────────────────────────────────────────────────────────
@@ -80,20 +81,6 @@ export const T = {
   },
 }
 export type Tokens = typeof T.dark
-
-// ─── Grain overlay ────────────────────────────────────────────────────────────
-export const Grain = ({ opacity }: { opacity: number }) => (
-  <div
-    className="fixed inset-0 pointer-events-none z-[9998] transition-opacity duration-300"
-    style={{
-      backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
-      backgroundRepeat: 'repeat',
-      backgroundSize: '128px 128px',
-      opacity,
-    }}
-    aria-hidden="true"
-  />
-)
 
 // ─── Theme toggle ─────────────────────────────────────────────────────────────
 export const ThemeToggle = ({
@@ -165,13 +152,14 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
       >
         <Link
           href="/"
-          className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
+          className="text-[9px] uppercase font-mono italic tracking-[0.25em] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
+          style={{ color: c.accentText }}
         >
           / Garv Malik {projectName ? `/ ${projectName}` : '/ Vol. 1'}
         </Link>
 
         <div className="flex items-center gap-4">
-          <span className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hidden md:inline" aria-hidden="true">2026</span>
+          <span className="text-[9px] uppercase font-mono italic tracking-[0.25em] hidden md:inline" style={{ color: c.accentText }} aria-hidden="true">2026</span>
 
           {/* Mobile hamburger — gap-1.5 = 6px between 1.5px lines.
                X requires translateY of 7.5px (line height + gap). */}
@@ -246,7 +234,8 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
 export const BackButton = ({ c }: { c: Tokens }) => (
   <Link
     href="/"
-    className="inline-flex items-center gap-3 text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] hover:opacity-70 transition-opacity group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded"
+    className="inline-flex items-center gap-3 text-[9px] uppercase font-mono tracking-[0.3em] hover:opacity-70 transition-opacity group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded"
+    style={{ color: c.accentText }}
     aria-label="Back to portfolio homepage"
   >
     <span
@@ -267,7 +256,7 @@ export const HireCTA = ({ c }: { c: Tokens }) => (
     style={{ borderColor: c.border }}
   >
     <div>
-      <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-2">
+      <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-2" style={{ color: c.accentText }}>
         Open to UX/UI internships — Finland & Europe
       </p>
       <p className="font-mono text-sm" style={{ color: c.textMuted }}>
@@ -332,7 +321,7 @@ export const Stat = ({
   label: string, value: string, c: Tokens
 }) => (
   <div className="flex flex-col gap-2 py-6 transition-colors duration-300">
-    <span className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00]">{label}</span>
+    <span className="text-[9px] uppercase font-mono tracking-[0.3em]" style={{ color: c.accentText }}>{label}</span>
     <span className="text-sm font-mono leading-snug" style={{ color: c.textMuted }}>{value}</span>
   </div>
 )
@@ -344,7 +333,7 @@ export const SectionHeading = ({
   num: string, title: string, c: Tokens
 }) => (
   <div className="flex items-center gap-4 mb-8">
-    <span className="text-[9px] font-mono tracking-[0.3em] text-[#ff4d00]" aria-hidden="true">{num}</span>
+    <span className="text-[9px] font-mono tracking-[0.3em]" style={{ color: c.accentText }} aria-hidden="true">{num}</span>
     <div className="flex-1 h-[1px] transition-colors duration-300" style={{ background: c.border }} aria-hidden="true" />
     <h2 className="text-[11px] uppercase font-mono tracking-[0.25em]" style={{ color: c.textMuted }}>{title}</h2>
   </div>
@@ -364,7 +353,7 @@ export const ProcessStep = ({
     onMouseEnter={e => (e.currentTarget.style.borderColor = accentBorder + '66')}
     onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}
   >
-    <p className="text-[9px] uppercase font-mono tracking-[0.3em] text-[#ff4d00] mb-2">{step}</p>
+    <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-2" style={{ color: c.accentText }}>{step}</p>
     <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>{body}</p>
   </div>
 )
@@ -415,6 +404,84 @@ export const PersonaGrid = ({
     ))}
   </div>
 )
+
+// ─── Lightbox image ───────────────────────────────────────────────────────────
+// Wraps any image (or image-containing element) in a click-to-expand control.
+// Clicking opens a fullscreen viewer; Esc, backdrop click, or ✕ closes it.
+export const LightboxImage = ({ src, alt, caption, children, className = '' }: {
+  src: string
+  alt: string
+  caption?: string
+  children: React.ReactNode
+  className?: string
+}) => {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open])
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={`block w-full text-left cursor-zoom-in relative group/zoom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] ${className}`}
+        aria-label={`Enlarge image: ${alt}`}
+      >
+        {children}
+        <span
+          className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-[12px] opacity-0 group-hover/zoom:opacity-100 transition-opacity duration-200 pointer-events-none"
+          style={{ background: 'rgba(0,0,0,0.65)', color: '#fff' }}
+          aria-hidden="true"
+        >
+          ⤢
+        </span>
+      </button>
+      {open && createPortal(
+        <div
+          className="fixed inset-0 z-[99990] flex flex-col items-center justify-center p-4 md:p-10"
+          style={{ background: 'rgba(3,3,3,0.94)' }}
+          onClick={() => setOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={alt}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt}
+            className="max-w-[94vw] max-h-[84vh] object-contain lightbox-pop"
+            onClick={e => e.stopPropagation()}
+          />
+          {caption && (
+            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              {caption}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close image viewer"
+            className="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 rounded-full border flex items-center justify-center text-base transition-colors hover:border-[#ff4d00] hover:text-[#ff4d00]"
+            style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.85)' }}
+          >
+            ✕
+          </button>
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
 
 // ─── Skip to content link ─────────────────────────────────────────────────────
 export const SkipLink = () => (

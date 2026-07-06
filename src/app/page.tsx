@@ -40,7 +40,7 @@ const Marquee = ({ items, speed = 40, reverse = false, textColor }: {
 const LayeredText = ({ text, className = '', color }: { text: string, className?: string, color: string }) => (
   <span className={`flex flex-wrap ${className}`} aria-label={text} role="text">
     {text.split('').map((char, i) => (
-      <span key={i} className="relative inline-flex justify-center overflow-hidden" style={{ width: char === ' ' ? '0.3em' : 'auto' }} aria-hidden="true">
+      <span key={i} className="hero-letter relative inline-flex justify-center overflow-hidden" style={{ width: char === ' ' ? '0.3em' : 'auto' }} aria-hidden="true">
         <span className="layered-bottom opacity-0" style={{ color }}>{char}</span>
         <span className="absolute top-0 left-0 w-full h-full layered-top" style={{ color }}>{char}</span>
       </span>
@@ -59,20 +59,61 @@ const ListRow = ({ label, value, borderColor, textColor, labelColor }: {
   </div>
 )
 
-/* ── Hover wave email ────────────────────────────────────────────────────── */
-const HoverWaveText = ({ text, color }: { text: string, color: string }) => {
+/* ── Scramble/decode email (Sui footer style) ────────────────────────────────
+ * On hover (and once on first reveal) every character shuffles through random
+ * glyphs, then locks into the real text left → right. Unresolved chars glow
+ * orange; resolved chars inherit the base color. */
+const ScrambleText = ({ text, color }: { text: string, color: string }) => {
   const ref = useRef<HTMLDivElement>(null)
+  const rafRef = useRef(0)
+  const runningRef = useRef(false)
   const [reduced, setReduced] = useState(false)
   useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
+
+  const scramble = () => {
+    if (!ref.current || runningRef.current || reduced) return
+    runningRef.current = true
+    const GLYPHS = '#@$%&/<>[]{}=+*^?!;:0123456789XKWZ'
+    const spans = Array.from(ref.current.children) as HTMLElement[]
+    const start = performance.now()
+    const dur = 950
+    const step = (now: number) => {
+      const t = now - start
+      for (let i = 0; i < spans.length; i++) {
+        const lockAt = 120 + (i / spans.length) * (dur - 320)
+        if (t >= lockAt) {
+          spans[i].textContent = text[i]
+          spans[i].style.color = ''          // inherit base color from parent
+        } else {
+          spans[i].textContent = GLYPHS[(Math.random() * GLYPHS.length) | 0]
+          spans[i].style.color = '#ff4d00'
+        }
+      }
+      if (t < dur) {
+        rafRef.current = requestAnimationFrame(step)
+      } else {
+        spans.forEach((s, i) => { s.textContent = text[i]; s.style.color = '' })
+        runningRef.current = false
+      }
+    }
+    rafRef.current = requestAnimationFrame(step)
+  }
+
+  // Run the decode once when the email first scrolls into view
+  useEffect(() => {
+    if (!ref.current || reduced) return
+    const io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) { scramble(); io.disconnect() }
+    }, { threshold: 0.4 })
+    io.observe(ref.current)
+    return () => { io.disconnect(); cancelAnimationFrame(rafRef.current) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduced])
+
   return (
     <div
       ref={ref}
-      onMouseEnter={() => {
-        if (!ref.current || reduced) return
-        gsap.to(ref.current.children, { y: -12, stagger: 0.025, duration: 0.18, yoyo: true, repeat: 1, ease: 'power2.out', overwrite: 'auto' })
-        gsap.to(ref.current.children, { color: '#ff4d00', stagger: 0.025, duration: 0.18, overwrite: 'auto' })
-      }}
-      onMouseLeave={() => { if (!ref.current) return; gsap.to(ref.current.children, { color, duration: 0.4, stagger: 0.02, overwrite: 'auto' }) }}
+      onMouseEnter={scramble}
       aria-hidden="true"
       className="text-[6vw] md:text-[3.2vw] font-bold uppercase leading-none tracking-tighter flex flex-wrap"
       style={{ color }}
@@ -160,17 +201,17 @@ const DESKTOP_ILLUSTRATIONS: Record<number, React.ReactNode> = {
       <line x1="700" y1="450" x2="1380" y2="450" stroke="#E8B84B" strokeWidth="1" opacity="0.4" />
       {Array.from({ length: 60 }).map((_, idx) => {
         const x = 720 + idx * 11
-        const h = 10 + Math.abs(Math.sin(idx * 0.7 + 1.2) * 160 + Math.sin(idx * 1.5) * 80)
+        const h = Math.round((10 + Math.abs(Math.sin(idx * 0.7 + 1.2) * 160 + Math.sin(idx * 1.5) * 80)) * 100) / 100
         return <rect key={idx} x={x} y={450 - h / 2} width="5" height={h} fill={idx % 4 === 0 ? '#E8B84B' : 'rgba(232,184,75,0.30)'} rx="2" />
       })}
       {Array.from({ length: 60 }).map((_, idx) => {
         const x = 720 + idx * 11
-        const h = 6 + Math.abs(Math.sin(idx * 1.1 + 2.5) * 60)
+        const h = Math.round((6 + Math.abs(Math.sin(idx * 1.1 + 2.5) * 60)) * 100) / 100
         return <rect key={`b${idx}`} x={x} y={260 - h / 2} width="5" height={h} fill="rgba(232,184,75,0.18)" rx="1" />
       })}
       {Array.from({ length: 60 }).map((_, idx) => {
         const x = 720 + idx * 11
-        const h = 6 + Math.abs(Math.sin(idx * 0.9 + 0.5) * 100 + Math.sin(idx * 2.1) * 50)
+        const h = Math.round((6 + Math.abs(Math.sin(idx * 0.9 + 0.5) * 100 + Math.sin(idx * 2.1) * 50)) * 100) / 100
         return <rect key={`c${idx}`} x={x} y={640 - h / 2} width="5" height={h} fill="rgba(232,184,75,0.22)" rx="1" />
       })}
     </svg>
@@ -342,6 +383,74 @@ export default function Home() {
     }
   }, [isMobile, reduced])
 
+  // ── Sui-style depth-of-field headline ──────────────────────────────────
+  // Letters near the cursor stay sharp; letters further away soften with a
+  // CSS blur (not an SVG filter — Safari-safe). Desktop fine-pointers only.
+  useEffect(() => {
+    if (isMobile || reduced) return
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    const hero = document.querySelector<HTMLElement>('.hero-section')
+    if (!hero) return
+    const letters = Array.from(hero.querySelectorAll<HTMLElement>('.hero-letter'))
+    if (!letters.length) return
+
+    const targets = new Float32Array(letters.length)
+    const current = new Float32Array(letters.length)
+    const centers = new Float32Array(letters.length)
+    let raf = 0
+    let hovering = false
+
+    const measure = () => letters.forEach((el, i) => {
+      const r = el.getBoundingClientRect()
+      centers[i] = r.left + r.width / 2
+    })
+    measure()
+    window.addEventListener('resize', measure, { passive: true })
+
+    // The entrance animation clips letters with overflow:hidden. Blur bleeds
+    // past the glyph box, so release the clip once letters are revealed.
+    const releaseClip = setTimeout(() => {
+      letters.forEach(el => { el.style.overflow = 'visible' })
+      measure()
+    }, (sessionStorage.getItem('portfolioLoaderSeen') ? 0.3 : 2.9) * 1000 + 1600)
+
+    const tick = () => {
+      let settling = false
+      for (let i = 0; i < letters.length; i++) {
+        current[i] += (targets[i] - current[i]) * 0.14
+        if (Math.abs(targets[i] - current[i]) > 0.04) settling = true
+        const b = current[i]
+        letters[i].style.filter = b < 0.08 ? '' : `blur(${b.toFixed(2)}px)`
+        letters[i].style.opacity = String(1 - Math.min(b, 6) * 0.055)
+      }
+      raf = settling || hovering ? requestAnimationFrame(tick) : 0
+    }
+    const onMove = (e: MouseEvent) => {
+      hovering = true
+      const vw = window.innerWidth
+      for (let i = 0; i < letters.length; i++) {
+        const d = Math.abs(centers[i] - e.clientX) / vw          // 0..1
+        targets[i] = Math.min(6, Math.max(0, (d - 0.05) * 13))   // sharp window near cursor
+      }
+      if (!raf) raf = requestAnimationFrame(tick)
+    }
+    const onLeave = () => {
+      hovering = false
+      targets.fill(0)
+      if (!raf) raf = requestAnimationFrame(tick)
+    }
+    hero.addEventListener('mousemove', onMove, { passive: true })
+    hero.addEventListener('mouseleave', onLeave)
+    return () => {
+      clearTimeout(releaseClip)
+      hero.removeEventListener('mousemove', onMove)
+      hero.removeEventListener('mouseleave', onLeave)
+      window.removeEventListener('resize', measure)
+      cancelAnimationFrame(raf)
+      letters.forEach(el => { el.style.filter = ''; el.style.opacity = '' })
+    }
+  }, [isMobile, reduced])
+
   // GSAP scroll animations
   useGSAP(() => {
     // Kill all existing ScrollTriggers before re-registering — prevents
@@ -355,11 +464,11 @@ export default function Home() {
     }
 
     // ── Hero entrance — delayed on first visit to sync with the loader ──
-    // Loader: 3s count + 0.2s hold + 0.5s fade = 3.7s. Hero starts at 3.2s
-    // (same moment the overlay begins fading) so text slides in AS it reveals.
+    // Loader: ~2.45s count + 0.05 + 0.25 unit fade + 0.12 hold ≈ 2.9s until
+    // the overlay starts fading. Hero starts then, so text slides in AS it reveals.
     const firstVisit = !sessionStorage.getItem('portfolioLoaderSeen')
-    const hd = firstVisit ? 3.2 : 0.3   // hero delay
-    const ld = firstVisit ? 4.1 : 1.2   // label delay
+    const hd = firstVisit ? 2.9 : 0.3   // hero delay
+    const ld = firstVisit ? 3.7 : 1.2   // label delay
     gsap.fromTo('.layered-top',    { yPercent: 105 }, { yPercent: 0, duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: hd })
     gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: hd })
     gsap.fromTo('.intro-label',    { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, delay: ld, ease: 'power2.out' })
@@ -693,65 +802,19 @@ export default function Home() {
      {/* ── HERO ── */}
       <section id="main-content" className="hero-section relative h-screen flex flex-col justify-end pb-[12vh] md:justify-center md:pb-0 px-6 md:px-16 overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg }} aria-label="Hero Garv Malik, UX UI Designer">
         
-        {/* Hero background — concentric arcs + SVG gradients. No filters (Safari-safe). */}
-        <svg
-          className="hero-bg absolute inset-0 w-full h-full z-0 pointer-events-none"
-          style={{ opacity: theme === 'dark' ? 0.75 : 0.50 }}
-          viewBox="0 0 1440 900"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid slice"
+        {/* Hero background — Sui-style aurora. Pure radial-gradients animated
+            with transforms only: no SVG filters, no CSS blur (Safari-safe). */}
+        <div
+          className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${theme === 'light' ? 'aurora-light' : ''}`}
           aria-hidden="true"
         >
-          <defs>
-            {/* Warm radial glow from bottom-left — gradient, not filter */}
-            <radialGradient id="cornerGlow" cx="0" cy="900" r="1300" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#ff4d00" stopOpacity={theme === 'dark' ? '0.22' : '0.14'} />
-              <stop offset="45%"  stopColor="#ff4d00" stopOpacity={theme === 'dark' ? '0.06' : '0.03'} />
-              <stop offset="100%" stopColor="#ff4d00" stopOpacity="0" />
-            </radialGradient>
-            {/* Cool violet accent top-right */}
-            <radialGradient id="topGlow" cx="1440" cy="0" r="820" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#8B5CF6" stopOpacity={theme === 'dark' ? '0.10' : '0.06'} />
-              <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-
-          {/* Gradient glow layers */}
-          <rect width="1440" height="900" fill="url(#cornerGlow)" />
-          <rect width="1440" height="900" fill="url(#topGlow)" />
-
-          {/* Concentric arcs radiating from bottom-left corner */}
-          {[300, 500, 700, 900, 1100, 1300, 1500, 1700, 1920].map((r, i) => (
-            <circle key={`arc-${i}`} cx="-60" cy="960" r={r} fill="none"
-              stroke={theme === 'dark' ? 'rgba(180,200,220,0.10)' : 'rgba(30,60,100,0.08)'}
-              strokeWidth={i === 3 || i === 6 ? 1.4 : 0.7}
-            />
-          ))}
-          {/* Orange accent arcs — every other ring */}
-          {[600, 1100, 1600].map((r, i) => (
-            <circle key={`oa-${i}`} cx="-60" cy="960" r={r} fill="none"
-              stroke={theme === 'dark' ? 'rgba(255,77,0,0.16)' : 'rgba(255,77,0,0.11)'}
-              strokeWidth="1.0"
-            />
-          ))}
-
-          {/* Subtle verticals for rhythm */}
-          {[480, 960, 1200].map((x, i) => (
-            <line key={`v-${i}`} x1={x} y1="0" x2={x} y2="900"
-              stroke={theme === 'dark' ? 'rgba(180,200,220,0.05)' : 'rgba(30,60,100,0.04)'}
-              strokeWidth="0.7"
-            />
-          ))}
-
-          {/* Horizon accent line */}
-          <line x1="0" y1="520" x2="1440" y2="520"
-            stroke={theme === 'dark' ? 'rgba(255,77,0,0.09)' : 'rgba(255,77,0,0.06)'}
-            strokeWidth="0.9"
-          />
-        </svg>
+          <div className="aurora-blob aurora-1" />
+          <div className="aurora-blob aurora-2" />
+          <div className="aurora-blob aurora-3" />
+        </div>
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
-        <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Home / P. 001</div>
+        <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Home / P. 001</div>
         <h1 className="sr-only">Garv Malik — UX/UI Designer specialising in research-led, accessible digital products. Based in Tampere, Finland.</h1>
 
 
@@ -790,7 +853,7 @@ export default function Home() {
             download
             data-cursor-hover
             className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#ff4d00] hover:text-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
-            style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.55)' }}
+            style={{ borderColor: theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.22)', color: c.textMuted }}
             aria-label="Download Garv Malik CV PDF"
           >
             Download CV ↓
@@ -811,7 +874,7 @@ export default function Home() {
       {/* ── MANIFESTO ── */}
       <section id="manifesto" className="manifesto-section relative h-screen flex flex-col justify-center px-6 md:px-16 transition-colors duration-300" style={{ background: c.bg }} aria-label="Design philosophy">
         {/* Issue 1 fix: top-16 clears the fixed nav bar (~60px) */}
-        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Manifesto / P. 002</div>
+        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Manifesto / P. 002</div>
         {/* Issue 4 fix:
             - Font switched to Bebas Neue (heading font) — eliminates JetBrains Mono
               monospace wide-spacing that made words look broken/gapped
@@ -854,26 +917,26 @@ export default function Home() {
 
       {/* ── SPLIT — What I Build / What Moves Me ── */}
       <section id="about-skills" className="split-section relative min-h-screen w-full border-t flex flex-col md:flex-row px-6 md:px-16 py-28 md:py-36 gap-16 md:gap-0 transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="Skills and values">
-        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Who Am I / P. 003</div>
+        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Who Am I / P. 003</div>
         <div className="center-line absolute left-1/2 top-0 w-[1px] h-0 -translate-x-1/2 hidden md:block" style={{ background: 'rgba(255,77,0,0.22)' }} aria-hidden="true" />
         <div className="w-full md:w-1/2 md:pr-20 flex flex-col justify-center pt-16 md:pt-0">
-          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">What I Do</p>
+          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase mb-5 font-mono tracking-[0.3em]" style={{ color: c.accentText }} aria-hidden="true">What I Do</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />I Build</h2>
           <dl className="flex flex-col">
-            <ListRow label="Design"  value="UX/UI · Design Systems"      borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Process" value="User Flows · Prototyping"     borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Tools"   value="Figma · Miro · Mural"         borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Research" value="Interviews · Testing · Affinity Mapping" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Design"  value="UX/UI · Design Systems"      borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
+            <ListRow label="Process" value="User Flows · Prototyping"     borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
+            <ListRow label="Tools"   value="Figma · Miro · Mural"         borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
+            <ListRow label="Research" value="Interviews · Testing · Affinity Mapping" borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
           </dl>
         </div>
         <div className="w-full md:w-1/2 md:pl-20 flex flex-col justify-center">
-          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase text-[#ff4d00] mb-5 font-mono tracking-[0.3em]" aria-hidden="true">What Drives Me</p>
+          <p className="split-header opacity-0 translate-y-6 text-[9px] uppercase mb-5 font-mono tracking-[0.3em]" style={{ color: c.accentText }} aria-hidden="true">What Drives Me</p>
           <h2 className="split-header opacity-0 translate-y-6 text-6xl md:text-7xl font-black uppercase leading-[0.88] mb-10 tracking-tight" style={{ color: c.text }}>What<br />Moves Me</h2>
           <dl className="flex flex-col">
-            <ListRow label="Principle"     value="Human-centered clarity"        borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Interest"      value="Emotional interaction"          borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Curious about" value="Behavior and research"          borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
-            <ListRow label="Goal"          value="Interfaces that feel intuitive" borderColor={c.border} textColor={c.textMuted} labelColor="#ff4d00" />
+            <ListRow label="Principle"     value="Human-centered clarity"        borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
+            <ListRow label="Interest"      value="Emotional interaction"          borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
+            <ListRow label="Curious about" value="Behavior and research"          borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
+            <ListRow label="Goal"          value="Interfaces that feel intuitive" borderColor={c.border} textColor={c.textMuted} labelColor={c.accentText} />
           </dl>
         </div>
       </section>
@@ -971,7 +1034,7 @@ export default function Home() {
                   {/* Waveform bars — simulated audio waveform */}
                   {Array.from({ length: 48 }).map((_, idx) => {
                     const x = 20 + idx * 7.3
-                    const h = 8 + Math.abs(Math.sin(idx * 0.7 + 1.2) * 80 + Math.sin(idx * 1.5) * 40)
+                    const h = Math.round((8 + Math.abs(Math.sin(idx * 0.7 + 1.2) * 80 + Math.sin(idx * 1.5) * 40)) * 100) / 100
                     return (
                       <rect key={idx}
                         x={x} y={350 - h / 2} width="3.5" height={h}
@@ -983,7 +1046,7 @@ export default function Home() {
                   {/* Second waveform — quieter, offset */}
                   {Array.from({ length: 48 }).map((_, idx) => {
                     const x = 20 + idx * 7.3
-                    const h = 4 + Math.abs(Math.sin(idx * 1.1 + 2.5) * 30)
+                    const h = Math.round((4 + Math.abs(Math.sin(idx * 1.1 + 2.5) * 30)) * 100) / 100
                     return (
                       <rect key={`b${idx}`}
                         x={x} y={210 - h / 2} width="3.5" height={h}
@@ -995,7 +1058,7 @@ export default function Home() {
                   {/* Third waveform — high noise */}
                   {Array.from({ length: 48 }).map((_, idx) => {
                     const x = 20 + idx * 7.3
-                    const h = 4 + Math.abs(Math.sin(idx * 0.9 + 0.5) * 50 + Math.sin(idx * 2.1) * 25)
+                    const h = Math.round((4 + Math.abs(Math.sin(idx * 0.9 + 0.5) * 50 + Math.sin(idx * 2.1) * 25)) * 100) / 100
                     return (
                       <rect key={`c${idx}`}
                         x={x} y={490 - h / 2} width="3.5" height={h}
@@ -1059,7 +1122,7 @@ export default function Home() {
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-4 h-[1px] bg-[#ff4d00]" />
-                  <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#ff4d00]">Project 0{i + 1}</span>
+                  <span className="text-[9px] font-mono uppercase tracking-[0.3em]" style={{ color: c.accentText }}>Project 0{i + 1}</span>
                 </div>
                 <h2 className="text-[10vw] font-black uppercase tracking-tight mb-2 leading-[0.92]" style={{ color: p.accentColor }}>{p.title}</h2>
                 <p className="font-mono text-xs mb-4 leading-relaxed" style={{ color: theme === 'dark' ? 'rgba(230,226,211,0.85)' : c.textMuted }}>{p.desc}</p>
@@ -1070,9 +1133,9 @@ export default function Home() {
                 </ul>
                 <Link href={p.href} className="inline-flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]" aria-label={`View project: ${p.title}`}>
                   <div className="w-9 h-9 rounded-full border border-[#ff4d00] flex items-center justify-center">
-                    <span className="text-[#ff4d00] text-sm">→</span>
+                    <span className="text-sm" style={{ color: c.accentText }}>→</span>
                   </div>
-                  <span className="text-[#ff4d00] font-mono text-[10px] uppercase font-bold tracking-[0.2em]">View Project</span>
+                  <span className="font-mono text-[10px] uppercase font-bold tracking-[0.2em]" style={{ color: c.accentText }}>View Project</span>
                 </Link>
               </div>
             </div>
@@ -1086,7 +1149,7 @@ export default function Home() {
 
       {/* ── ABOUT ── */}
       <section id="about" className="about-section relative min-h-screen flex flex-col justify-center px-6 md:px-16 py-28 border-t overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="About Garv Malik">
-        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ About / P. 007</div>
+        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ About / P. 007</div>
 
         {/* WHO AM I */}
         <h2 className="flex flex-col mb-8 md:mb-12 pt-16 md:pt-6" aria-label="Who am I">
@@ -1116,7 +1179,7 @@ export default function Home() {
 
       {/* ── RIGHT NOW ── */}
       <section className="now-section relative min-h-[55vh] flex flex-col justify-center px-6 md:px-16 py-24 border-t transition-colors duration-300" style={{ background: c.bg, borderColor: c.border }} aria-label="What Garv is doing right now">
-        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Right Now / P. 008</div>
+        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Right Now / P. 008</div>
         <h2 className="now-item opacity-0 flex flex-col mb-10 md:mb-14 pt-16 md:pt-6" aria-label="Right Now">
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: c.text, fontFamily: "'Bebas Neue', sans-serif" }}>RIGHT</span>
           <span className="text-[22vw] md:text-[11vw] font-black uppercase leading-[0.82] tracking-[-0.02em]" style={{ color: '#ff4d00', fontFamily: "'Bebas Neue', sans-serif" }}>NOW</span>
@@ -1138,13 +1201,13 @@ export default function Home() {
 
       {/* ── FOOTER ── */}
       <footer id="contact" className="footer-section min-h-screen flex flex-col justify-center px-6 md:px-16 border-t relative overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="Contact and social links">
-        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic text-[#ff4d00] tracking-[0.25em]" aria-hidden="true">/ Open Channel / P. 009</div>
+        <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Open Channel / P. 009</div>
         <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none" style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)' }} aria-hidden="true">+</div>
         <div className="footer-email opacity-0 mt-20 mb-10">
           {/* Issue 6 fix: label bumped from text-[9px] → text-[11px] for light mode readability */}
           <p className="text-[11px] font-mono uppercase tracking-[0.25em] mb-6 font-bold" style={{ color: c.accentText }}>Open to UX/UI internships in Finland and Europe.</p>
           <a href="mailto:thegarvmalik@gmail.com" data-cursor-hover aria-label="Send email to thegarvmalik@gmail.com" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1">
-            <HoverWaveText text="THEGARVMALIK@GMAIL.COM" color={c.text} />
+            <ScrambleText text="THEGARVMALIK@GMAIL.COM" color={c.text} />
           </a>
         </div>
         <div className="w-full h-[1px] mb-10" style={{ background: c.border }} aria-hidden="true" />

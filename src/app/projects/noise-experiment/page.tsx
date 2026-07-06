@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import {
   useTheme, T,
-  Grain, ThemeToggle, SiteNav, BackButton, ProjectNav,
+  ThemeToggle, SiteNav, BackButton, ProjectNav,
   Stat, SectionHeading, ProcessStep, Card, Tag, SkipLink,
 } from '../_shared'
 

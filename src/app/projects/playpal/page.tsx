@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import {
   useTheme, T,
-  Grain, ThemeToggle, SiteNav, BackButton, ProjectNav,
+  ThemeToggle, SiteNav, BackButton, ProjectNav, LightboxImage,
   Stat, SectionHeading, ProcessStep, Card, Tag, SkipLink,
 } from '../_shared'
 
@@ -141,30 +141,34 @@ export default function PlayPalPage() {
               <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>
                 Home · Play · Book — Three Tab Views
               </p>
-              <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
-                <Image
-                  src="/home-screen.png"
-                  alt="PlayPal Home, Play and Book screens"
-                  width={1200}
-                  height={700}
-                  className="w-full h-auto"
-                />
-              </div>
+              <LightboxImage src="/home-screen.png" alt="PlayPal Home, Play and Book screens" caption="Home · Play · Book — three tab views">
+                <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                  <Image
+                    src="/home-screen.png"
+                    alt="PlayPal Home, Play and Book screens"
+                    width={1200}
+                    height={700}
+                    className="w-full h-auto"
+                  />
+                </div>
+              </LightboxImage>
             </div>
             {/* Create game screens — full width */}
             <div>
               <p className="text-[9px] uppercase font-mono tracking-[0.3em] mb-4" style={{ color: brand.primary }}>
                 Create Game Flow
               </p>
-              <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
-                <Image
-                  src="/create-game.png"
-                  alt="PlayPal Create Game flow"
-                  width={1200}
-                  height={700}
-                  className="w-full h-auto"
-                />
-              </div>
+              <LightboxImage src="/create-game.png" alt="PlayPal Create Game flow" caption="Create game flow">
+                <div className="rounded-2xl overflow-hidden border" style={{ borderColor: c.border }}>
+                  <Image
+                    src="/create-game.png"
+                    alt="PlayPal Create Game flow"
+                    width={1200}
+                    height={700}
+                    className="w-full h-auto"
+                  />
+                </div>
+              </LightboxImage>
             </div>
           </div>
         </div>

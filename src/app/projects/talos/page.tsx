@@ -5,8 +5,8 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import {
   useTheme, T,
-  Grain, ThemeToggle, SiteNav, BackButton, ProjectNav,
-  Stat, SectionHeading, ProcessStep, Card, Tag, SkipLink,
+  ThemeToggle, SiteNav, BackButton, ProjectNav,
+  Stat, SectionHeading, ProcessStep, Card, Tag, SkipLink, LightboxImage,
 } from '../_shared'
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
@@ -233,17 +233,19 @@ export default function TalosCare() {
               { file: 'past-summaries.png',    label: 'Past Summaries' },
             ].map(screen => (
               <div key={screen.file} className="flex-shrink-0 flex flex-col gap-2.5" style={{ scrollSnapAlign: 'start' }}>
-                <div
-                  className="overflow-hidden border"
-                  style={{ width: 175, height: 380, borderColor: c.border }}
-                >
-                  <img
-                    src={`/talos/${screen.file}`}
-                    alt={screen.label}
-                    loading="lazy"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
-                  />
-                </div>
+                <LightboxImage src={`/talos/${screen.file}`} alt={screen.label} caption={screen.label}>
+                  <div
+                    className="overflow-hidden border"
+                    style={{ width: 175, height: 380, borderColor: c.border }}
+                  >
+                    <img
+                      src={`/talos/${screen.file}`}
+                      alt={screen.label}
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+                    />
+                  </div>
+                </LightboxImage>
                 <p
                   className="font-mono uppercase"
                   style={{ fontSize: '8px', letterSpacing: '0.12em', color: c.textFaint, width: 175 }}
