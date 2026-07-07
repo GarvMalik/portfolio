@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Bebas_Neue, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
-import LoaderWrapper from "./LoaderWrapper"
+import LoaderController from "./cinematic/LoaderController"
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -87,11 +87,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
         {/*
-          LoaderWrapper is a dynamic client component — it never runs on the
+          LoaderController is a dynamic client component — it never runs on the
           server, so it cannot crash SSR or block hydration. The site renders
           normally underneath it while the loader plays on top.
         */}
-        <LoaderWrapper />
+        <LoaderController />
         {children}
       </body>
     </html>

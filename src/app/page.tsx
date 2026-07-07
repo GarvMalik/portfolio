@@ -6,6 +6,8 @@ import { useGSAP } from '@gsap/react'
 import Link from 'next/link'
 // Fix: removed duplicate useTheme and T — now imported from _shared
 import { useTheme, T } from './projects/_shared'
+import FluidBackground from './cinematic/FluidBackground'
+import { playHomepageReveal, REVEAL_EVENT } from './cinematic/HomepageReveal'
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
@@ -412,7 +414,7 @@ export default function Home() {
     const releaseClip = setTimeout(() => {
       letters.forEach(el => { el.style.overflow = 'visible' })
       measure()
-    }, (sessionStorage.getItem('portfolioLoaderSeen') ? 0.3 : 2.9) * 1000 + 1600)
+    }, (sessionStorage.getItem('portfolioLoaderSeen') ? 0.6 : 2.7) * 1000 + 900)
 
     const tick = () => {
       let settling = false
@@ -451,6 +453,39 @@ export default function Home() {
     }
   }, [isMobile, reduced])
 
+  // ── Cinematic reveal — the interface is born when the loader hands off ──
+  // LoaderController broadcasts REVEAL_EVENT at 1.8s (full cinematic) or
+  // ~0s (return-visit quick fade / reduced motion). Until then the reveal
+  // targets are pre-hidden so nothing shows through the dissolving veil.
+  useEffect(() => {
+    const scope = container.current
+    if (!scope) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return // stays visible, no motion
+
+    let tl: gsap.core.Timeline | undefined
+    const targets = ['.cine-nav', '.cine-title', '.cine-desc', '.cine-cta', '.cine-deco']
+    const play = (fast: boolean) => { tl = playHomepageReveal(scope, { fast }) }
+
+    if (window.__cineRevealed) {
+      // Loader already finished (client-side navigation back to Home)
+      play(true)
+      return () => { tl?.kill() }
+    }
+
+    targets.forEach(t => gsap.set(scope.querySelectorAll(t), { opacity: 0 }))
+    const onReveal = (e: Event) => play(!!(e as CustomEvent).detail?.fast)
+    window.addEventListener(REVEAL_EVENT, onReveal, { once: true })
+    // Safety net — never leave the page hidden if the loader dies
+    const fallback = setTimeout(() => {
+      if (!window.__cineRevealed) targets.forEach(t => gsap.set(scope.querySelectorAll(t), { opacity: 1 }))
+    }, 4500)
+    return () => {
+      window.removeEventListener(REVEAL_EVENT, onReveal)
+      clearTimeout(fallback)
+      tl?.kill()
+    }
+  }, [])
+
   // GSAP scroll animations
   useGSAP(() => {
     // Kill all existing ScrollTriggers before re-registering — prevents
@@ -459,19 +494,16 @@ export default function Home() {
     ScrollTrigger.getAll().forEach(t => t.kill())
 
     if (reduced) {
-      gsap.set(['.layered-top', '.layered-bottom', '.intro-label', '.quote-line', '.manifesto-sub', '.split-header', '.split-item', '.now-item', '.footer-email'], { clearProps: 'all' })
+      // Several hidden states are Tailwind classes, not inline styles —
+      // clearProps can't reveal those, so set explicit visible values.
+      gsap.set('.quote-line', { y: 0 })
+      gsap.set('.center-line', { height: '100%' })
+      gsap.set(['.manifesto-sub', '.split-header', '.split-item', '.now-item', '.footer-email'], { opacity: 1, y: 0 })
       return
     }
 
-    // ── Hero entrance — delayed on first visit to sync with the loader ──
-    // Loader: ~2.45s count + 0.05 + 0.25 unit fade + 0.12 hold ≈ 2.9s until
-    // the overlay starts fading. Hero starts then, so text slides in AS it reveals.
-    const firstVisit = !sessionStorage.getItem('portfolioLoaderSeen')
-    const hd = firstVisit ? 2.9 : 0.3   // hero delay
-    const ld = firstVisit ? 3.7 : 1.2   // label delay
-    gsap.fromTo('.layered-top',    { yPercent: 105 }, { yPercent: 0, duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: hd })
-    gsap.fromTo('.layered-bottom', { opacity: 0 },    { opacity: 1,  duration: 1.4, stagger: 0.06, ease: 'power4.out', delay: hd })
-    gsap.fromTo('.intro-label',    { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, delay: ld, ease: 'power2.out' })
+    // Hero entrance is owned by the cinematic loader — see the
+    // REVEAL_EVENT effect below (cinematic/HomepageReveal.ts).
 
     if (!isMobile) {
       // ── DESKTOP: full scrub parallax + pinning ──
@@ -620,7 +652,7 @@ export default function Home() {
 
       {/* ── NAVIGATION ──────────────────────────────────────────────────── */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-8 transition-colors duration-300"
+        className="cine-nav fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-8 transition-colors duration-300"
         aria-label="Site navigation"
         style={{
           background: c.navBg,
@@ -633,7 +665,7 @@ export default function Home() {
         <a
           href="#main-content"
           onClick={e => { e.preventDefault(); document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' }) }}
-          className="intro-label opacity-0 text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded"
+          className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded"
           aria-label="Garv Malik — scroll to top"
         >
           / Garv Malik
@@ -676,7 +708,7 @@ export default function Home() {
 
         {/* Right side: year + mobile menu toggle */}
         <div className="flex items-center gap-4">
-          <span className="intro-label opacity-0 text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hidden md:inline" aria-hidden="true">
+          <span className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hidden md:inline" aria-hidden="true">
             2026
           </span>
 
@@ -802,24 +834,16 @@ export default function Home() {
      {/* ── HERO ── */}
       <section id="main-content" className="hero-section relative h-screen flex flex-col justify-end pb-[12vh] md:justify-center md:pb-0 px-6 md:px-16 overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg }} aria-label="Hero Garv Malik, UX UI Designer">
         
-        {/* Hero background — Sui-style aurora. Pure radial-gradients animated
-            with transforms only: no SVG filters, no CSS blur (Safari-safe). */}
-        <div
-          className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${theme === 'light' ? 'aurora-light' : ''}`}
-          aria-hidden="true"
-        >
-          <div className="aurora-blob aurora-1" />
-          <div className="aurora-blob aurora-2" />
-          <div className="aurora-blob aurora-3" />
-        </div>
+        {/* Living background — 4-layer fluid gradient, animates forever */}
+        <FluidBackground theme={theme} />
 
         <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: c.border }} aria-hidden="true" />
-        <div className="intro-label opacity-0 absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Home / P. 001</div>
+        <div className="cine-deco absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Home / P. 001</div>
         <h1 className="sr-only">Garv Malik — UX/UI Designer specialising in research-led, accessible digital products. Based in Tampere, Finland.</h1>
 
 
         {/* Stacked name */}
-        <div className="hero-name-wrap flex flex-col items-start gap-0 relative z-10 w-full" aria-hidden="true">
+        <div className="hero-name-wrap cine-title flex flex-col items-start gap-0 relative z-10 w-full" aria-hidden="true">
           <div className="hero-garv">
             <LayeredText text="GARV"  className="text-[28vw] md:text-[21vw] leading-[0.82] font-black uppercase tracking-tighter" color={c.text} />
           </div>
@@ -829,7 +853,7 @@ export default function Home() {
         </div>
 
         {/* Role + tagline line */}
-        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-3 mt-5 mb-1">
+        <div className="cine-desc relative z-10 flex flex-wrap items-center gap-3 mt-5 mb-1">
           <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-[0.28em]" style={{ color: c.textMuted }}>UX/UI Designer</span>
           <span className="text-[#ff4d00] opacity-50" aria-hidden="true">·</span>
           <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-[0.28em]" style={{ color: c.textMuted }}>Research-led products</span>
@@ -838,7 +862,7 @@ export default function Home() {
         </div>
 
         {/* Hero CTAs */}
-        <div className="intro-label opacity-0 relative z-10 flex flex-wrap items-center gap-4 mt-5 mb-2">
+        <div className="cine-cta relative z-10 flex flex-wrap items-center gap-4 mt-5 mb-2">
           <a
             href="mailto:thegarvmalik@gmail.com"
             data-cursor-hover
@@ -860,10 +884,10 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="intro-label opacity-0 absolute bottom-0 left-0 right-0 border-t" style={{ borderColor: c.border }}>
+        <div className="cine-deco absolute bottom-0 left-0 right-0 border-t" style={{ borderColor: c.border }}>
           <Marquee items={MARQUEE_ITEMS} speed={35} textColor={c.textMuted} />
         </div>
-        <div className="intro-label opacity-0 absolute bottom-16 left-6 md:left-16 flex items-center gap-3" aria-hidden="true">
+        <div className="cine-deco absolute bottom-16 left-6 md:left-16 flex items-center gap-3" aria-hidden="true">
           <div className="w-6 h-6 rounded-full border flex items-center justify-center" style={{ borderColor: c.border }}>
             <span className="text-[8px]" style={{ color: c.textFaint }}>↓</span>
           </div>

@@ -105,74 +105,115 @@ html {
   animation: lightboxPop 0.22s ease-out;
 }
 
-/* === HERO AURORA ===========================================================
-   Sui-style flowing gradient background. Radial gradients are inherently
-   soft — no CSS blur / SVG filter needed (Safari-safe). Transform-only
-   animations stay fully GPU-composited. */
-.aurora-blob {
+/* === CINEMATIC DESIGN TOKENS ===============================================
+   Brand palette for the loading cinematic + living background.
+   Change these and the whole sequence re-themes automatically. */
+:root {
+  --cine-bg:        #050505;                 /* site dark background   */
+  --cine-bg-light:  #f5f2ec;                 /* site light background  */
+  --cine-primary:   #ff4d00;                 /* brand orange           */
+  --cine-secondary: #6a3cff;                 /* violet-blue secondary  */
+  --cine-blue:      #2978ff;                 /* electric blue accent   */
+  --cine-accent:    #ffb347;                 /* warm amber accent      */
+}
+
+/* === FLUID BACKGROUND ======================================================
+   The homepage's permanently-living background. Four layers, all
+   compositor-only (transform / opacity). Radial gradients are inherently
+   soft — no CSS blur, no SVG filters (Safari constraint).
+   Layer durations are mutually prime-ish (36s / 47s / 13s) so the
+   combined pattern never visibly repeats. */
+.fluid-layer {
   position: absolute;
-  border-radius: 50%;
-  will-change: transform;
+  inset: 0;
   pointer-events: none;
+  will-change: transform;
 }
-.aurora-1 {
-  width: 110vmax; height: 110vmax;
-  left: -38vmax; bottom: -62vmax;
-  background: radial-gradient(circle,
-    rgba(255,77,0,0.40) 0%,
-    rgba(255,77,0,0.15) 32%,
-    rgba(255,60,0,0.04) 52%,
-    transparent 68%);
-  animation: aurora-drift-1 26s ease-in-out infinite alternate;
+
+/* Layer 1 — large radial field, slowest drift */
+.fluid-1 {
+  background:
+    radial-gradient(120vmax 120vmax at 8% 110%,
+      color-mix(in srgb, var(--cine-primary) 34%, transparent) 0%,
+      color-mix(in srgb, var(--cine-primary) 12%, transparent) 34%,
+      transparent 62%);
+  animation: fluid-drift-1 36s ease-in-out infinite alternate;
 }
-.aurora-2 {
-  width: 85vmax; height: 85vmax;
-  right: -34vmax; top: -46vmax;
-  background: radial-gradient(circle,
-    rgba(120,60,255,0.18) 0%,
-    rgba(120,60,255,0.06) 40%,
-    transparent 66%);
-  animation: aurora-drift-2 34s ease-in-out infinite alternate;
+
+/* Layer 2 — soft mesh (several gradients in one paint), opposite drift */
+.fluid-2 {
+  background:
+    radial-gradient(70vmax 55vmax at 96% -8%,
+      color-mix(in srgb, var(--cine-secondary) 17%, transparent) 0%,
+      transparent 60%),
+    radial-gradient(48vmax 40vmax at 70% 74%,
+      color-mix(in srgb, var(--cine-blue) 8%, transparent) 0%,
+      transparent 58%),
+    radial-gradient(42vmax 36vmax at 36% 30%,
+      color-mix(in srgb, var(--cine-accent) 9%, transparent) 0%,
+      transparent 55%);
+  animation: fluid-drift-2 47s ease-in-out infinite alternate;
 }
-.aurora-3 {
-  width: 72vmax; height: 72vmax;
-  left: 24vw; top: 32vh;
-  background: radial-gradient(circle,
-    rgba(255,150,60,0.13) 0%,
-    rgba(255,110,30,0.05) 38%,
-    transparent 62%);
-  animation: aurora-drift-3 42s ease-in-out infinite alternate;
+
+/* Layer 3 — lighting bloom, opacity breathes */
+.fluid-3 {
+  background:
+    radial-gradient(52vmax 44vmax at 42% 58%,
+      color-mix(in srgb, var(--cine-accent) 12%, transparent) 0%,
+      transparent 55%);
+  animation: fluid-bloom 13s ease-in-out infinite alternate;
+  will-change: opacity;
 }
-@keyframes aurora-drift-1 {
-  0%   { transform: translate(0, 0)        scale(1);    }
-  50%  { transform: translate(9vw, -7vh)   scale(1.14); }
-  100% { transform: translate(-5vw, 4vh)   scale(0.95); }
+
+/* Layer 4 — static noise tile, kills gradient banding */
+.fluid-noise {
+  background-image: url('/noise.png');
+  background-repeat: repeat;
+  background-size: 64px 64px;
+  opacity: 0.5;
+  will-change: auto;
 }
-@keyframes aurora-drift-2 {
-  0%   { transform: translate(0, 0)        scale(1);    }
-  50%  { transform: translate(-8vw, 7vh)   scale(1.2);  }
-  100% { transform: translate(5vw, -4vh)   scale(0.93); }
+
+@keyframes fluid-drift-1 {
+  0%   { transform: translate3d(0, 0, 0)         scale(1);    }
+  50%  { transform: translate3d(6vw, -5vh, 0)    scale(1.12); }
+  100% { transform: translate3d(-4vw, 3vh, 0)    scale(0.97); }
 }
-@keyframes aurora-drift-3 {
-  0%   { transform: translate(0, 0)        scale(1);    }
-  50%  { transform: translate(-11vw, -9vh) scale(1.28); }
-  100% { transform: translate(9vw, 7vh)    scale(0.88); }
+@keyframes fluid-drift-2 {
+  0%   { transform: translate3d(0, 0, 0)         scale(1)    rotate(0.001deg); }
+  50%  { transform: translate3d(-5vw, 6vh, 0)    scale(1.15) rotate(0.001deg); }
+  100% { transform: translate3d(4vw, -4vh, 0)    scale(0.95) rotate(0.001deg); }
 }
-/* Light theme — softer pastel wash so the dark name stays dominant */
-.aurora-light .aurora-1 {
-  background: radial-gradient(circle,
-    rgba(255,77,0,0.22) 0%,
-    rgba(255,77,0,0.08) 34%,
-    transparent 64%);
+@keyframes fluid-bloom {
+  0%   { opacity: 0.35; }
+  50%  { opacity: 1;    }
+  100% { opacity: 0.5;  }
 }
-.aurora-light .aurora-2 {
-  background: radial-gradient(circle,
-    rgba(110,70,255,0.13) 0%,
-    rgba(110,70,255,0.04) 42%,
-    transparent 64%);
+
+/* Light theme — quieter pastel wash so dark type stays dominant */
+.fluid-light .fluid-1 {
+  background:
+    radial-gradient(120vmax 120vmax at 8% 110%,
+      color-mix(in srgb, var(--cine-primary) 18%, transparent) 0%,
+      color-mix(in srgb, var(--cine-primary) 7%, transparent) 36%,
+      transparent 62%);
 }
-.aurora-light .aurora-3 {
-  background: radial-gradient(circle,
-    rgba(255,140,60,0.12) 0%,
-    transparent 58%);
+.fluid-light .fluid-2 {
+  background:
+    radial-gradient(70vmax 55vmax at 96% -8%,
+      color-mix(in srgb, var(--cine-secondary) 11%, transparent) 0%,
+      transparent 60%),
+    radial-gradient(48vmax 40vmax at 70% 74%,
+      color-mix(in srgb, var(--cine-blue) 5%, transparent) 0%,
+      transparent 58%),
+    radial-gradient(42vmax 36vmax at 36% 30%,
+      color-mix(in srgb, var(--cine-accent) 7%, transparent) 0%,
+      transparent 55%);
 }
+.fluid-light .fluid-3 {
+  background:
+    radial-gradient(52vmax 44vmax at 42% 58%,
+      color-mix(in srgb, var(--cine-accent) 8%, transparent) 0%,
+      transparent 55%);
+}
+.fluid-light .fluid-noise { opacity: 0.35; }
