@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Bebas_Neue, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import LoaderController from "./cinematic/LoaderController"
+import { PageTransitionProvider } from "./cinematic/PageTransition"
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -92,7 +93,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           normally underneath it while the loader plays on top.
         */}
         <LoaderController />
-        {children}
+        <PageTransitionProvider>
+          {children}
+        </PageTransitionProvider>
       </body>
     </html>
   )

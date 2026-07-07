@@ -21,15 +21,27 @@ const TALOS_BRAND = {
   glow:      'rgba(56,102,65,0.22)',
 }
 
+// Light-theme variant — same hues, darkened for contrast on the cream background
+const TALOS_BRAND_LIGHT = {
+  primary: '#26452c',
+  secondary: '#3e692e',
+  tertiary: '#72893b',
+  bg: '#080c08',
+  bgLight: '#F8F3E6',
+  glow: 'rgba(56,102,65,0.22)',
+}
+
 export default function TalosCare() {
   const container = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
-  const brand = TALOS_BRAND
+  const brand = theme === 'dark' ? TALOS_BRAND : TALOS_BRAND_LIGHT
 
   useGSAP(() => {
     ScrollTrigger.getAll().forEach(t => t.kill())
+    // Arrived via the cinematic route transition? Hold the entrance until the veil lifts.
+    const td = typeof window !== 'undefined' && window.__ptActive ? 0.75 : 0
     const reduced = typeof window !== 'undefined'
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
@@ -38,11 +50,11 @@ export default function TalosCare() {
     }
     gsap.fromTo('.project-hero-title span',
       { yPercent: 110 },
-      { yPercent: 0, duration: 1.2, stagger: 0.04, ease: 'power4.out', delay: 0.1 }
+      { yPercent: 0, duration: 1.2, stagger: 0.04, ease: 'power4.out', delay: td + 0.1 }
     )
     gsap.fromTo('.project-fade-in',
       { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: 0.5 }
+      { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: td + 0.5 }
     )
     gsap.utils.toArray<HTMLElement>('.section-block').forEach(el => {
       gsap.fromTo(el,
@@ -57,7 +69,7 @@ export default function TalosCare() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden ${tr}`}
-      style={{ background: c.bg, color: c.text }}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
       <SiteNav c={c} projectName="Talos Care" />
@@ -147,7 +159,7 @@ export default function TalosCare() {
             href="https://github.com/GarvMalik/talos-app"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#5B9B43] hover:text-[#5B9B43] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
+            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent hover-accent-border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
             style={{ borderColor: c.border, color: c.textMuted }}
             aria-label="View source code on GitHub"
           >

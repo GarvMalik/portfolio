@@ -22,13 +22,22 @@ const CITYLOOP_BRAND = {
   glow:     'rgba(217,95,48,0.18)',
 }
 
+// Light-theme variant — same hues, darkened for contrast on the cream background
+const CITYLOOP_BRAND_LIGHT = {
+  primary: '#944121',
+  secondary: '#929893',
+  dark: '#6d2e16',
+  bg: '#0e0b09',
+  glow: 'rgba(217,95,48,0.18)',
+}
+
 export default function CityLoopPage() {
   const container = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
 
-  const brand = CITYLOOP_BRAND
+  const brand = theme === 'dark' ? CITYLOOP_BRAND : CITYLOOP_BRAND_LIGHT
 
   useGSAP(() => {
     // Compute reduced-motion inside useGSAP — safe on both client and server
@@ -66,7 +75,7 @@ export default function CityLoopPage() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
-      style={{ background: c.bg, color: c.text }}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
       <SiteNav c={c} projectName="CityLoop" />

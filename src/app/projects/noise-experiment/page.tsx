@@ -20,15 +20,26 @@ const NOISE_BRAND = {
   glow:     'rgba(232,184,75,0.15)',
 }
 
+// Light-theme variant — same hues, darkened for contrast on the cream background
+const NOISE_BRAND_LIGHT = {
+  primary: '#9e7d33',
+  secondary: '#33549e',
+  dark: '#120e00',
+  bg: '#0c0b08',
+  glow: 'rgba(232,184,75,0.15)',
+}
+
 export default function NoiseExperimentPage() {
   const container = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
-  const brand = NOISE_BRAND
+  const brand = theme === 'dark' ? NOISE_BRAND : NOISE_BRAND_LIGHT
 
   useGSAP(() => {
     ScrollTrigger.getAll().forEach(t => t.kill())
+    // Arrived via the cinematic route transition? Hold the entrance until the veil lifts.
+    const td = typeof window !== 'undefined' && window.__ptActive ? 0.75 : 0
     const reduced = typeof window !== 'undefined'
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
@@ -37,11 +48,11 @@ export default function NoiseExperimentPage() {
     }
     gsap.fromTo('.project-hero-title span',
       { yPercent: 110 },
-      { yPercent: 0, duration: 1.2, stagger: 0.04, ease: 'power4.out', delay: 0.1 }
+      { yPercent: 0, duration: 1.2, stagger: 0.04, ease: 'power4.out', delay: td + 0.1 }
     )
     gsap.fromTo('.project-fade-in',
       { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: 0.5 }
+      { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: td + 0.5 }
     )
     gsap.utils.toArray<HTMLElement>('.section-block').forEach(el => {
       gsap.fromTo(el,
@@ -56,7 +67,7 @@ export default function NoiseExperimentPage() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden ${tr}`}
-      style={{ background: c.bg, color: c.text }}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
       <SiteNav c={c} projectName="Noise Study" />

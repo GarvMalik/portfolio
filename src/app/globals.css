@@ -326,3 +326,26 @@ html {
   pointer-events: none;
   will-change: transform, opacity;
 }
+
+/* === PAGE TRANSITION ======================================================= */
+/* Stripe drift — direction per stripe via --pt-dir, pure transform */
+@keyframes pt-drift {
+  from { transform: translateX(calc(var(--pt-dir, 1) * -14px)); }
+  to   { transform: translateX(calc(var(--pt-dir, 1) *  14px)); }
+}
+
+/* === ACCESSIBLE HOVER ACCENT ==============================================
+   Links across the site set their resting color via inline style, which
+   silently defeats Tailwind hover: classes (inline style > stylesheet).
+   .hover-accent restores working hovers AND picks the right orange per
+   theme: #ff4d00 on dark, #c03000 on light (AA), via --accent-hover set
+   on each page's <main>. */
+.hover-accent {
+  transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hover-accent:hover {
+  color: var(--accent-hover, #ff4d00) !important;
+}
+.hover-accent-border:hover {
+  border-color: var(--accent-hover, #ff4d00) !important;
+}

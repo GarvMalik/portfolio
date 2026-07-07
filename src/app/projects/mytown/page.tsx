@@ -21,13 +21,22 @@ const MYTOWN_BRAND = {
   glow:      'rgba(255,132,75,0.15)',
 }
 
+// Light-theme variant — same hues, darkened for contrast on the cream background
+const MYTOWN_BRAND_LIGHT = {
+  primary: '#ad5a33',
+  secondary: '#3a71a0',
+  tertiary: '#1b1b41',
+  bg: '#0d1318',
+  glow: 'rgba(255,132,75,0.15)',
+}
+
 export default function MyTownPage() {
   const container = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
 
-  const brand = MYTOWN_BRAND
+  const brand = theme === 'dark' ? MYTOWN_BRAND : MYTOWN_BRAND_LIGHT
 
   useGSAP(() => {
     const reduced = typeof window !== 'undefined'
@@ -57,7 +66,7 @@ export default function MyTownPage() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
-      style={{ background: c.bg, color: c.text }}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
       <SiteNav c={c} projectName="MyTown" />

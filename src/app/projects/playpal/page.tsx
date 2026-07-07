@@ -21,13 +21,22 @@ const PLAYPAL_BRAND = {
   glow:     'rgba(41,120,255,0.20)',
 }
 
+// Light-theme variant — same hues, darkened for contrast on the cream background
+const PLAYPAL_BRAND_LIGHT = {
+  primary: '#1c52ad',
+  secondary: '#ad8305',
+  dark: '#013794',
+  bg: '#080c14',
+  glow: 'rgba(41,120,255,0.20)',
+}
+
 export default function PlayPalPage() {
   const container = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
 
-  const brand = PLAYPAL_BRAND
+  const brand = theme === 'dark' ? PLAYPAL_BRAND : PLAYPAL_BRAND_LIGHT
 
   useGSAP(() => {
     const reduced = typeof window !== 'undefined'
@@ -57,7 +66,7 @@ export default function PlayPalPage() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden selection:text-black ${tr}`}
-      style={{ background: c.bg, color: c.text }}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
       <SiteNav c={c} projectName="PlayPal" />

@@ -11,9 +11,17 @@ import {
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
-const BRAND = {
+const BRAND_DARK = {
   primary:   '#8B5CF6',   // violet — neuro/brain
   secondary: '#10B981',   // emerald — accuracy/success
+  bg:        '#08060f',
+  glow:      'rgba(139,92,246,0.12)',
+}
+
+// Light-theme variant — same hues, darkened for contrast on the cream background
+const BRAND_LIGHT = {
+  primary:   '#5f3fa7',
+  secondary: '#0b7e58',
   bg:        '#08060f',
   glow:      'rgba(139,92,246,0.12)',
 }
@@ -34,9 +42,12 @@ export default function EEGADHDPage() {
   const { theme, toggle } = useTheme()
   const c = T[theme]
   const tr = 'transition-colors duration-300'
+  const BRAND = theme === 'dark' ? BRAND_DARK : BRAND_LIGHT
 
   useGSAP(() => {
     ScrollTrigger.getAll().forEach(t => t.kill())
+    // Arrived via the cinematic route transition? Hold the entrance until the veil lifts.
+    const td = typeof window !== 'undefined' && window.__ptActive ? 0.75 : 0
     const reduced = typeof window !== 'undefined'
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
@@ -45,11 +56,11 @@ export default function EEGADHDPage() {
     }
     gsap.fromTo('.project-hero-title span',
       { yPercent: 110 },
-      { yPercent: 0, duration: 1.2, stagger: 0.04, ease: 'power4.out', delay: 0.1 }
+      { yPercent: 0, duration: 1.2, stagger: 0.04, ease: 'power4.out', delay: td + 0.1 }
     )
     gsap.fromTo('.project-fade-in',
       { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: 0.5 }
+      { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: td + 0.5 }
     )
     gsap.utils.toArray<HTMLElement>('.section-block').forEach(el => {
       gsap.fromTo(el,
@@ -64,7 +75,7 @@ export default function EEGADHDPage() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden ${tr}`}
-      style={{ background: c.bg, color: c.text }}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
       <SiteNav c={c} projectName="EEG ADHD" />
@@ -153,7 +164,7 @@ export default function EEGADHDPage() {
           <a
             href="/garv-malik-thesis-eeg-adhd.pdf"
             download
-            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#8B5CF6] hover:text-[#8B5CF6] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5CF6] rounded-sm"
+            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent hover-accent-border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5CF6] rounded-sm"
             style={{ borderColor: c.border, color: c.textMuted }}
             aria-label="Download B.Tech thesis PDF"
           >
@@ -494,7 +505,7 @@ export default function EEGADHDPage() {
           <a
             href="/garv-malik-thesis-eeg-adhd.pdf"
             download
-            className="inline-flex items-center gap-3 px-5 py-3 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#8B5CF6] hover:text-[#8B5CF6] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5CF6] rounded-sm flex-shrink-0"
+            className="inline-flex items-center gap-3 px-5 py-3 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent hover-accent-border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5CF6] rounded-sm flex-shrink-0"
             style={{ borderColor: c.border, color: c.textMuted }}
             aria-label="Download thesis PDF"
           >

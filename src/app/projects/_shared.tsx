@@ -196,7 +196,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
             key={href}
             href={href}
             onClick={() => setMenuOpen(false)}
-            className="text-[11vw] font-black uppercase tracking-tight leading-tight transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ff4d00] rounded hover:text-[#ff4d00]"
+            className="text-[11vw] font-black uppercase tracking-tight leading-tight transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ff4d00] rounded hover-accent"
             style={{
               color: c.text,
               transitionDelay: menuOpen ? `${idx * 40}ms` : '0ms',
@@ -218,7 +218,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
               rel="noopener noreferrer"
               aria-label={`${link.label} — opens in a new tab`}
               onClick={() => setMenuOpen(false)}
-              className="text-[9px] font-mono uppercase tracking-[0.25em] hover:text-[#ff4d00] transition-colors duration-200"
+              className="text-[9px] font-mono uppercase tracking-[0.25em] hover-accent transition-colors duration-200"
               style={{ color: c.textMuted }}
             >
               {link.label} ↗
@@ -265,7 +265,7 @@ export const HireCTA = ({ c }: { c: Tokens }) => (
     </div>
     <a
       href="mailto:thegarvmalik@gmail.com"
-      className="inline-flex items-center gap-3 px-5 py-3 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#ff4d00] hover:text-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+      className="inline-flex items-center gap-3 px-5 py-3 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent-border hover-accent transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
       style={{ borderColor: c.border, color: c.textMuted }}
     >
       thegarvmalik@gmail.com
@@ -287,10 +287,10 @@ export const ProjectNav = ({
     {prev ? (
       <Link
         href={prev.href}
-        className="flex items-center gap-3 text-[9px] uppercase font-mono tracking-[0.3em] hover:text-[#ff4d00] transition-colors duration-200 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
+        className="flex items-center gap-3 text-[9px] uppercase font-mono tracking-[0.3em] hover-accent transition-colors duration-200 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
         style={{ color: c.textMuted }}
       >
-        <span className="w-6 h-6 rounded-full border flex items-center justify-center group-hover:border-[#ff4d00] transition-colors" style={{ borderColor: c.border }} aria-hidden="true">
+        <span className="w-6 h-6 rounded-full border flex items-center justify-center group-hover-accent-border transition-colors" style={{ borderColor: c.border }} aria-hidden="true">
           <span className="text-[8px]">←</span>
         </span>
         {prev.label}
@@ -300,12 +300,12 @@ export const ProjectNav = ({
     {next && (
       <Link
         href={next.href}
-        className="flex items-center gap-3 text-[9px] uppercase font-mono tracking-[0.3em] hover:text-[#ff4d00] transition-colors duration-200 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
+        className="flex items-center gap-3 text-[9px] uppercase font-mono tracking-[0.3em] hover-accent transition-colors duration-200 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
         style={{ color: c.textMuted }}
         aria-label={`Next project: ${next.label}`}
       >
         {next.label}
-        <span className="w-6 h-6 rounded-full border flex items-center justify-center group-hover:border-[#ff4d00] transition-colors" style={{ borderColor: c.border }} aria-hidden="true">
+        <span className="w-6 h-6 rounded-full border flex items-center justify-center group-hover-accent-border transition-colors" style={{ borderColor: c.border }} aria-hidden="true">
           <span className="text-[8px]">→</span>
         </span>
       </Link>
@@ -471,7 +471,7 @@ export const LightboxImage = ({ src, alt, caption, children, className = '' }: {
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close image viewer"
-            className="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 rounded-full border flex items-center justify-center text-base transition-colors hover:border-[#ff4d00] hover:text-[#ff4d00]"
+            className="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 rounded-full border flex items-center justify-center text-base transition-colors hover-accent-border hover-accent"
             style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.85)' }}
           >
             ✕

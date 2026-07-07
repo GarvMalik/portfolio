@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useTheme, T } from './projects/_shared'
 import FluidBackground from './cinematic/FluidBackground'
 import { playHomepageReveal, REVEAL_EVENT } from './cinematic/HomepageReveal'
+import { usePageTransition } from './cinematic/PageTransition'
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
 
@@ -302,13 +303,15 @@ const DESKTOP_ILLUSTRATIONS: Record<number, React.ReactNode> = {
   ),
 }
 
-const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, surfaceColor, borderColor }: {
+const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, surfaceColor, borderColor, theme, onView }: {
   index: number, title: string, desc: string, tags: string[], accentColor: string,
   pageNum: string, showLabel: boolean, href: string, bgGradient: string,
-  videoSrc?: string, surfaceColor: string, borderColor: string
+  videoSrc?: string, surfaceColor: string, borderColor: string,
+  theme: 'dark' | 'light',
+  onView: (e: React.MouseEvent<HTMLAnchorElement>, href: string, accent: string) => void
 }) => (
   <article className="project-card w-screen h-full relative overflow-hidden flex flex-col justify-end p-6 md:p-16 group" aria-label={`Project: ${title}`}>
-    {showLabel && <div className="absolute top-10 left-10 text-[10px] uppercase font-mono italic text-[#ff4d00] tracking-widest z-10" aria-hidden="true">/ STUFF I BUILT / {pageNum}</div>}
+    {showLabel && <div className="absolute top-10 left-10 text-[10px] uppercase font-mono italic tracking-widest z-10" style={{ color: theme === 'dark' ? '#ff4d00' : '#c03000' }} aria-hidden="true">/ STUFF I BUILT / {pageNum}</div>}
     <div className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none z-0 opacity-[0.04]" style={{ color: 'gray', fontVariantNumeric: 'tabular-nums' }} aria-hidden="true">0{index + 1}</div>
 
     <div className="absolute inset-0" style={{ background: bgGradient, opacity: 0.70 }} aria-hidden="true" />
@@ -334,6 +337,7 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
         {/* Mobile-only inline button — hidden on desktop */}
         <Link
           href={href}
+          onClick={e => onView(e, href, accentColor)}
           className="md:hidden flex items-center gap-3 z-20 group/link rounded-full self-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]"
           aria-label={`View project: ${title}`}
         >
@@ -348,6 +352,7 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
     {/* Desktop-only button — absolute bottom-right, exactly like the original design */}
     <Link
       href={href}
+      onClick={e => onView(e, href, accentColor)}
       className="hidden md:flex absolute bottom-12 right-12 items-center gap-3 z-20 group/link rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]"
       aria-label={`View project: ${title}`}
     >
@@ -362,7 +367,18 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
 /* ── Main page ───────────────────────────────────────────────────────────── */
 export default function Home() {
   const container = useRef<HTMLDivElement>(null)
+  const { startPageTransition } = usePageTransition()
   const [isMobile, setIsMobile] = useState(false)
+
+  // ── View Project → cinematic route transition ──
+  // Plain left-clicks get the curtain; modified clicks (new tab, etc.)
+  // keep native link behaviour. Frame 1: 120ms press feedback first.
+  const onViewProject = (e: React.MouseEvent<HTMLAnchorElement>, href: string, accent: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+    e.preventDefault()
+    gsap.to(e.currentTarget, { scale: 0.97, duration: 0.12, ease: 'power1.out', yoyo: true, repeat: 1 })
+    startPageTransition(href, accent)
+  }
   // Set isMobile after mount (useEffect is client-only — safe for SSR/hydration)
   // Also handles orientation changes
   useEffect(() => {
@@ -801,7 +817,7 @@ export default function Home() {
   ]
 
   return (
-    <main ref={container} className="overflow-x-hidden selection:bg-[#ff4d00] selection:text-black transition-colors duration-300" style={{ background: c.bg, color: c.text }}>
+    <main ref={container} className="overflow-x-hidden selection:bg-[#ff4d00] selection:text-black transition-colors duration-300" style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}>
       {/* WCAG 2.4.1 Bypass Blocks — skip link */}
       <a href="#main-content" className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[99999] focus-visible:px-4 focus-visible:py-2 focus-visible:bg-[#ff4d00] focus-visible:text-black focus-visible:font-mono focus-visible:text-sm focus-visible:uppercase focus-visible:tracking-widest focus-visible:rounded">
         Skip to main content
@@ -952,7 +968,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${link.label} — opens in a new tab`}
-              className="text-[9px] font-mono uppercase tracking-[0.25em] hover:text-[#ff4d00] transition-colors duration-200"
+              className="text-[9px] font-mono uppercase tracking-[0.25em] hover-accent transition-colors duration-200"
               style={{ color: c.textMuted }}
               onClick={() => setMenuOpen(false)}
             >
@@ -1035,7 +1051,7 @@ export default function Home() {
             href="/garv-malik-cv.pdf"
             download
             data-cursor-hover
-            className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:border-[#ff4d00] hover:text-[#ff4d00] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent-border hover-accent transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
             style={{ borderColor: theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.22)', color: c.textMuted }}
             aria-label="Download Garv Malik CV PDF"
           >
@@ -1314,7 +1330,7 @@ export default function Home() {
                     <li key={tag} className="px-2 py-1 border text-[8px] font-bold uppercase font-mono tracking-widest" style={{ borderColor: c.border, color: theme === 'dark' ? 'rgba(230,226,211,0.6)' : c.textFaint }}>{tag}</li>
                   ))}
                 </ul>
-                <Link href={p.href} className="inline-flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]" aria-label={`View project: ${p.title}`}>
+                <Link href={p.href} onClick={e => onViewProject(e, p.href, p.accentColor)} className="inline-flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00]" aria-label={`View project: ${p.title}`}>
                   <div className="w-9 h-9 rounded-full border border-[#ff4d00] flex items-center justify-center">
                     <span className="text-sm" style={{ color: c.accentText }}>→</span>
                   </div>
@@ -1326,7 +1342,7 @@ export default function Home() {
         </div>
       ) : (
         <div id="projects" className="horizontal-section flex w-[500vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
-          {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} />)}
+          {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} theme={theme} onView={onViewProject} />)}
         </div>
       )}
 
@@ -1401,7 +1417,7 @@ export default function Home() {
           <a
             href="mailto:thegarvmalik@gmail.com"
             data-cursor-hover
-            className="footer-link inline-block mt-4 text-[10px] font-mono uppercase tracking-[0.25em] hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1 px-1"
+            className="footer-link inline-block mt-4 text-[10px] font-mono uppercase tracking-[0.25em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1 px-1"
             style={{ color: c.textFaint }}
           >
             or open mail app ↗
@@ -1419,7 +1435,7 @@ export default function Home() {
             ].map(link => (
               <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" data-cursor-hover
                 aria-label={`${link.label} — opens in a new tab`}
-                className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
+                className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
                 style={{ color: c.textMuted }}>
                 {link.display}
                 <span className="fl-underline" aria-hidden="true" />
@@ -1431,7 +1447,7 @@ export default function Home() {
               download
               data-cursor-hover
               aria-label="Download CV PDF"
-              className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
+              className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
               style={{ color: c.textMuted }}
             >
               CV ↓
