@@ -74,7 +74,21 @@ export default function LoaderController() {
       ? buildQuickFade(common)
       : buildCinematicTimeline({ ...common, veil: veilRef.current! })
 
-    return () => { release(); tl.kill() }
+    // If the tab is hidden (rAF frozen) skip straight to the finished
+    // state — never leave a visitor stuck behind the veil.
+    const onVis = () => {
+      if (document.visibilityState !== 'hidden') return
+      tl.kill()
+      common.onReveal()
+      common.onComplete()
+    }
+    document.addEventListener('visibilitychange', onVis)
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVis)
+      release()
+      tl.kill()
+    }
   }, [gone, returnVisit])
 
   if (gone) return null

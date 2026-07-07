@@ -70,6 +70,7 @@ export default function NoiseExperimentPage() {
       style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
+      <h1 className="sr-only">Effect of Environmental Noise on Reaction Time — experimental research study by Garv Malik.</h1>
       <SiteNav c={c} projectName="Noise Study" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

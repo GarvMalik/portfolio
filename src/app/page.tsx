@@ -310,7 +310,7 @@ const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel
   theme: 'dark' | 'light',
   onView: (e: React.MouseEvent<HTMLAnchorElement>, href: string, accent: string) => void
 }) => (
-  <article className="project-card w-screen h-full relative overflow-hidden flex flex-col justify-end p-6 md:p-16 group" aria-label={`Project: ${title}`}>
+  <article className="project-card w-screen flex-shrink-0 h-full relative overflow-hidden flex flex-col justify-end p-6 md:p-16 group" aria-label={`Project: ${title}`}>
     {showLabel && <div className="absolute top-10 left-10 text-[10px] uppercase font-mono italic tracking-widest z-10" style={{ color: theme === 'dark' ? '#ff4d00' : '#c03000' }} aria-hidden="true">/ STUFF I BUILT / {pageNum}</div>}
     <div className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none z-0 opacity-[0.04]" style={{ color: 'gray', fontVariantNumeric: 'tabular-nums' }} aria-hidden="true">0{index + 1}</div>
 
@@ -840,7 +840,7 @@ export default function Home() {
         <a
           href="#main-content"
           onClick={e => { e.preventDefault(); document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' }) }}
-          className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded"
+          className="text-[9px] uppercase font-mono italic tracking-[0.25em] text-[#ff4d00] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-2"
           aria-label="Garv Malik — scroll to top"
         >
           / Garv Malik
@@ -968,7 +968,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${link.label} — opens in a new tab`}
-              className="text-[9px] font-mono uppercase tracking-[0.25em] hover-accent transition-colors duration-200"
+              className="text-[9px] font-mono uppercase tracking-[0.25em] hover-accent transition-colors duration-200 py-2.5 px-1"
               style={{ color: c.textMuted }}
               onClick={() => setMenuOpen(false)}
             >
@@ -1041,7 +1041,7 @@ export default function Home() {
           <a
             href="mailto:thegarvmalik@gmail.com"
             data-cursor-hover
-            className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-[#ff4d00] hover:text-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
+            className="btn-fill-accent inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
             style={{ borderColor: c.accentText, color: c.accentText }}
             aria-label="Send email to Garv Malik"
           >
@@ -1341,7 +1341,7 @@ export default function Home() {
           ))}
         </div>
       ) : (
-        <div id="projects" className="horizontal-section flex w-[500vw] h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg }} role="region" aria-label="Selected projects — scroll to explore">
+        <div id="projects" className="horizontal-section flex h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg, width: `${projects.length * 100}vw` }} role="region" aria-label="Selected projects — scroll to explore">
           {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} theme={theme} onView={onViewProject} />)}
         </div>
       )}
@@ -1417,7 +1417,7 @@ export default function Home() {
           <a
             href="mailto:thegarvmalik@gmail.com"
             data-cursor-hover
-            className="footer-link inline-block mt-4 text-[10px] font-mono uppercase tracking-[0.25em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1 px-1"
+            className="footer-link inline-block mt-4 text-[10px] font-mono uppercase tracking-[0.25em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
             style={{ color: c.textFaint }}
           >
             or open mail app ↗

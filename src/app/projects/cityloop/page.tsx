@@ -78,6 +78,7 @@ export default function CityLoopPage() {
       style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
+      <h1 className="sr-only">CityLoop Discovery — mood-based city discovery app. UX/UI design case study by Garv Malik.</h1>
       <SiteNav c={c} projectName="CityLoop" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

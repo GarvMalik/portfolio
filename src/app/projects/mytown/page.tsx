@@ -69,6 +69,7 @@ export default function MyTownPage() {
       style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
+      <h1 className="sr-only">MyTown Relocation — service design for international students in Finland. Case study by Garv Malik.</h1>
       <SiteNav c={c} projectName="MyTown" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

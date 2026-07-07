@@ -78,6 +78,7 @@ export default function EEGADHDPage() {
       style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
+      <h1 className="sr-only">EEG-based ADHD Detection with CNNs — machine learning thesis by Garv Malik.</h1>
       <SiteNav c={c} projectName="EEG ADHD" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 

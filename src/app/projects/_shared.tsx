@@ -91,7 +91,7 @@ export const ThemeToggle = ({
   <button
     onClick={toggle}
     aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-    className="fixed bottom-6 right-6 z-[10001] w-10 h-10 rounded-full border flex items-center justify-center transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
+    className="fixed bottom-6 right-6 z-[10001] w-12 h-12 rounded-full border flex items-center justify-center transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
     style={{ background: c.toggleBg, borderColor: 'rgba(255,77,0,0.35)' }}
   >
     {theme === 'dark' ? (
@@ -152,7 +152,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
       >
         <Link
           href="/"
-          className="text-[9px] uppercase font-mono italic tracking-[0.25em] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
+          className="text-[9px] uppercase font-mono italic tracking-[0.25em] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-2"
           style={{ color: c.accentText }}
         >
           / Garv Malik {projectName ? `/ ${projectName}` : '/ Vol. 1'}
@@ -218,7 +218,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
               rel="noopener noreferrer"
               aria-label={`${link.label} — opens in a new tab`}
               onClick={() => setMenuOpen(false)}
-              className="text-[9px] font-mono uppercase tracking-[0.25em] hover-accent transition-colors duration-200"
+              className="text-[9px] font-mono uppercase tracking-[0.25em] hover-accent transition-colors duration-200 py-2.5 px-1"
               style={{ color: c.textMuted }}
             >
               {link.label} ↗

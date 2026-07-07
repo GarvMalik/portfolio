@@ -87,7 +87,7 @@ function TransitionOverlay({ job, rootRef }: { job: TransitionJob; rootRef: Reac
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[9999] overflow-hidden"
+      className="fixed inset-0 z-[20000] overflow-hidden"
       style={{ transform: 'translateY(100%)' }}
       aria-hidden="true"
     >
@@ -156,7 +156,23 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
       setJob(null)
     }
 
-    const tl = gsap.timeline()
+    let done = false
+    const tl = gsap.timeline({ onComplete: () => { done = true } })
+
+    // rAF stops in hidden tabs, freezing GSAP mid-curtain with scroll
+    // locked. If the tab hides — or 8s pass without completing — jump
+    // straight to the destination and clean up.
+    const fastForward = () => {
+      if (done) return
+      done = true
+      tl.kill()
+      router.push(job.route)
+      finish()
+    }
+    const onVis = () => { if (document.visibilityState === 'hidden') fastForward() }
+    document.addEventListener('visibilitychange', onVis)
+    const hardStop = setTimeout(fastForward, 8000)
+
     tl.to(root, { yPercent: 90, duration: 0.2, ease: 'power2.out' }, 0.15)
       .to(root, { yPercent: 0, duration: 0.35, ease: 'power3.inOut' }, 0.35)
       .call(() => router.push(job.route), [], 0.72)
@@ -168,7 +184,12 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
       .to(q('.pt-edge'), { opacity: 0, duration: 0.35, ease: 'power2.inOut' }, 2.30)
       .call(finish, [], 2.65)
 
-    return () => { tl.kill(); finish() }
+    return () => {
+      document.removeEventListener('visibilitychange', onVis)
+      clearTimeout(hardStop)
+      tl.kill()
+      finish()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job])
 

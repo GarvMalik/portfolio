@@ -72,6 +72,7 @@ export default function TalosCare() {
       style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
     >
       <SkipLink />
+      <h1 className="sr-only">Talos Care — conversational AI medical pre-screening agent. Case study by Garv Malik.</h1>
       <SiteNav c={c} projectName="Talos Care" />
       <ThemeToggle theme={theme} toggle={toggle} c={c} />
 
