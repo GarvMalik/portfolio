@@ -13,10 +13,10 @@
  * prefers-reduced-motion freezes the drift via the global CSS rule —
  * the gradients remain as a static wash.
  */
-export default function FluidBackground({ theme }: { theme: 'dark' | 'light' }) {
+export default function FluidBackground({ theme, slow = false }: { theme: 'dark' | 'light'; slow?: boolean }) {
   return (
     <div
-      className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${theme === 'light' ? 'fluid-light' : ''}`}
+      className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${theme === 'light' ? 'fluid-light' : ''} ${slow ? 'fluid-slow' : ''}`}
       aria-hidden="true"
     >
       <div className="fluid-layer fluid-1" />

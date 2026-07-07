@@ -61,22 +61,30 @@ const ListRow = ({ label, value, borderColor, textColor, labelColor }: {
   </div>
 )
 
-/* ── Scramble/decode email (Sui footer style) ────────────────────────────────
- * On hover (and once on first reveal) every character shuffles through random
- * glyphs, then locks into the real text left → right. Unresolved chars glow
- * orange; resolved chars inherit the base color. */
-const ScrambleText = ({ text, color }: { text: string, color: string }) => {
-  const ref = useRef<HTMLDivElement>(null)
+/* ── Luminous email — the footer's hero interaction ──────────────────────────
+ * Reveal: Sui-style scramble/decode when scrolled into view (once).
+ * Hover: a travelling light sweeps across the glyphs (background-clip
+ *   text + background-position — compositor-friendly) while a soft glow
+ *   swells behind; on leave the glow fades slowly, never snaps.
+ * Click: copies the address — the glow briefly intensifies and the
+ *   "Copied" confirmation emerges out of it, then everything settles. */
+const LuminousEmail = ({ text, theme, c }: { text: string, theme: 'dark' | 'light', c: typeof T.dark }) => {
+  const btnRef  = useRef<HTMLButtonElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
+  const copiedRef = useRef<HTMLDivElement>(null)
+  const liveRef = useRef<HTMLSpanElement>(null)
   const rafRef = useRef(0)
   const runningRef = useRef(false)
+  const litOff = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [reduced, setReduced] = useState(false)
   useEffect(() => { setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches) }, [])
 
   const scramble = () => {
-    if (!ref.current || runningRef.current || reduced) return
+    if (!textRef.current || runningRef.current || reduced) return
     runningRef.current = true
     const GLYPHS = '#@$%&/<>[]{}=+*^?!;:0123456789XKWZ'
-    const spans = Array.from(ref.current.children) as HTMLElement[]
+    const spans = Array.from(textRef.current.children) as HTMLElement[]
     const start = performance.now()
     const dur = 950
     const step = (now: number) => {
@@ -103,25 +111,76 @@ const ScrambleText = ({ text, color }: { text: string, color: string }) => {
 
   // Run the decode once when the email first scrolls into view
   useEffect(() => {
-    if (!ref.current || reduced) return
+    if (!textRef.current || reduced) return
     const io = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) { scramble(); io.disconnect() }
     }, { threshold: 0.4 })
-    io.observe(ref.current)
+    io.observe(textRef.current)
     return () => { io.disconnect(); cancelAnimationFrame(rafRef.current) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced])
 
+  const onEnter = () => {
+    if (reduced) return
+    clearTimeout(litOff.current)
+    btnRef.current?.classList.add('lit')
+    if (glowRef.current) gsap.to(glowRef.current, { opacity: 0.8, scale: 1, duration: 0.6, ease: 'power2.out' })
+  }
+  const onLeave = () => {
+    if (reduced) return
+    // the glow lingers — light fades, never disappears instantly
+    if (glowRef.current) gsap.to(glowRef.current, { opacity: 0, duration: 1.1, ease: 'power2.inOut' })
+    litOff.current = setTimeout(() => btnRef.current?.classList.remove('lit'), 350)
+  }
+  const onCopy = async () => {
+    const email = text.toLowerCase()
+    try { await navigator.clipboard.writeText(email) }
+    catch { window.location.href = `mailto:${email}`; return }
+    if (liveRef.current) liveRef.current.textContent = 'Email address copied to clipboard'
+    if (reduced) return
+    if (glowRef.current) {
+      gsap.timeline()
+        .to(glowRef.current, { opacity: 1, scale: 1.12, duration: 0.25, ease: 'power2.out' })
+        .to(glowRef.current, { opacity: 0.5, scale: 1, duration: 0.9, ease: 'power2.inOut' })
+    }
+    if (copiedRef.current) {
+      gsap.timeline()
+        .fromTo(copiedRef.current,
+          { opacity: 0, y: 10, scale: 0.92, filter: 'blur(6px)' },
+          { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.45, ease: 'power4.out' })
+        .to(copiedRef.current, { opacity: 0, y: -6, duration: 0.6, ease: 'power2.in' }, '+=1.3')
+    }
+  }
+
   return (
-    <div
-      ref={ref}
-      onMouseEnter={scramble}
-      aria-hidden="true"
-      className="text-[6vw] md:text-[3.2vw] font-bold uppercase leading-none tracking-tighter flex flex-wrap"
-      style={{ color }}
+    <button
+      ref={btnRef}
+      type="button"
+      onClick={onCopy}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      data-cursor-hover
+      aria-label={`Copy email address ${text.toLowerCase()}`}
+      className="lum-email text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1 cursor-pointer"
     >
+      <div ref={glowRef} className="lum-glow" aria-hidden="true" />
+      <div ref={copiedRef} className="lum-copied font-mono text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: c.accentText }} aria-hidden="true">
+        Copied to clipboard ✓
+      </div>
+      <span ref={liveRef} role="status" aria-live="polite" className="sr-only" />
+      <div
+        ref={textRef}
+        aria-hidden="true"
+        className="lum-text text-[6vw] md:text-[3.2vw] font-bold uppercase leading-none tracking-tighter flex flex-wrap"
+        style={{
+          color: c.text,
+          '--lum-base': c.text,
+          '--lum-bright': theme === 'dark' ? '#fff3e8' : '#ff5a10',
+        } as React.CSSProperties}
+      >
       {text.split('').map((char, i) => <span key={i} className="inline-block">{char === ' ' ? '\u00A0' : char}</span>)}
-    </div>
+      </div>
+    </button>
   )
 }
 
@@ -485,6 +544,106 @@ export default function Home() {
       tl?.kill()
     }
   }, [])
+
+  // ── Footer motion surface — one connected interactive environment ──
+  // The cursor carries light: a bloom lags behind it (quickTo inertia),
+  // nearby links warm up by proximity, hovered zones take focus, and
+  // underlines grow from wherever the cursor actually entered the link.
+  useEffect(() => {
+    if (isMobile || reduced) return
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    const footer = document.querySelector<HTMLElement>('.footer-section')
+    if (!footer) return
+    const light = footer.querySelector<HTMLElement>('.footer-cursor-light')
+    const links = Array.from(footer.querySelectorAll<HTMLElement>('.footer-link'))
+    const zones = Array.from(footer.querySelectorAll<HTMLElement>('[data-zone]'))
+
+    // Cursor-carried light — interpolated, never directly mapped
+    const xTo = light ? gsap.quickTo(light, 'x', { duration: 0.7, ease: 'power3' }) : null
+    const yTo = light ? gsap.quickTo(light, 'y', { duration: 0.7, ease: 'power3' }) : null
+    let seeded = false
+    let raf = 0
+    let mx = 0, my = 0
+
+    const proximity = () => {
+      raf = 0
+      // nearby elements brighten — interaction radius well beyond the element
+      for (const l of links) {
+        const lr = l.getBoundingClientRect()
+        const fr = footer.getBoundingClientRect()
+        const d = Math.hypot(lr.left - fr.left + lr.width / 2 - mx, lr.top - fr.top + lr.height / 2 - my)
+        const p = Math.max(0, 1 - d / 320)
+        l.style.opacity = String(0.8 + p * 0.2)
+      }
+    }
+    const onMove = (e: MouseEvent) => {
+      const r = footer.getBoundingClientRect()
+      mx = e.clientX - r.left
+      my = e.clientY - r.top
+      if (light && !seeded) { gsap.set(light, { x: mx, y: my }); seeded = true }
+      xTo?.(mx); yTo?.(my)
+      if (!raf) raf = requestAnimationFrame(proximity)
+    }
+    const onEnter = () => { if (light) gsap.to(light, { opacity: 1, duration: 0.6, ease: 'power2.out' }) }
+    const onLeave = () => {
+      if (light) gsap.to(light, { opacity: 0, duration: 0.9, ease: 'power2.inOut' })
+      links.forEach(l => gsap.to(l, { opacity: 1, duration: 0.5, ease: 'power2.out' }))
+      zones.forEach(z => gsap.to(z, { opacity: 1, duration: 0.5, ease: 'power2.out' }))
+    }
+    footer.addEventListener('mousemove', onMove, { passive: true })
+    footer.addEventListener('mouseenter', onEnter)
+    footer.addEventListener('mouseleave', onLeave)
+
+    // Zone emphasis: hovered 100%, adjacent ~90%, rest ~80%
+    const zoneCleanups: Array<() => void> = []
+    zones.forEach((z, zi) => {
+      const on = () => zones.forEach((o, oi) => gsap.to(o, {
+        opacity: o === z ? 1 : Math.abs(oi - zi) === 1 ? 0.9 : 0.8,
+        duration: 0.45, ease: 'power2.out',
+      }))
+      z.addEventListener('mouseenter', on)
+      zoneCleanups.push(() => z.removeEventListener('mouseenter', on))
+    })
+
+    // Per-link layers: underline grows from the cursor's entry point,
+    // gentle lift + tilt, and neighbors react just enough to connect
+    const linkCleanups: Array<() => void> = []
+    links.forEach((link, i) => {
+      const ul = link.querySelector<HTMLElement>('.fl-underline')
+      const neighbors = [links[i - 1], links[i + 1]].filter(Boolean) as HTMLElement[]
+      const enter = (e: MouseEvent) => {
+        if (ul) {
+          const lr = link.getBoundingClientRect()
+          ul.style.transformOrigin = `${((e.clientX - lr.left) / lr.width) * 100}% 50%`
+          gsap.to(ul, { scaleX: 1, duration: 0.45, ease: 'power4.out' })
+        }
+        gsap.to(link, { y: -3, rotate: 1.2, duration: 0.45, ease: 'power4.out' })
+        gsap.to(neighbors, { y: -1, duration: 0.5, ease: 'power3.out' })
+      }
+      const leave = () => {
+        // underline retracts toward its entry point — never disappears instantly
+        if (ul) gsap.to(ul, { scaleX: 0, duration: 0.4, ease: 'power2.inOut' })
+        gsap.to(link, { y: 0, rotate: 0, duration: 0.55, ease: 'power3.out' })
+        gsap.to(neighbors, { y: 0, duration: 0.5, ease: 'power3.out' })
+      }
+      link.addEventListener('mouseenter', enter)
+      link.addEventListener('mouseleave', leave)
+      linkCleanups.push(() => {
+        link.removeEventListener('mouseenter', enter)
+        link.removeEventListener('mouseleave', leave)
+      })
+    })
+
+    return () => {
+      footer.removeEventListener('mousemove', onMove)
+      footer.removeEventListener('mouseenter', onEnter)
+      footer.removeEventListener('mouseleave', onLeave)
+      zoneCleanups.forEach(fn => fn())
+      linkCleanups.forEach(fn => fn())
+      cancelAnimationFrame(raf)
+      links.forEach(l => { l.style.opacity = '' })
+    }
+  }, [isMobile, reduced])
 
   // GSAP scroll animations
   useGSAP(() => {
@@ -1223,19 +1382,35 @@ export default function Home() {
         </dl>
       </section>
 
-      {/* ── FOOTER ── */}
+      {/* ── FOOTER — interactive motion surface ──
+          The loader's motion language, settled into calm: slow fluid
+          layers idle underneath, a cursor-carried light with inertia,
+          zone emphasis, and layered link interactions. */}
       <footer id="contact" className="footer-section min-h-screen flex flex-col justify-center px-6 md:px-16 border-t relative overflow-hidden transition-colors duration-300 scroll-mt-[52px]" style={{ background: c.bg, borderColor: c.border }} aria-label="Contact and social links">
+        {/* Ambient layers — mesh drift 52s/61s, bloom 19s, noise */}
+        <FluidBackground theme={theme} slow />
+        {/* Cursor-carried light — GSAP quickTo gives it soft lag */}
+        <div className="footer-cursor-light" aria-hidden="true" />
+
         <div className="absolute top-16 left-6 md:left-10 text-[9px] uppercase font-mono italic tracking-[0.25em]" style={{ color: c.accentText }} aria-hidden="true">/ Open Channel / P. 009</div>
-        <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 text-[22vw] font-black leading-none select-none pointer-events-none" style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)' }} aria-hidden="true">+</div>
-        <div className="footer-email opacity-0 mt-20 mb-10">
-          {/* Issue 6 fix: label bumped from text-[9px] → text-[11px] for light mode readability */}
+        <div className="footer-plus absolute right-6 md:right-10 top-1/2 text-[22vw] font-black leading-none select-none pointer-events-none" style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)' }} aria-hidden="true">+</div>
+
+        <div className="footer-email opacity-0 mt-20 mb-10 relative z-10" data-zone="email">
           <p className="text-[11px] font-mono uppercase tracking-[0.25em] mb-6 font-bold" style={{ color: c.accentText }}>Open to UX/UI internships in Finland and Europe.</p>
-          <a href="mailto:thegarvmalik@gmail.com" data-cursor-hover aria-label="Send email to thegarvmalik@gmail.com" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1">
-            <ScrambleText text="THEGARVMALIK@GMAIL.COM" color={c.text} />
+          <LuminousEmail text="THEGARVMALIK@GMAIL.COM" theme={theme} c={c} />
+          <a
+            href="mailto:thegarvmalik@gmail.com"
+            data-cursor-hover
+            className="footer-link inline-block mt-4 text-[10px] font-mono uppercase tracking-[0.25em] hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1 px-1"
+            style={{ color: c.textFaint }}
+          >
+            or open mail app ↗
+            <span className="fl-underline" aria-hidden="true" />
+            <span className="fl-glow" aria-hidden="true" />
           </a>
         </div>
-        <div className="w-full h-[1px] mb-10" style={{ background: c.border }} aria-hidden="true" />
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div className="w-full h-[1px] mb-10 relative z-10" style={{ background: c.border }} aria-hidden="true" />
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10" data-zone="links">
           <nav className="flex flex-wrap gap-6 md:gap-8" aria-label="Social and professional links">
             {[
               { label: 'Github',   href: 'https://github.com/garvmalik',         display: 'Github ↗' },
@@ -1244,9 +1419,11 @@ export default function Home() {
             ].map(link => (
               <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" data-cursor-hover
                 aria-label={`${link.label} — opens in a new tab`}
-                className="text-[11px] font-mono uppercase tracking-[0.2em] transition-colors duration-200 hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1 border-b-2 border-transparent hover:border-[#ff4d00]"
+                className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
                 style={{ color: c.textMuted }}>
                 {link.display}
+                <span className="fl-underline" aria-hidden="true" />
+                <span className="fl-glow" aria-hidden="true" />
               </a>
             ))}
             <a
@@ -1254,15 +1431,17 @@ export default function Home() {
               download
               data-cursor-hover
               aria-label="Download CV PDF"
-              className="text-[11px] font-mono uppercase tracking-[0.2em] transition-colors duration-200 hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1 border-b-2 border-transparent hover:border-[#ff4d00]"
+              className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover:text-[#ff4d00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
               style={{ color: c.textMuted }}
             >
               CV ↓
+              <span className="fl-underline" aria-hidden="true" />
+              <span className="fl-glow" aria-hidden="true" />
             </a>
           </nav>
           <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: c.textMuted }}>© 2026 Garv Malik</p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 border-t py-1" style={{ borderColor: c.border }} aria-hidden="true">
+        <div className="absolute bottom-0 left-0 right-0 border-t py-1" style={{ borderColor: c.border }} data-zone="meta" aria-hidden="true">
           <Marquee items={['Open to Work', 'UX/UI Internships', 'Finland & Europe', 'Interaction Design', 'Research-Led', 'Tampere, Finland']} speed={30} textColor={c.textFaint} />
         </div>
       </footer>
