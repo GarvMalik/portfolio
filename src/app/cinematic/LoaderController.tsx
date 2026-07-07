@@ -44,7 +44,11 @@ export default function LoaderController() {
       setGone(true)
       return
     }
-    if (sessionStorage.getItem(SESSION_KEY)) setReturnVisit(true)
+    // ?cinematic forces a full replay (the loader is once-per-session
+    // by design, which makes it easy to think it "stopped working")
+    const force = new URLSearchParams(window.location.search).has('cinematic')
+    if (force) sessionStorage.removeItem(SESSION_KEY)
+    if (!force && sessionStorage.getItem(SESSION_KEY)) setReturnVisit(true)
   }, [])
 
   useEffect(() => {
