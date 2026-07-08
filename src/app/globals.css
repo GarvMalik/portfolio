@@ -37,6 +37,40 @@ body, p, li, dt, dd, blockquote, label, input, textarea, button, a {
   outline: none;
 }
 
+/* === HIGH CONTRAST (WCAG 1.4.11 / prefers-contrast) =======================
+   Scope, stated honestly: structural borders and muted text colors are
+   set via inline styles from the JS token map (T.dark/T.light in
+   _shared.tsx), so a CSS media query cannot safely strengthen them
+   without either an !important selector broad enough to also override
+   intentional brand-colored borders (a hack), or migrating every token
+   consumer to CSS custom properties (a real refactor, not done here).
+   What IS safely and fully covered below: a stronger universal focus
+   ring (the highest-value a11y win under this preference) and
+   underlines on inline links so color is never the only differentiator
+   (WCAG 1.4.1, Use of Color). */
+@media (prefers-contrast: more) {
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 4px;
+  }
+  main a:not(nav a):not(.footer-link):not(.hover-accent) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+/* === FORCED COLORS (Windows High Contrast Mode) ===========================
+   Decorative-only layers (living gradients, cursor-light, aurora blobs)
+   carry no content and must not obscure text or controls when the OS
+   overrides all page colors. */
+@media (forced-colors: active) {
+  .fluid-layer,
+  .footer-cursor-light,
+  .footer-plus {
+    display: none;
+  }
+}
+
 /* === SELECTION ============================================================= */
 ::selection {
   background-color: #ff4d00;
@@ -339,6 +373,9 @@ html {
   color: var(--accent-hover, #ff4d00) !important;
 }
 .hover-accent-border:hover {
+  border-color: var(--accent-hover, #ff4d00) !important;
+}
+.group:hover .group-hover-accent-border {
   border-color: var(--accent-hover, #ff4d00) !important;
 }
 

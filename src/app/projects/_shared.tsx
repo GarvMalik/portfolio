@@ -13,9 +13,51 @@
  *  NOTE: decorative #ff4d00 on light bg = 2.98:1 — only used with aria-hidden
  */
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+
+// ─── Focus trap ───────────────────────────────────────────────────────────────
+// Shared by the mobile nav overlay and the image lightbox (WCAG 2.4.3,
+// 2.1.2): while `active`, Tab/Shift+Tab cycle only within the container,
+// focus moves in on open, and returns to whatever triggered it on close.
+export function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>, active: boolean) {
+  useEffect(() => {
+    if (!active || !containerRef.current) return
+    const container = containerRef.current
+    const previouslyFocused = document.activeElement as HTMLElement | null
+
+    const focusables = () => Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE))
+      .filter(el => el.offsetParent !== null)   // skip anything hidden
+
+    // Move focus in — prefer the first focusable element so keyboard
+    // users land somewhere useful, not just on the container itself.
+    const first = focusables()[0]
+    first?.focus()
+
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      const els = focusables()
+      if (els.length === 0) return
+      const firstEl = els[0]
+      const lastEl = els[els.length - 1]
+      if (e.shiftKey && document.activeElement === firstEl) {
+        e.preventDefault()
+        lastEl.focus()
+      } else if (!e.shiftKey && document.activeElement === lastEl) {
+        e.preventDefault()
+        firstEl.focus()
+      }
+    }
+    container.addEventListener('keydown', onKeydown)
+    return () => {
+      container.removeEventListener('keydown', onKeydown)
+      previouslyFocused?.focus()
+    }
+  }, [active, containerRef])
+}
 
 // ─── Theme hook ───────────────────────────────────────────────────────────────
 export function useTheme() {
@@ -117,6 +159,8 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
   projectName?: string
 }) => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(menuRef, menuOpen)
 
   useEffect(() => {
     // Only attach Escape listener when menu is actually open — avoids
@@ -165,7 +209,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
                X requires translateY of 7.5px (line height + gap). */}
           <button
             className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={e => { e.currentTarget.focus(); setMenuOpen(o => !o) }}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
           >
@@ -179,8 +223,14 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
         </div>
       </nav>
 
-      {/* Mobile fullscreen overlay */}
+      {/* Mobile fullscreen overlay.
+          inert (not just aria-hidden) when closed: aria-hidden alone
+          hides content from screen readers but does NOT stop keyboard
+          Tab from reaching the invisible links inside — inert makes the
+          whole subtree genuinely unfocusable, matching what aria-hidden
+          implies. useFocusTrap takes over Tab-cycling while open. */}
       <div
+        ref={menuRef}
         className="md:hidden fixed inset-0 z-[49] flex flex-col justify-center items-start px-8 transition-all duration-300"
         style={{
           background: c.navBg,
@@ -190,6 +240,7 @@ export const SiteNav = ({ c, projectLinks, projectName }: {
           transform: menuOpen ? 'none' : 'translateY(-8px)',
         }}
         aria-hidden={!menuOpen}
+        inert={!menuOpen}
       >
         {defaultLinks.map(({ label, href }, idx) => (
           <Link
@@ -416,6 +467,8 @@ export const LightboxImage = ({ src, alt, caption, children, className = '' }: {
   className?: string
 }) => {
   const [open, setOpen] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, open)
 
   useEffect(() => {
     if (!open) return
@@ -433,7 +486,7 @@ export const LightboxImage = ({ src, alt, caption, children, className = '' }: {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={e => { e.currentTarget.focus(); setOpen(true) }}
         className={`block w-full text-left cursor-zoom-in relative group/zoom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] ${className}`}
         aria-label={`Enlarge image: ${alt}`}
       >
@@ -448,6 +501,7 @@ export const LightboxImage = ({ src, alt, caption, children, className = '' }: {
       </button>
       {open && createPortal(
         <div
+          ref={dialogRef}
           className="fixed inset-0 z-[99990] flex flex-col items-center justify-center p-4 md:p-10"
           style={{ background: 'rgba(3,3,3,0.94)' }}
           onClick={() => setOpen(false)}

@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import Link from 'next/link'
 // Fix: removed duplicate useTheme and T — now imported from _shared
-import { useTheme, T } from './projects/_shared'
+import { useTheme, T, ThemeToggle, useFocusTrap } from './projects/_shared'
 import FluidBackground from './cinematic/FluidBackground'
 import { playHomepageReveal, REVEAL_EVENT } from './cinematic/HomepageReveal'
 import { usePageTransition } from './cinematic/PageTransition'
@@ -160,7 +160,6 @@ const LuminousEmail = ({ text, theme, c }: { text: string, theme: 'dark' | 'ligh
       onClick={onCopy}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      data-cursor-hover
       aria-label={`Copy email address ${text.toLowerCase()}`}
       className="lum-email text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff4d00] rounded py-1 cursor-pointer"
     >
@@ -190,29 +189,6 @@ const LuminousEmail = ({ text, theme, c }: { text: string, theme: 'dark' | 'ligh
  * WCAG 2.4.7: focus-visible ring
  * WCAG 2.5.5: 48×48px touch target
  */
-const ThemeToggle = ({ theme, toggle, bg, fg }: { theme: 'dark' | 'light', toggle: () => void, bg: string, fg: string }) => (
-  <button
-    onClick={toggle}
-    aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-    className="fixed bottom-6 right-6 z-[10001] w-12 h-12 rounded-full border flex items-center justify-center transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00]"
-    style={{ background: bg, borderColor: 'rgba(255,77,0,0.45)' }}
-  >
-    {theme === 'dark' ? (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={fg} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    ) : (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={fg} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-    )}
-  </button>
-)
-
 /* ── Project card ────────────────────────────────────────────────────────────
  * FIX: Changed from <div> to <article> (WCAG 1.3.1 — self-contained content)
  * FIX: Tags use <ul>/<li> (WCAG 1.3.1)
@@ -392,6 +368,8 @@ export default function Home() {
   
   // Navigation State from page (2).tsx
   const [menuOpen, setMenuOpen] = useState(false)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(mobileMenuRef, menuOpen)
   const [activeSection, setActiveSection] = useState('main-content')
   
   const { theme, toggle } = useTheme()
@@ -823,7 +801,7 @@ export default function Home() {
         Skip to main content
       </a>
 
-      <ThemeToggle theme={theme} toggle={toggle} bg={c.toggleBg} fg={c.toggleFg} />
+      <ThemeToggle theme={theme} toggle={toggle} c={c} />
 
       {/* ── NAVIGATION ──────────────────────────────────────────────────── */}
       <nav
@@ -891,7 +869,7 @@ export default function Home() {
                X requires translateY of 7.5px (line height + gap). */}
           <button
             className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded"
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={e => { e.currentTarget.focus(); setMenuOpen(o => !o) }}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
           >
@@ -921,8 +899,13 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Mobile fullscreen menu overlay */}
+      {/* Mobile fullscreen menu overlay.
+          inert (not just aria-hidden) when closed: aria-hidden alone
+          hides content from screen readers but does not stop keyboard
+          Tab from reaching the invisible links inside — inert makes the
+          subtree genuinely unfocusable. useFocusTrap cycles Tab while open. */}
       <div
+        ref={mobileMenuRef}
         className="md:hidden fixed inset-0 z-[49] flex flex-col justify-center items-start px-8 transition-all duration-300"
         style={{
           background: c.navBg,
@@ -931,6 +914,7 @@ export default function Home() {
           transform: menuOpen ? 'none' : 'translateY(-8px)',
         }}
         aria-hidden={!menuOpen}
+        inert={!menuOpen}
       >
         {[
           { label: 'Home',    id: 'main-content' },
@@ -1040,7 +1024,6 @@ export default function Home() {
         <div className="cine-cta relative z-10 flex flex-wrap items-center gap-4 mt-5 mb-2">
           <a
             href="mailto:thegarvmalik@gmail.com"
-            data-cursor-hover
             className="btn-fill-accent inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
             style={{ borderColor: c.accentText, color: c.accentText }}
             aria-label="Send email to Garv Malik"
@@ -1050,7 +1033,6 @@ export default function Home() {
           <a
             href="/garv-malik-cv.pdf"
             download
-            data-cursor-hover
             className="inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent-border hover-accent transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded-sm"
             style={{ borderColor: theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.22)', color: c.textMuted }}
             aria-label="Download Garv Malik CV PDF"
@@ -1416,7 +1398,6 @@ export default function Home() {
           <LuminousEmail text="THEGARVMALIK@GMAIL.COM" theme={theme} c={c} />
           <a
             href="mailto:thegarvmalik@gmail.com"
-            data-cursor-hover
             className="footer-link inline-block mt-4 text-[10px] font-mono uppercase tracking-[0.25em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
             style={{ color: c.textFaint }}
           >
@@ -1433,7 +1414,7 @@ export default function Home() {
               { label: 'LinkedIn', href: 'https://linkedin.com/in/thegarvmalik', display: 'LinkedIn ↗' },
               { label: 'Behance',  href: 'https://www.behance.net/garvmalik',    display: 'Behance ↗' },
             ].map(link => (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" data-cursor-hover
+              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer"
                 aria-label={`${link.label} — opens in a new tab`}
                 className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
                 style={{ color: c.textMuted }}>
@@ -1445,7 +1426,6 @@ export default function Home() {
             <a
               href="/garv-malik-cv.pdf"
               download
-              data-cursor-hover
               aria-label="Download CV PDF"
               className="footer-link text-[11px] font-mono uppercase tracking-[0.2em] hover-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d00] rounded py-1.5 px-1"
               style={{ color: c.textMuted }}
