@@ -646,6 +646,19 @@ export default function Home() {
     // during the isMobile state flip after hydration.
     ScrollTrigger.getAll().forEach(t => t.kill())
 
+    // The desktop-only horizontal-scroll section pins #projects, which
+    // reparents it into a pin-spacer and sets inline width/transform.
+    // kill()'s default revert doesn't always fully clear this before the
+    // mobile stacked layout (same #projects id, reused DOM node across
+    // the isMobile ternary) re-renders — leaving a leftover 600vw width
+    // that made every project card balloon far past the viewport on
+    // phones (text appeared to run off the edge instead of wrapping).
+    // Explicit belt-and-suspenders cleanup, mobile-only so it never
+    // touches the desktop layout's own intentional width.
+    if (isMobile) {
+      gsap.set('#projects', { clearProps: 'width,transform,translate,rotate,scale' })
+    }
+
     if (reduced) {
       // Several hidden states are Tailwind classes, not inline styles —
       // clearProps can't reveal those, so set explicit visible values.
