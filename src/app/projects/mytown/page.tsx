@@ -299,10 +299,10 @@ export default function MyTownPage() {
           <SectionHeading num="07" title="Reflection" c={c} />
           <div className="max-w-2xl space-y-4">
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              This project changed how I think about design beyond interfaces. Coming from a computer science background, I initially approached the problem with a solution-first mindset. Through this course, I learned to slow down and focus on understanding why users struggle before designing features.
+              This project changed how I think about design beyond interfaces. Coming from a computer science background, I naturally reached for a solution-first mindset. This course taught me to slow down — to understand why students were struggling before deciding what to build.
             </p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              One key learning was the value of asking deeper questions. Students mentioned Google Maps and Telegram, but interviews revealed these choices were driven by trust and peer recommendations — helping us avoid designing unnecessary replacements.
+              The best lesson came from pushing one question further than felt necessary. Students mentioned Google Maps and Telegram, but the real story underneath was about trust and peer recommendations, not the tools themselves — which saved us from designing replacements nobody actually needed.
             </p>
           </div>
         </div>

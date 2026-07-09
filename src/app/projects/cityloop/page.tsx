@@ -259,10 +259,10 @@ export default function CityLoopPage() {
           <SectionHeading num="05" title="Reflection" c={c} />
           <div className="max-w-2xl space-y-4">
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              This project helped strengthen my ability to design with context rather than focusing only on individual screens. Working on CityLoop pushed me to think about how mood, weather, and time influence everyday decisions, especially in a Nordic environment.
+              CityLoop pushed me to design for context, not just screens — how mood, weather, and time of day quietly shape a decision that looks simple from the outside. Living somewhere with real Nordic weather made that easy to relate to.
             </p>
             <p className="font-mono text-sm leading-relaxed" style={{ color: c.textMuted }}>
-              I learned the importance of restraint in design — it was often more valuable to remove features or simplify interactions than to add more. CityLoop reinforced my interest in designing calm, human-centered interfaces that support real-life decisions without overwhelming users.
+              The biggest lesson was restraint. Most of our best iterations got better by cutting things, not adding them. I still think about that every time I'm tempted to bolt on one more filter "just in case."
             </p>
           </div>
         </div>
