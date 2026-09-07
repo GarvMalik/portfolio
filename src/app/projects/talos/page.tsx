@@ -69,7 +69,7 @@ export default function TalosCare() {
     <main
       ref={container}
       className={`min-h-screen overflow-x-hidden ${tr}`}
-      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText } as React.CSSProperties}
+      style={{ background: c.bg, color: c.text, '--accent-hover': c.accentText, '--brand-hover': brand.secondary } as React.CSSProperties}
     >
       <SkipLink />
       <h1 className="sr-only">Talos Care — conversational AI medical pre-screening agent. Case study by Garv Malik.</h1>
@@ -160,7 +160,7 @@ export default function TalosCare() {
             href="https://github.com/GarvMalik/talos-app"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover-accent hover-accent-border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
+            className="inline-flex items-center gap-3 px-5 py-2.5 border text-[10px] font-mono uppercase tracking-[0.2em] hover-brand hover-brand-border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
             style={{ borderColor: c.border, color: c.textMuted }}
             aria-label="View source code on GitHub"
           >

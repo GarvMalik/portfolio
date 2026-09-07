@@ -41,7 +41,7 @@ const Marquee = ({ items, speed = 40, reverse = false, textColor }: {
 
 /* ── Layered hero text ───────────────────────────────────────────────────── */
 const LayeredText = ({ text, className = '', color }: { text: string, className?: string, color: string }) => (
-  <span className={`flex flex-wrap ${className}`} aria-label={text} role="text">
+  <span className={`flex flex-wrap ${className}`}>
     {text.split('').map((char, i) => (
       <span key={i} className="hero-letter relative inline-flex justify-center overflow-hidden" style={{ width: char === ' ' ? '0.3em' : 'auto' }} aria-hidden="true">
         <span className="layered-bottom opacity-0" style={{ color }}>{char}</span>
@@ -1353,7 +1353,7 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-14 md:gap-20 items-center">
           <ul className="flex flex-col gap-4" aria-label="Credentials">
-            {['M.Sc. Human-Technology Interaction — Year 1', 'Tampere University, Finland', 'UX/UI Design · Research · Accessibility'].map(item => (
+            {['M.Sc. Human-Technology Interaction · 2024–2026', 'Tampere University, Finland', 'UX/UI Design · Research · Accessibility'].map(item => (
               <li key={item} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] flex-shrink-0" aria-hidden="true" />
                 <span className="text-[11px] font-mono uppercase tracking-[0.22em]" style={{ color: c.textMuted }}>{item}</span>

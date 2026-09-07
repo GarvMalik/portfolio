@@ -392,3 +392,23 @@ html {
   border-color: var(--accent-hover, #ff4d00) !important;
   color: #050505 !important;
 }
+
+/* === BRAND-COLORED HOVER (per-project buttons) =============================
+   Separate from .hover-accent on purpose. .hover-accent is the site-wide
+   orange used by shared chrome (nav, footer, ProjectNav, HireCTA).
+   .hover-brand is for buttons that belong to a single project's palette —
+   Talos's sage green, EEG's violet — which previously used dead
+   `hover:text-[#hex]` classes that inline styles silently overrode.
+   Each project page sets --brand-hover on its <main>; falls back to the
+   site accent so the utility is safe to use anywhere. */
+.hover-brand,
+.hover-brand-border {
+  transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hover-brand:hover {
+  color: var(--brand-hover, var(--accent-hover, #ff4d00)) !important;
+}
+.hover-brand-border:hover {
+  border-color: var(--brand-hover, var(--accent-hover, #ff4d00)) !important;
+}
