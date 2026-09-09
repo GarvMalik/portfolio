@@ -1,5 +1,6 @@
 "use client"
 import { useRef } from 'react'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -251,9 +252,11 @@ export default function TalosCare() {
                     className="overflow-hidden border"
                     style={{ width: 175, height: 380, borderColor: c.border }}
                   >
-                    <img
+                    <Image
                       src={`/talos/${screen.file}`}
                       alt={screen.label}
+                      width={175}
+                      height={380}
                       loading="lazy"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
                     />

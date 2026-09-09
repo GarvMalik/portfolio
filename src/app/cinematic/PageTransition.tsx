@@ -22,7 +22,7 @@
  * GSAP drives the timeline (site-wide motion runtime); stripes drift
  * via pure CSS transforms. Reduced motion skips straight to push().
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import gsap from 'gsap'
 
@@ -41,17 +41,33 @@ const Ctx = createContext<TransitionCtx>({ startPageTransition: () => {} })
 export const usePageTransition = () => useContext(Ctx)
 
 /* ── AnimatedStripeLayer — ~40 illuminated glass panels ─────────────────── */
+/**
+ * Stripe geometry is randomised once at module load rather than during
+ * render. react-hooks/purity (React 19) forbids impure calls like
+ * Math.random() in render, and doing it in an effect would just trade
+ * that for a set-state-in-effect. Module scope keeps the component pure.
+ *
+ * Safe from hydration mismatch: the overlay only mounts after a click, so
+ * AnimatedStripeLayer never renders on the server and its markup is never
+ * diffed against server HTML.
+ *
+ * Tradeoff: every transition now shares one stripe layout instead of
+ * re-rolling per transition — imperceptible in practice, since each
+ * curtain is a different brand color, the stripes drift on independent
+ * CSS delays, and only one is ever on screen at a time.
+ */
+const STRIPES = Array.from({ length: 40 }, (_, i) => ({
+  grow: 0.4 + Math.random() * 2.6,
+  mix: [0, 6, 14, 24, 38, 55, 75][(Math.random() * 7) | 0],
+  opacity: 0.35 + Math.random() * 0.6,
+  dur: 6 + Math.random() * 6,
+  dir: i % 2 === 0 ? 1 : -1,
+  delay: -(Math.random() * 12),
+  hot: Math.random() > 0.85,
+}))
+
 function AnimatedStripeLayer({ accent, base }: { accent: string; base: string }) {
-  // Client-only (mounts after click) so Math.random is hydration-safe
-  const stripes = useMemo(() => Array.from({ length: 40 }, (_, i) => ({
-    grow: 0.4 + Math.random() * 2.6,
-    mix: [0, 6, 14, 24, 38, 55, 75][(Math.random() * 7) | 0],
-    opacity: 0.35 + Math.random() * 0.6,
-    dur: 6 + Math.random() * 6,
-    dir: i % 2 === 0 ? 1 : -1,
-    delay: -(Math.random() * 12),
-    hot: Math.random() > 0.85,
-  })), [])
+  const stripes = STRIPES
   return (
     <div className="absolute inset-0 flex" aria-hidden="true">
       {stripes.map((s, i) => (

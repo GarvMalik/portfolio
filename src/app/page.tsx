@@ -279,10 +279,10 @@ const DESKTOP_ILLUSTRATIONS: Record<number, React.ReactNode> = {
   ),
 }
 
-const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, surfaceColor, borderColor, theme, onView }: {
+const ProjectCard = ({ index, title, desc, tags, accentColor, pageNum, showLabel, href, bgGradient, borderColor, theme, onView }: {
   index: number, title: string, desc: string, tags: string[], accentColor: string,
   pageNum: string, showLabel: boolean, href: string, bgGradient: string,
-  videoSrc?: string, surfaceColor: string, borderColor: string,
+  borderColor: string,
   theme: 'dark' | 'light',
   onView: (e: React.MouseEvent<HTMLAnchorElement>, href: string, accent: string) => void
 }) => (
@@ -758,7 +758,6 @@ export default function Home() {
       accentColor: '#D95F30',   // CityLoop terracotta
       pageNum: 'P. 004', showLabel: true, href: '/projects/cityloop',
       bgGradient: 'radial-gradient(ellipse at 30% 60%, #3d1a0e 0%, #1a0a05 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #2a1208 0%, transparent 60%)',
-      videoSrc: '',
     },
     {
       title: 'MyTown Relocation',
@@ -767,7 +766,6 @@ export default function Home() {
       accentColor: '#FF844B',   // MyTown orange
       pageNum: 'P. 005', showLabel: false, href: '/projects/mytown',
       bgGradient: 'radial-gradient(ellipse at 20% 70%, #2a1e18 0%, #1a1208 40%, transparent 70%), radial-gradient(ellipse at 75% 25%, #1e2535 0%, transparent 60%)',
-      videoSrc: '',
     },
     {
       title: 'PlayPal Community',
@@ -776,7 +774,6 @@ export default function Home() {
       accentColor: '#2978FF',   // PlayPal blue
       pageNum: 'P. 006', showLabel: false, href: '/projects/playpal',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #0a1530 0%, #050c1e 40%, transparent 70%), radial-gradient(ellipse at 70% 25%, #0d1828 0%, transparent 60%)',
-      videoSrc: '',
     },
     {
       title: 'Noise & Reaction',
@@ -785,7 +782,6 @@ export default function Home() {
       accentColor: '#E8B84B',   // Amber — research/academic
       pageNum: 'P. 007', showLabel: false, href: '/projects/noise-experiment',
       bgGradient: 'radial-gradient(ellipse at 30% 60%, #1e1500 0%, #0c0b08 40%, transparent 70%), radial-gradient(ellipse at 70% 30%, #0a0e1a 0%, transparent 60%)',
-      videoSrc: '',
     },
     {
       title: 'Talos Care',
@@ -794,7 +790,6 @@ export default function Home() {
       accentColor: '#5B9B43',   // Talos sage green
       pageNum: 'P. 008', showLabel: false, href: '/projects/talos',
       bgGradient: 'radial-gradient(ellipse at 25% 65%, #061208 0%, #030805 40%, transparent 70%), radial-gradient(ellipse at 72% 28%, #081a0a 0%, transparent 60%)',
-      videoSrc: '',
     },
     {
       title: 'EEG ADHD Thesis',
@@ -803,7 +798,6 @@ export default function Home() {
       accentColor: '#8B5CF6',   // violet — neuro/brain
       pageNum: 'P. 009', showLabel: false, href: '/projects/eeg-adhd',
       bgGradient: 'radial-gradient(ellipse at 22% 60%, #0d0818 0%, #060410 40%, transparent 70%), radial-gradient(ellipse at 75% 28%, #10082a 0%, transparent 60%)',
-      videoSrc: '',
     },
   ]
 
@@ -1337,7 +1331,7 @@ export default function Home() {
         </div>
       ) : (
         <div id="projects" className="horizontal-section flex h-screen overflow-hidden scroll-mt-[52px]" style={{ background: c.bg, width: `${projects.length * 100}vw` }} role="region" aria-label="Selected projects — scroll to explore">
-          {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} surfaceColor={c.surface} borderColor={c.border} theme={theme} onView={onViewProject} />)}
+          {projects.map((p, i) => <ProjectCard key={i} index={i} {...p} borderColor={c.border} theme={theme} onView={onViewProject} />)}
         </div>
       )}
 

@@ -85,26 +85,21 @@ export const T = {
   dark: {
     bg:          '#050505',
     surface:     '#0d0d0d',
-    surfaceHi:   '#161616',
     text:        '#e6e2d3',
     textMuted:   '#a09c8f',
     textFaint:   '#6b6760',
     accent:      '#ff4d00',
     // accentText: accessible orange for visible text — same as accent in dark (6.13:1)
     accentText:  '#ff4d00',
-    accentGreen: '#42d392',
     border:      'rgba(255,255,255,0.07)',
-    borderHover: 'rgba(255,77,0,0.40)',
     navBg:       'rgba(5,5,5,0.94)',
     toggleBg:    '#161616',
     toggleFg:    '#e6e2d3',
-    grain:       0.06,
     cardBg:      '#080808',
   },
   light: {
     bg:          '#f5f2ec',
     surface:     '#eae7df',
-    surfaceHi:   '#e0ddd5',
     text:        '#0d0c0a',
     textMuted:   '#4a4742',
     textFaint:   '#8a8680',
@@ -112,13 +107,10 @@ export const T = {
     // accentText: darker orange for visible text on light bg — 5.19:1 (WCAG AA ✓)
     // #ff4d00 on #f5f2ec is only 2.98:1 so we use #c03000 for text labels
     accentText:  '#c03000',
-    accentGreen: '#1a7a4a',
     border:      'rgba(0,0,0,0.10)',
-    borderHover: 'rgba(255,77,0,0.50)',
     navBg:       'rgba(245,242,236,0.92)',
     toggleBg:    '#dedad2',
     toggleFg:    '#0d0c0a',
-    grain:       0.020,
     cardBg:      '#eae7df',
   },
 }

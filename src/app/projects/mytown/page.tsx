@@ -7,7 +7,7 @@ import { useGSAP } from '@gsap/react'
 import {
   useTheme, T,
   ThemeToggle, SiteNav, BackButton, ProjectNav, LightboxImage,
-  Stat, SectionHeading, ProcessStep, Card, Tag, PersonaGrid, SkipLink,
+  Stat, SectionHeading, ProcessStep, Card, Tag, SkipLink,
 } from '../_shared'
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger)
